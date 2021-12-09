@@ -3,10 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './db/database.module';
-import { TenantConfig } from './entities/tenant.entity';
+import { TenantConfigModule } from './tenant-config/tenant.config.module';
 
 @Module({
-  imports: [DatabaseModule, TypeOrmModule.forFeature([TenantConfig])],
+  imports: [TenantConfigModule],
   controllers: [AppController],
   providers: [AppService],
 })

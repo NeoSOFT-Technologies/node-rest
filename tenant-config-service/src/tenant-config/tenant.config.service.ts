@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { TenantConfigDto } from "src/dto/tenant.config.dto";
-import { TenantConfig } from "src/entities/tenant.entity";
 import { Repository } from "typeorm";
+import { TenantConfigDto } from "./dto/tenant.config.dto";
+import { TenantConfig } from "./entities/tenant.entity";
 
 @Injectable()
 export class TenantConfigService{
@@ -13,6 +13,7 @@ export class TenantConfigService{
     }
 
     async getConfig(tenantId: number) {
+        console.log('Tenant ID: ', tenantId);
         return await this.configRepository.findOneOrFail({
           where: {
             tenantId: tenantId,

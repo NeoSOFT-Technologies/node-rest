@@ -33,6 +33,8 @@ export class RegistertenantService {
             createdDateTime: registered_tenant.createdDateTime,
         }
 
-        return this.client.send({ cmd: 'tenant-master' }, tenantDetails);
+        // return this.client.send({ cmd: 'tenant-master' }, tenantDetails);
+        this.client.emit({cmd: 'tenant-master'}, tenantDetails);
+        return {Message: "Tenant Registered Successfully"}
     }
 }

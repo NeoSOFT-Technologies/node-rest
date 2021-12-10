@@ -6,6 +6,8 @@ import { DatabaseModule } from './db/database.module';
 import { RegistertenantService } from './registertenant.service';
 import { Tenant } from './entity/tenant.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import config from './config';
 
 @Module({
   imports: [ClientsModule.register([
@@ -17,11 +19,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         port: 8847,
       },
     },
-    
-  ]), DatabaseModule,
+
+  ]),
+  ConfigModule.forRoot({
+    envFilePath: [`${process.cwd()}/../config/.env`],
+    isGlobal: true,
+    expandVariables: true,
+    load: config,
+  }),
+    DatabaseModule,
   TypeOrmModule.forFeature([Tenant])
   ],
   controllers: [RegistertenantController],
-  providers:[IdentifierService, RegistertenantService]
+  providers: [IdentifierService, RegistertenantService]
 })
 export class RegistertenantModule { }

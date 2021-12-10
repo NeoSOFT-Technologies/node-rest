@@ -1,18 +1,23 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { readFileSync } from 'fs';
-import { db_connection } from './create-database';
 import { ProvisionTenantDto } from './dto/provision.tenant.dto';
 import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
 import { SeedingDataeDto } from './dto/seeding-data.dto';
+import { ConfigService } from '@nestjs/config'
+import { getConnection } from './create-database';
 
 @Injectable()
 export class TenantprovisionService {
+    constructor(private config: ConfigService) {}
+
+    private db_connection = getConnection(this.config);
+    
     async createDatabase(tenant_name: ProvisionTenantDto) {
         const query = readFileSync(`${__dirname}/scripts/create-database.sql`).toString();
 
         return await new Promise((res, rej) => {
             if (query) {
-                db_connection.query(query, ['db-' + tenant_name.tenantName], (err) => {
+                this.db_connection.query(query, ['db-' + tenant_name.tenantName], (err) => {
                     if (err) {
                         rej(err)
                     }
@@ -37,14 +42,14 @@ export class TenantprovisionService {
         const query = readFileSync(`${__dirname}/scripts/create-table.sql`).toString();
 
         return await new Promise((res, rej) => {
-            db_connection.connect((err) => {
+            this.db_connection.connect((err) => {
                 if (err) {
                     throw err;
                 }
                 console.log('connected')
             });
 
-            db_connection.query(query, [dbName, tableName, columns[0].columnName], (err) => {
+            this.db_connection.query(query, [dbName, tableName, columns[0].columnName], (err) => {
                 if (err) {
                     rej(err)
                 }
@@ -65,7 +70,7 @@ export class TenantprovisionService {
         const query = readFileSync(`${__dirname}/scripts/seed-data.sql`).toString();
 
         return await new Promise((res, rej) => {
-            db_connection.query(query, [dbName, tableName, columns, values], (err) => {
+            this.db_connection.query(query, [dbName, tableName, columns, values], (err) => {
                 if (err) {
                     rej(err)
                 }
@@ -83,7 +88,7 @@ export class TenantprovisionService {
         const query = readFileSync(`${__dirname}/scripts/ping.sql`).toString();
 
         return await new Promise((res, rej) => {
-            db_connection.query(query, [dbName, dbName], (err, result) => {
+            this.db_connection.query(query, [dbName, dbName], (err, result) => {
                 if (err) {
                     rej(err)
                 }

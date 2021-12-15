@@ -1,5 +1,5 @@
 import { Controller } from "@nestjs/common";
-import { MessagePattern } from "@nestjs/microservices";
+import { EventPattern, MessagePattern } from "@nestjs/microservices";
 import { TenantDetailsDto } from "src/dto/tenant.details.dto";
 import { TenantMasterService } from "./tenant.master.service";
 
@@ -7,10 +7,11 @@ import { TenantMasterService } from "./tenant.master.service";
 export class TenantMasterController{
     constructor(private readonly tenantMasterService: TenantMasterService){};
 
-    @MessagePattern({ cmd: 'tenant-master' })
+    // @MessagePattern({ cmd: 'tenant-master' })
+    @EventPattern({ cmd: 'tenant-master' })
     async masterTenantService(tenantDetails: TenantDetailsDto) {
-        try {
-          return this.tenantMasterService.masterTenantService(tenantDetails);
+        try{ 
+           await this.tenantMasterService.masterTenantService(tenantDetails);
         } catch (e) {
           return e
         }

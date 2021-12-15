@@ -13,12 +13,11 @@ export class TenantConfigService{
     }
 
     async getConfig(tenantId: number) {
-        console.log('Tenant ID: ', tenantId);
         return await this.configRepository.findOneOrFail({
           where: {
             tenantId: tenantId,
           }
         });
-      }
+    }
 
 }

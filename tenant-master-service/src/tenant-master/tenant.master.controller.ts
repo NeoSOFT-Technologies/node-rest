@@ -1,6 +1,6 @@
 import { Controller } from "@nestjs/common";
-import { EventPattern, MessagePattern } from "@nestjs/microservices";
-import { TenantDetailsDto } from "src/dto/tenant.details.dto";
+import { EventPattern } from "@nestjs/microservices";
+import { TenantDetailsDto } from "./dto/tenant.details.dto";
 import { TenantMasterService } from "./tenant.master.service";
 
 @Controller()

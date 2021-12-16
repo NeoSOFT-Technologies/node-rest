@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { TenantConfig } from "src/tenant-config/entities/tenant.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TenantConfig } from "../entities/tenant.entity";
 
 @Module({
     imports:[TypeOrmModule.forRootAsync({

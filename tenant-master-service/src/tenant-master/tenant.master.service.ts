@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { TenantDetailsDto } from "src/dto/tenant.details.dto";
+import { TenantDetailsDto } from "./dto/tenant.details.dto";
 
 @Injectable()
 export class TenantMasterService{

@@ -6,7 +6,6 @@ import { TenantConfigService } from "./tenant.config.service";
 @Controller()
 export class TenantConfigController{
     constructor(private readonly tenantConfigService: TenantConfigService){}
-    // @MessagePattern({ cmd: 'set_config' })
     @EventPattern({cmd: 'set_config'})
     async setConfig(tenantconfig: TenantConfigDto) {
       await this.tenantConfigService.setConfig(tenantconfig);

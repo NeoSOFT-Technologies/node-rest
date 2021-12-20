@@ -4,17 +4,19 @@ import { TenantprovisionService } from './tenantprovision.service';
 import { ConfigModule } from '@nestjs/config';
 import config from './config';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
-    envFilePath: [`${process.cwd()}/../config/.env`],
-    isGlobal: true,
-    expandVariables: true,
-    load: config,
-  })
-],
+      envFilePath: [
+        `${process.cwd()}/../config/.env`,
+        `${process.cwd()}/config/.env`,
+      ],
+      isGlobal: true,
+      expandVariables: true,
+      load: config,
+    }),
+  ],
   controllers: [TenantprovisionController],
-  providers: [TenantprovisionService]
+  providers: [TenantprovisionService],
 })
 export class TenantprovisionModule {}

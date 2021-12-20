@@ -10,27 +10,30 @@ import { ConfigModule } from '@nestjs/config';
 import config from './config';
 
 @Module({
-  imports: [ClientsModule.register([
-    {
-      name: 'Tenant-Master',
-      transport: Transport.TCP,
-      options: {
-        host: '127.0.0.1',
-        port: 8847,
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'Tenant-Master',
+        transport: Transport.TCP,
+        options: {
+          host: '127.0.0.1',
+          port: 8847,
+        },
       },
-    },
-
-  ]),
-  ConfigModule.forRoot({
-    envFilePath: [`${process.cwd()}/../config/.env`],
-    isGlobal: true,
-    expandVariables: true,
-    load: config,
-  }),
+    ]),
+    ConfigModule.forRoot({
+      envFilePath: [
+        `${process.cwd()}/../config/.env`,
+        `${process.cwd()}/config/.env`,
+      ],
+      isGlobal: true,
+      expandVariables: true,
+      load: config,
+    }),
     DatabaseModule,
-  TypeOrmModule.forFeature([Tenant])
+    TypeOrmModule.forFeature([Tenant]),
   ],
   controllers: [RegistertenantController],
-  providers: [IdentifierService, RegistertenantService]
+  providers: [IdentifierService, RegistertenantService],
 })
-export class RegistertenantModule { }
+export class RegistertenantModule {}

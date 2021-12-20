@@ -1,9 +1,12 @@
-import { Transport } from "@nestjs/microservices";
+import { Transport } from '@nestjs/microservices';
+
+console.log(process.env.MICRO_SERVICE_HOST);
+console.log(typeof process.env.MICRO_SERVICE_PORT);
 
 export const transportOptions = {
-    transport: Transport.TCP,
-    options: {
-        host: '127.0.0.1',
-        port: 8875
-    }
-}
+  transport: Transport.TCP,
+  options: {
+    host: process.env.MICRO_SERVICE_HOST,
+    port: process.env.MICRO_SERVICE_PORT,
+  },
+};

@@ -5,9 +5,8 @@ import { AppService } from './app.service';
 import { TenantMasterModule } from './tenant-master/tenant.master.module';
 
 @Module({
-  imports: [TenantMasterModule,
-  ],
+  imports: [TenantMasterModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

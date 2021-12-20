@@ -1,6 +1,6 @@
 export class SeedingDataeDto {
-    dbName:string;
-    tableName: string;
-    columnNames:string[];
-    values: any[];
+  dbName: string;
+  tableName: string;
+  columnNames: string[];
+  values: any[];
 }

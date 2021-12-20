@@ -7,16 +7,17 @@ import { Tenant } from '../entity/tenant.entity';
 
 @Injectable()
 export class IdentifierService {
-    constructor(
-        @InjectRepository(Tenant) private readonly tenantRepository: Repository<Tenant>,
-    ) { }
+  constructor(
+    @InjectRepository(Tenant)
+    private readonly tenantRepository: Repository<Tenant>,
+  ) {}
 
-    async identify(tenant: IdentifyTenantDto):Promise<number> {
-            return this.tenantRepository.count({
-            where:{
-                tenantName: tenant.tenantName,
-                email: tenant.email
-            }
-        });
-    }
+  async identify(tenant: IdentifyTenantDto): Promise<number> {
+    return this.tenantRepository.count({
+      where: {
+        tenantName: tenant.tenantName,
+        email: tenant.email,
+      },
+    });
+  }
 }

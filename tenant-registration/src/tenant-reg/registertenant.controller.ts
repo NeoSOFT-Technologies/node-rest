@@ -6,15 +6,18 @@ import { RegistertenantService } from './registertenant.service';
 
 @Controller('registertenant')
 export class RegistertenantController {
-  constructor(private readonly tenantService: RegistertenantService, private readonly identifierService: IdentifierService) { }
+  constructor(
+    private readonly tenantService: RegistertenantService,
+    private readonly identifierService: IdentifierService,
+  ) {}
 
   @MessagePattern({ cmd: 'register-tenant' })
   async registerTenant(tenant: RegisterTenantDto) {
     try {
       if (await this.identifierService.identify(tenant)) {
         return {
-          'status': 'this tenant already exists'
-        }
+          status: 'this tenant already exists',
+        };
       }
       return await this.tenantService.register(tenant);
     } catch (e) {

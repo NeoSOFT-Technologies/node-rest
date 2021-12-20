@@ -1,6 +1,6 @@
 export class TenantDetailsDto {
-    tenantId:string;
-    tenantName: string;
-    description: string;
-    createdDateTime:string;
+  tenantId: string;
+  tenantName: string;
+  description: string;
+  createdDateTime: string;
 }

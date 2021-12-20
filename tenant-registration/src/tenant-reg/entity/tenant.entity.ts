@@ -1,4 +1,9 @@
-import { Column, Entity, ObjectIdColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ObjectIdColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Tenant {
@@ -16,8 +21,8 @@ export class Tenant {
   password: string;
 
   @Column()
-  description:string
+  description: string;
 
   @Column()
-  createdDateTime:string
+  createdDateTime: string;
 }

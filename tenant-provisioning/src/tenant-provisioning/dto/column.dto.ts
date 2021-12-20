@@ -1,4 +1,4 @@
 export class columnDto {
-    columnName: string;
-    columntype:any;
+  columnName: string;
+  columntype: any;
 }

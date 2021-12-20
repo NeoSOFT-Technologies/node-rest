@@ -1,4 +1,4 @@
 export class IdentifyTenantDto {
-    tenantName?: string;
-    email: string;
+  tenantName?: string;
+  email: string;
 }

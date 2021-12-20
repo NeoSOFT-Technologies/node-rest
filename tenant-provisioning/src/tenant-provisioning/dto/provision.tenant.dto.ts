@@ -1,3 +1,3 @@
 export class ProvisionTenantDto {
-    tenantName: string;
+  tenantName: string;
 }

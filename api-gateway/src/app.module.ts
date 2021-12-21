@@ -1,0 +1,38 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import config from './config';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: [`${process.cwd()}/src/config/env/.env`],
+      isGlobal: true,
+      expandVariables: true,
+      load: config,
+    }),
+    ClientsModule.register([
+      {
+        name: 'REGISTER_TENANT',
+        transport: Transport.TCP,
+        options: {
+          host: '127.0.0.1',
+          port: 8875,
+        },
+      },
+      {
+        name: 'GET_TENANT_CONFIG',
+        transport: Transport.TCP,
+        options: {
+          host: '127.0.0.1',
+          port: 8848,
+        },
+      },
+    ]),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}

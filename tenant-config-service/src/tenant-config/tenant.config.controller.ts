@@ -8,11 +8,19 @@ export class TenantConfigController {
   constructor(private readonly tenantConfigService: TenantConfigService) {}
   @EventPattern({ cmd: 'set_config' })
   async setConfig(tenantconfig: TenantConfigDto) {
-    await this.tenantConfigService.setConfig(tenantconfig);
+    try {
+      await this.tenantConfigService.setConfig(tenantconfig);
+    } catch (e) {
+      return e;
+    }
   }
 
   @MessagePattern({ cmd: 'get_config' })
   async getConfig(tenantId: number) {
-    return await this.tenantConfigService.getConfig(tenantId);
+    try {
+      return await this.tenantConfigService.getConfig(tenantId);
+    } catch (e) {
+      return e;
+    }
   }
 }

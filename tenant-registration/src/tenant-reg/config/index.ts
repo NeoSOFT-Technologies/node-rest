@@ -1,3 +1,4 @@
 import db from './database';
+import microservice from './micro-service';
 
-export default [db];
+export default [db, microservice];

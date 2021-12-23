@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import config from './config';
 import { TenantMasterController } from './tenant.master.controller';
 import { TenantMasterService } from './tenant.master.service';
 @Module({
@@ -27,6 +28,7 @@ import { TenantMasterService } from './tenant.master.service';
       envFilePath: [`${process.cwd()}/config/.env`],
       isGlobal: true,
       expandVariables: true,
+      load: config,
     }),
   ],
   controllers: [TenantMasterController],

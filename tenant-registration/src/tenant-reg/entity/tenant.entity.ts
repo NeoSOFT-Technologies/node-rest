@@ -8,7 +8,6 @@ import {
 @Entity()
 export class Tenant {
   @PrimaryGeneratedColumn()
-  // @ObjectIdColumn()
   id: string;
 
   @Column()

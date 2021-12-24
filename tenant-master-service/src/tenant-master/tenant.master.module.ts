@@ -11,7 +11,7 @@ import { TenantMasterService } from './tenant.master.service';
         name: 'TENANT_CONFIG_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: '127.0.0.1',
+          host: process.env.CLIENT2_HOST,
           port: 8848,
         },
       },
@@ -19,7 +19,7 @@ import { TenantMasterService } from './tenant.master.service';
         name: 'TENANT_PROVISION_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: '127.0.0.1',
+          host: process.env.CLIENT1_HOST,
           port: 8878,
         },
       },

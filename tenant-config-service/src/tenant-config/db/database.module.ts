@@ -6,14 +6,6 @@ import { TenantConfig } from '../entities/tenant.entity';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      // type: 'mysql',
-      // host: 'localhost',
-      // port: 3306,
-      // username: 'root',
-      // password: 'root',
-      // database:'rest_api',
-      // entities:[TenantConfig],
-      // synchronize: true,
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({

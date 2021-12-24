@@ -7,7 +7,6 @@ import { TenantMasterService } from './tenant.master.service';
 export class TenantMasterController {
   constructor(private readonly tenantMasterService: TenantMasterService) {}
 
-  // @MessagePattern({ cmd: 'tenant-master' })
   @EventPattern({ cmd: 'tenant-master' })
   async masterTenantService(tenantDetails: TenantDetailsDto) {
     try {

@@ -16,7 +16,7 @@ import config from './config';
         name: 'Tenant-Master',
         transport: Transport.TCP,
         options: {
-          host: '127.0.0.1',
+          host: process.env.CLIENT_HOST,
           port: 8847,
         },
       },

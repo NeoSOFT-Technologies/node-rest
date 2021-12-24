@@ -18,7 +18,7 @@ import config from './config';
         name: 'REGISTER_TENANT',
         transport: Transport.TCP,
         options: {
-          host: '127.0.0.1',
+          host: process.env.TENANT_REGISTRATION_HOST,
           port: 8875,
         },
       },
@@ -26,7 +26,7 @@ import config from './config';
         name: 'GET_TENANT_CONFIG',
         transport: Transport.TCP,
         options: {
-          host: '127.0.0.1',
+          host: process.env.TENANT_CONFIG_HOST,
           port: 8848,
         },
       },

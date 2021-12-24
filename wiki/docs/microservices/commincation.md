@@ -5,7 +5,7 @@
 A multi tenancy is a software architecture that implies centralized administration. It means that a single instance of an application serves many customers (called also tenants) and each one has his access to shared resources (Code, storage and networking).
 A good example would be Github where each user or organization has a separate work area. This concept is used while developing software that runs for different organizations. Gmail, Google Drive, Yahoo, and many others are perfect examples of multi-tenant applications, these all serve different content based on the user who logged in.
 
-![Single vs Multi Tenant](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/images/single-vs-multi-tenant.png?raw=true)
+![single-vs-multi-tenant](https://user-images.githubusercontent.com/87794374/147321261-b13a89de-2ed8-4828-87c2-74670e2bb2e2.png)
 
 ### The major advantages of multi tenant architecture are
 
@@ -42,5 +42,4 @@ The message style is useful when you need to exchange messages between various s
 This style is useful when we want to publish events without waiting for a response. In that case, we don't need overhead required by request-response for maintaining two channels. To create an event handler, we use the `@EventPattern()` decorator, which is imported from the `@nestjs/microservices` package.
 
 
-
-![Communication](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/images/microservices-communication.png?raw=true)
+![microservices-communication](https://user-images.githubusercontent.com/87794374/147321289-364dffc0-cea4-4525-9891-3522f28a5bd7.png)

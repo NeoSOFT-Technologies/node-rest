@@ -102,6 +102,15 @@ Please find below a detailed description of the app's folder structures:
 | .eslintrc                | Config settings for ESLint code style checking                                                |
 | .eslintignore            | Config settings for paths to exclude from linting                                             |
 
+### Microservices
+- [Tenant Registration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-registration.md)
+- Tenant Master Service
+- [Tenant Provisioning Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-provisioning.md)
+- Tenant Configuration Service
+
+### Consuming Microservices
+- [API Gateway](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/api-gateway.md)
+- [Understand Microservices Communication](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/communication.md)
 
 ## Contributing to this project
 

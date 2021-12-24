@@ -66,4 +66,4 @@ $ npm run start
 ```
 We can interact with the API through swagger by navigating to `http://localhost:5000/api/docs` while the application is running
 
-
+![swagger](https://user-images.githubusercontent.com/87794374/147329878-69b939c6-36d0-4cbc-a8de-73825aab51c2.PNG)

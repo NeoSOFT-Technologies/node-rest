@@ -111,6 +111,7 @@ Please find below a detailed description of the app's folder structures:
 ### Consuming Microservices
 - [API Gateway](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/api-gateway.md)
 - [Understand Microservices Communication](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/communication.md)
+- [Video Demonstration](https://user-images.githubusercontent.com/87794374/147342616-5b38b414-fda5-4c11-8ebc-40ebcb59cc5b.mp4)
 
 ## Contributing to this project
 

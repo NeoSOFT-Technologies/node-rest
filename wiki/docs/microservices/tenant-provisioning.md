@@ -28,10 +28,10 @@ export const getConnection = (config: ConfigService) => {
   return db_connection;
 };
 ``` 
-`host:  ` The hostname of the database to connect to
-`user:  ` The MySQL user to authenticate as
-`password:  ` The password of that MySQL user
-`multipleStatements:  ` Allow multiple mysql statements per query. (Default: false)
+`host:  ` The hostname of the database to connect to  
+`user:  ` The MySQL user to authenticate as  
+`password:  ` The password of that MySQL user  
+`multipleStatements:  ` Allow multiple mysql statements per query. (Default: false)  
 
 ### SQL script for creating database
 ```sql

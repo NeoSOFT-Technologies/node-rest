@@ -34,13 +34,13 @@ The database configuration which is going to store tenant details in `tenant_con
   ],
 })
 ```
-`type:  ` Database type. Must specify which database engine to use.
-`host:  ` Database host.
-`port:  ` Database host port. Default mysql port is 3306
-`username:  ` Database username.
-`password:  ` Database password.
-`database:  ` Database name.
-`entities:  ` Entities that maps with database table. It is shown below
+`type:  ` Database type. Must specify which database engine to use.  
+`host:  ` Database host.  
+`port:  ` Database host port. Default mysql port is 3306  
+`username:  ` Database username.  
+`password:  ` Database password.  
+`database:  ` Database name.  
+`entities:  ` Entities that maps with database table. It is shown below  
 
 ### Defining Tenant entity
 

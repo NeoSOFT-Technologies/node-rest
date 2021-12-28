@@ -111,7 +111,8 @@ export const transportOptions = (config: ConfigService) => {
   };
 };
 ```
-### Start the Microservice
+### Starting the microservice
+Since we have dockerised the microservice there is no need for explicitly starting the microservice. But if we need to start then we have to run the following command.
 ```bash
 $ npm run start
 ```

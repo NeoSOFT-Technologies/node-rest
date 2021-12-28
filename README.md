@@ -90,6 +90,12 @@ $ npm install
 # docker
 $ docker-compose up #--build
 ```
+> The output of the above command should be shown as below.
+
+![Docker-compose-up](https://user-images.githubusercontent.com/87708447/147568333-c7ea461b-05b2-43fc-92af-4090aadb3b44.png)
+
+
+
 ## Project Structure
 
 In a TypeScript project, it's best to have separate _source_  and _distributable_ files.
@@ -128,9 +134,9 @@ Please find below a detailed description of the app's folder structures:
 
 ### Microservices
 - [Tenant Registration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-registration.md)
-- Tenant Master Service
+- [Tenant Master Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-master-service.md)
 - [Tenant Provisioning Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-provisioning.md)
-- Tenant Configuration Service
+- [Tenant Configuration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-config-service.md)
 
 ### Consuming Microservices
 - [API Gateway](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/api-gateway.md)

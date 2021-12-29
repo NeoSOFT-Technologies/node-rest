@@ -12,7 +12,9 @@ export class TenantprovisionService {
 
   private db_connection = getConnection(this.config);
 
-  async createDatabase(tenant_name: ProvisionTenantDto) {
+  async createDatabase(
+    tenant_name: ProvisionTenantDto,
+  ): Promise<Record<string, any>> {
     const query = readFileSync(
       `${__dirname}/scripts/create-database.sql`,
     ).toString();
@@ -37,7 +39,9 @@ export class TenantprovisionService {
     });
   }
 
-  async createTable(table_details: ProvisionTenantTableDto) {
+  async createTable(
+    table_details: ProvisionTenantTableDto,
+  ): Promise<Record<string, any>> {
     const dbName = table_details.dbName;
     const tableName = table_details.tableName;
     const columns = table_details.columns;
@@ -69,7 +73,7 @@ export class TenantprovisionService {
       );
     });
   }
-  async seed(data: SeedingDataeDto) {
+  async seed(data: SeedingDataeDto): Promise<Record<string, any>> {
     const dbName = data.dbName;
     const tableName = data.tableName;
     const columns = data.columnNames;
@@ -93,7 +97,7 @@ export class TenantprovisionService {
       );
     });
   }
-  async ping(tenantData: ProvisionTenantDto) {
+  async ping(tenantData: ProvisionTenantDto): Promise<Record<string, any>> {
     const dbName = 'db-' + tenantData.tenantName;
 
     const query = readFileSync(`${__dirname}/scripts/ping.sql`).toString();

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IdentifierService } from '../../src/tenant-reg/identifier/identifier.service';
-import { RegistertenantController } from '../../src/tenant-reg/registertenant.controller';
-import { RegistertenantService } from '../../src/tenant-reg/registertenant.service';
+import { IdentifierService } from '@app/tenant-reg/identifier/identifier.service';
+import { RegistertenantController } from '@app/tenant-reg/registertenant.controller';
+import { RegistertenantService } from '@app/tenant-reg/registertenant.service';
 
 describe('Testing RegisTration MicroService Controller', () => {
   let registertenantController: RegistertenantController;

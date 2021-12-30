@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantprovisionController } from '../../src/tenant-provisioning/tenantprovision.controller';
-import { TenantprovisionService } from '../../src/tenant-provisioning/tenantprovision.service';
+import { TenantprovisionController } from '@app/tenant-provisioning/tenantprovision.controller';
+import { TenantprovisionService } from '@app/tenant-provisioning/tenantprovision.service';
 
 describe('Testing RegisTration MicroService Controller', () => {
   let tenantprovisionController: TenantprovisionController;

@@ -1,7 +1,7 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import config from '../../src/tenant-provisioning/config';
-import { TenantprovisionService } from '../../src/tenant-provisioning/tenantprovision.service';
+import config from '@app/tenant-provisioning/config';
+import { TenantprovisionService } from '@app/tenant-provisioning/tenantprovision.service';
 
 describe('Testing RegisTration MicroService Service', () => {
   let tenantprovisionService: TenantprovisionService;

@@ -4,13 +4,11 @@ import { ProvisionTenantDto } from './dto/provision.tenant.dto';
 import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
 import { SeedingDataeDto } from './dto/seeding-data.dto';
 import { ConfigService } from '@nestjs/config';
-import { getConnection } from './create-database';
+import { ConnectionUtils } from './connection.utils';
 
 @Injectable()
 export class TenantprovisionService {
   constructor(private config: ConfigService) {}
-
-  private db_connection = getConnection(this.config);
 
   async createDatabase(
     tenant_name: ProvisionTenantDto,
@@ -18,23 +16,21 @@ export class TenantprovisionService {
     const query = readFileSync(
       `${__dirname}/scripts/create-database.sql`,
     ).toString();
+    const db_connection = ConnectionUtils.getConnection(this.config);
 
     return await new Promise((res, rej) => {
       if (query) {
-        this.db_connection.query(
-          query,
-          ['db-' + tenant_name.tenantName],
-          (err) => {
-            if (err) {
-              rej(err);
-            } else {
-              res({
-                status: 'Database created successfully',
-                database_name: 'db-' + tenant_name.tenantName,
-              });
-            }
-          },
-        );
+        db_connection.query(query, ['db-' + tenant_name.tenantName], (err) => {
+          if (err) {
+            rej(err);
+          } else {
+            ConnectionUtils.endConnection(db_connection);
+            res({
+              status: 'Database created successfully',
+              database_name: 'db-' + tenant_name.tenantName,
+            });
+          }
+        });
       }
     });
   }
@@ -49,22 +45,17 @@ export class TenantprovisionService {
     const query = readFileSync(
       `${__dirname}/scripts/create-table.sql`,
     ).toString();
+    const db_connection = ConnectionUtils.getConnection(this.config);
 
     return await new Promise((res, rej) => {
-      this.db_connection.connect((err) => {
-        if (err) {
-          throw err;
-        }
-        console.log('connected');
-      });
-
-      this.db_connection.query(
+      db_connection.query(
         query,
         [dbName, tableName, columns[0].columnName],
         (err) => {
           if (err) {
             rej(err);
           } else {
+            ConnectionUtils.endConnection(db_connection);
             res({
               status: 'Table created successfully',
             });
@@ -80,15 +71,17 @@ export class TenantprovisionService {
     const values = data.values;
 
     const query = readFileSync(`${__dirname}/scripts/seed-data.sql`).toString();
+    const db_connection = ConnectionUtils.getConnection(this.config);
 
     return await new Promise((res, rej) => {
-      this.db_connection.query(
+      db_connection.query(
         query,
         [dbName, tableName, columns, values],
         (err) => {
           if (err) {
             rej(err);
           } else {
+            ConnectionUtils.endConnection(db_connection);
             res({
               status: 'Data seeded successfully',
             });
@@ -101,12 +94,14 @@ export class TenantprovisionService {
     const dbName = 'db-' + tenantData.tenantName;
 
     const query = readFileSync(`${__dirname}/scripts/ping.sql`).toString();
+    const db_connection = ConnectionUtils.getConnection(this.config);
 
     return await new Promise((res, rej) => {
-      this.db_connection.query(query, [dbName, dbName], (err, result) => {
+      db_connection.query(query, [dbName, dbName], (err, result) => {
         if (err) {
           rej(err);
         } else {
+          ConnectionUtils.endConnection(db_connection);
           res({
             'Tenant-Database': result[0],
             'Tenant-Table': result[1],

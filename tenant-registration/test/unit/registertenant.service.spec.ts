@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Tenant } from '../../src/tenant-reg/entity/tenant.entity';
-import { RegistertenantService } from '../../src/tenant-reg/registertenant.service';
+import { Tenant } from '@app/tenant-reg/entity/tenant.entity';
+import { RegistertenantService } from '@app/tenant-reg/registertenant.service';
 
 describe('Testing RegisTration MicroService Service', () => {
   let registertenantService: RegistertenantService;

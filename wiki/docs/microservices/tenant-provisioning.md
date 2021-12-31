@@ -11,21 +11,25 @@ $ npm install
 For this we use [mysql client](https://www.npmjs.com/package/mysql2) for Node.js which supports prepared statements, non-utf8 encodings, binary log protocol, compression, ssl much more
 
 ```ts
-export const getConnection = (config: ConfigService) => {
-  const db_connection = mysql.createConnection({
-    host: config.get('db.host'),
-    user: config.get('db.username'),
-    password: config.get('db.password'),
-    multipleStatements: true,
-  });
-  db_connection.connect((err) => {
-    if (err) {
-      throw err;
-    }
-    console.log('connected');
-  });
+export const ConnectionUtils = {
+  getConnection: function (config: ConfigService) {
+    const db_connection = mysql.createConnection({
+      host: config.get('db.host'),
+      user: config.get('db.username'),
+      password: config.get('db.password'),
+      multipleStatements: true,
+    });
+    db_connection.connect((err) => {
+      if (err) {
+        throw err;
+      }
+      console.log('connected');
+    });
 
-  return db_connection;
+    return db_connection;
+  },
+
+  ...
 };
 ``` 
 `host:  ` The hostname of the database to connect to  
@@ -42,35 +46,32 @@ The SQL script is read to create the database for the tenant
 
 ```ts
 # tenantprovision.service.ts
+
 export class TenantprovisionService {
   constructor(private config: ConfigService) {}
 
-  private db_connection = getConnection(this.config);
-
-  async createDatabase(tenant_name: ProvisionTenantDto) {
-    const query = readFileSync(
-      `${__dirname}/scripts/create-database.sql`,
-    ).toString();
+  async createDatabase(tenant_name: ProvisionTenantDto): Promise<Record<string, any>> {
+    const query = readFileSync(`${__dirname}/scripts/create-database.sql`).toString();
+    const db_connection = ConnectionUtils.getConnection(this.config);
 
     return await new Promise((res, rej) => {
       if (query) {
-        this.db_connection.query(
-          query,
-          ['db-' + tenant_name.tenantName],
-          (err) => {
-            if (err) {
-              rej(err);
-            } else {
-              res({
-                status: 'Database created successfully',
-                database_name: 'db-' + tenant_name.tenantName,
-              });
-            }
-          },
-        );
+        db_connection.query(query, ['db-' + tenant_name.tenantName], (err) => {
+          if (err) {
+            rej(err);
+          } else {
+            ConnectionUtils.endConnection(db_connection);
+            res({
+              status: 'Database created successfully',
+              database_name: 'db-' + tenant_name.tenantName,
+            });
+          }
+        });
       }
     });
   }
+
+  ...
 ```
 
 ### Controller
@@ -78,21 +79,23 @@ The controller with the message handler based on request-response paradigm. This
 
 ```ts
 # tenantprovision.module.ts
-    @MessagePattern({ cmd: 'create-database' })
-    async createDatabase(tenant_name: ProvisionTenantDto) {
-        try {
-        return await this.provisionService.createDatabase(tenant_name);
-        } catch (e) {
-        return e;
-        }
-    }
-    ...
+
+@MessagePattern({ cmd: 'create-database' })
+async createDatabase(tenant_name: ProvisionTenantDto) {
+  try {
+    return await this.provisionService.createDatabase(tenant_name);
+  } catch (e) {
+    return e;
+  }
+}
+...
 ```
 ### Bootstrap the microservice
 This bootstraps the whole application to start the tenant registration microservice
 
 ```ts
 # main.ts
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
@@ -101,6 +104,7 @@ async function bootstrap() {
 }
 
 # src/transport/transport.ts
+
 export const transportOptions = (config: ConfigService) => {
   return {
     transport: Transport.TCP,

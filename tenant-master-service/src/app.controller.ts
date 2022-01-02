@@ -1,10 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
-import {
-  ClientProxy,
-  MessagePattern,
-  EventPattern,
-} from '@nestjs/microservices';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {

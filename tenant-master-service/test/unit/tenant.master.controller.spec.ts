@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantMasterController } from '../../src/tenant-master/tenant.master.controller';
-import { TenantMasterService } from '../../src/tenant-master/tenant.master.service';
+import { TenantMasterController } from '@app/tenant-master/tenant.master.controller';
+import { TenantMasterService } from '@app/tenant-master/tenant.master.service';
 
 describe('Tenant Master Controller', () => {
   let tenantMasterController: TenantMasterController;

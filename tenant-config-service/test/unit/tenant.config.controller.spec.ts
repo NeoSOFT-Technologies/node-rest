@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DatabaseModule } from '../../src/tenant-config/db/database.module';
-import { TenantConfigController } from '../../src/tenant-config/tenant.config.controller';
-import { TenantConfigModule } from '../../src/tenant-config/tenant.config.module';
-import { TenantConfigService } from '../../src/tenant-config/tenant.config.service';
+import { TenantConfigController } from '@app/tenant-config/tenant.config.controller';
+import { TenantConfigService } from '@app/tenant-config/tenant.config.service';
 
 describe('Testing Tenant Config Controller', () => {
   let tenantConfigController: TenantConfigController;

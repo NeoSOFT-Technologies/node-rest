@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
-import { TenantMasterService } from '../../src/tenant-master/tenant.master.service';
+import { TenantMasterService } from '@app/tenant-master/tenant.master.service';
 
 describe('Testing Tenant Master Service', () => {
   let tenantMasterService: TenantMasterService;
@@ -46,11 +46,11 @@ describe('Testing Tenant Master Service', () => {
     beforeAll(async () => {
       await tenantMasterService.masterTenantService(mockTenantDetails);
     });
-    it('Testing createDatabase', async () => {
+    it('Testing createDatabase for tenant', async () => {
       const provisioningDatabase = jest.spyOn(mockClient1, 'send');
       expect(provisioningDatabase).toHaveBeenCalled();
     });
-    it('Testing setConfig', async () => {
+    it('Testing setConfig of the tenant', async () => {
       const settingConfig = jest.spyOn(mockClient2, 'emit');
       expect(settingConfig).toHaveBeenCalled();
     });

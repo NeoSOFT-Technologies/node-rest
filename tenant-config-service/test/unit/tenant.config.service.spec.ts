@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TenantConfig } from '../../src/tenant-config/entities/tenant.entity';
-import { DatabaseModule } from '../../src/tenant-config/db/database.module';
-import { TenantConfigService } from '../../src/tenant-config/tenant.config.service';
+import { TenantConfig } from '@app/tenant-config/entities/tenant.entity';
+import { DatabaseModule } from '@app/tenant-config/db/database.module';
+import { TenantConfigService } from '@app/tenant-config/tenant.config.service';
 import { ConfigModule } from '@nestjs/config';
-import config from '../../src/tenant-config/config';
-import { TenantConfigController } from '../../src/tenant-config/tenant.config.controller';
+import config from '@app/tenant-config/config';
+import { TenantConfigController } from '@app/tenant-config/tenant.config.controller';
 
 describe('Testing Config Service', () => {
   const mockTenantConfigDetails = {

@@ -68,20 +68,9 @@ $ git clone https://github.com/NeoSOFT-Technologies/node-rest.git
 ```
 #### Quick Installation
 
-Next, install the packages that are required for this project in each of the microservice.
-
+Next, install the packages that are required for this project.
 ```bash
 # Install the required npm modules in root repo
-$ npm install
-# Install the required npm modules in api-gateway
-$ npm install
-# Install the required npm modules in tenant-registration
-$ npm install
-# Install the required npm modules in tenant-master-service
-$ npm install
-# Install the required npm modules in tenant-provisioning
-$ npm install
-# Install the required npm modules in tenant-config-service
 $ npm install
 ```
 ### Running the app

@@ -2,26 +2,25 @@ name: CI
 on:
   push:
     paths:
-      - './multitenacy-rest-service/src'
-      - './tenant-config-service/src'
-      - './tenant-provisioning/src'
-      - './tenant-registration/src'
+      - 'multitenacy-rest-service/*'
+      - 'tenant-config-service/*'
+      - 'tenant-provisioning/*'
+      - 'tenant-registration/*'
     branches:
       - main
       - dev
       - release-*
   pull_request:
     paths:
-      - './multitenacy-rest-service'
-      - './tenant-config-service'
-      - './tenant-provisioning'
-      - './tenant-registration'
+      - 'multitenacy-rest-service/*'
+      - 'tenant-config-service/*'
+      - 'tenant-provisioning/*'
+      - 'tenant-registration/*'
     types: [opened, synchronize, reopened]
     branches:
       - main
       - dev
       - release-*
-
 jobs:
   CI:
     strategy:

@@ -39,4 +39,34 @@ export class RegistertenantService {
     this.client.emit({ cmd: 'tenant-master' }, tenantDetails);
     return { Message: 'Tenant Registered Successfully' };
   }
+
+  listAll(): Promise<Tenant[]> {
+    return this.tenantRepository.find();
+  }
+
+  async updateDescription(tenantname: string, newdescription: string) {
+    const tenant: Tenant = await this.tenantRepository.findOneOrFail({
+      where: {
+        tenantName: tenantname,
+      },
+    });
+
+    return this.tenantRepository.update(tenant.id, {
+      ...tenant,
+      description: newdescription,
+    });
+  }
+
+  async softDelete(tenantname: string) {
+    const tenant: Tenant = await this.tenantRepository.findOneOrFail({
+      where: {
+        tenantName: tenantname,
+      },
+    });
+
+    return this.tenantRepository.update(tenant.id, {
+      ...tenant,
+      isDelete: true,
+    });
+  }
 }

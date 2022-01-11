@@ -24,4 +24,34 @@ export class RegistertenantController {
       return e;
     }
   }
+
+  @MessagePattern({ cmd: 'list-all-tenant' })
+  async listAllTenant() {
+    try {
+      return await this.tenantService.listAll();
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @MessagePattern({ cmd: 'update-description' })
+  async updateDescription({ tenantname, newdescription }) {
+    try {
+      return await this.tenantService.updateDescription(
+        tenantname,
+        newdescription,
+      );
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @MessagePattern({ cmd: 'soft-delete' })
+  async softDelete(tenantname: string) {
+    try {
+      return await this.tenantService.softDelete(tenantname);
+    } catch (e) {
+      return e;
+    }
+  }
 }

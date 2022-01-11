@@ -6,11 +6,17 @@
   "scripts": {
     "prepare": "husky install",
     "precommit": "lint-staged",
+    "install:multitenancy-rest-service": "cd multitenancy-rest-service && npm install",
     "install:tenant-registration": "cd tenant-registration && npm install",
     "install:tenant-provisioning": "cd tenant-provisioning && npm install",
     "install:tenant-master-service": "cd tenant-master-service && npm install",
     "install:tenant-config-service": "cd tenant-config-service && npm install",
-    "postinstall": "run-s install:*"
+    "postinstall": "run-s install:*",
+    "test:tenant-registration": "cd tenant-registration && npm run test",
+    "test:tenant-provisioning": "cd tenant-provisioning && npm run test",
+    "test:tenant-master-service": "cd tenant-master-service && npm run test",
+    "test:tenant-config-service": "cd tenant-config-service && npm run test",
+    "test": "run-s test:*"
   },
   "repository": {
     "type": "git",

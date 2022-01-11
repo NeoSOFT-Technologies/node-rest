@@ -20,13 +20,13 @@ services:
         MYSQL_ROOT_USER: 'root'
         MYSQL_PASSWORD: 'root'
 
-  api-gateway:
+  multitenancy-rest-service:
     build: 
-      context: ./api-gateway
+      context: ./multitenancy-rest-service
       dockerfile: Dockerfile
-    container_name: 'api-gateway'
+    container_name: 'multitenancy-rest-service'
     volumes:
-      - ./api-gateway:/usr/src/app
+      - ./multitenancy-rest-service:/usr/src/app
     networks:
       - internal
     depends_on:
@@ -36,7 +36,7 @@ services:
     ports:
       - '5000:5000'
     env_file:
-      - ./api-gateway/config/.env
+      - ./multitenancy-rest-service/config/.env
 
   tenant-registration:
     build: ./tenant-registration

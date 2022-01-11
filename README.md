@@ -128,7 +128,7 @@ Please find below a detailed description of the app's folder structures:
 - [Tenant Configuration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-config-service.md)
 
 ### Consuming Microservices
-- [API Gateway](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/api-gateway.md)
+- [Multitenancy Rest Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/multitenancy-rest-service.md)
 - [Understand Microservices Communication](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/communication.md)
 - [Video Demonstration](https://user-images.githubusercontent.com/87794374/147342616-5b38b414-fda5-4c11-8ebc-40ebcb59cc5b.mp4)
 

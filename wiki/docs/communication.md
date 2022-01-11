@@ -27,7 +27,7 @@ This service provisions a separeate database to the tenant which the tenant has 
 4) **Tenant Configuration Service**
 This service stores the tenant details and configurations and renders it via api provided.
 
-These services are exposed through api's in **api-gateway**
+These services are exposed through api's in **multitenancy-rest-service**
 
 ## Microservices Communication
 

@@ -1,6 +1,6 @@
-# API-Gateway
+# Multitenancy Rest Service
 
-This api-gateway has been included to interact with the tenant microservices. It has two endpoints namely `/register` and `get-tenant-config/:id`
+This multitenancy-rest-service has been included to interact with the tenant microservices. It has two endpoints namely `/register` and `get-tenant-config/:id`
 
 ### Installation
 First run this command to install all dependency

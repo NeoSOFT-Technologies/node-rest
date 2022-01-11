@@ -90,7 +90,7 @@ export class IdentifierService {
 ```
 
 ### Controller
-The controller with the message handler based on request-response paradigm. This is important for this service to communicate through api-gateway
+The controller with the message handler based on request-response paradigm. This is important for this service to communicate through multitenancy-rest-service
 
 ```ts
 # src/tenant-reg/registertenant.controller.ts

@@ -10,7 +10,17 @@
     "install:tenant-provisioning": "cd tenant-provisioning && npm install",
     "install:tenant-master-service": "cd tenant-master-service && npm install",
     "install:tenant-config-service": "cd tenant-config-service && npm install",
-    "postinstall": "run-s install:*"
+    "lint:tenant-registration": "cd tenant-registration && npm run lint",
+    "lint:tenant-provisioning": "cd tenant-provisioning && npm run lint",
+    "lint:tenant-master-service": "cd tenant-master-service && npm run lint",
+    "lint:tenant-config-service": "cd tenant-config-service && npm run lint",
+    "build:tenant-registration": "cd tenant-registration && npm run build",
+    "build:tenant-provisioning": "cd tenant-provisioning && npm run build",
+    "build:tenant-master-service": "cd tenant-master-service && npm run build",
+    "build:tenant-config-service": "cd tenant-config-service && npm run build",
+    "postinstall": "run-s install:*",
+    "prebuild": "run-p lint:*",
+    "build": "run-p build:*"
   },
   "repository": {
     "type": "git",

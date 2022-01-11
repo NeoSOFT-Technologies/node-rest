@@ -30,4 +30,7 @@ export class TenantConfig {
 
   @Column()
   port: number;
+
+  @Column({ default: '{ max_size: 30 }' })
+  policy: string;
 }

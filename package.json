@@ -1,0 +1,56 @@
+{
+  "name": "node-rest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "precommit": "lint-staged",
+    "install:multitenancy-rest-service": "cd multitenancy-rest-service && npm install",
+    "install:tenant-registration": "cd tenant-registration && npm install",
+    "install:tenant-provisioning": "cd tenant-provisioning && npm install",
+    "install:tenant-master-service": "cd tenant-master-service && npm install",
+    "install:tenant-config-service": "cd tenant-config-service && npm install",
+    "lint:tenant-registration": "cd tenant-registration && npm run lint",
+    "lint:tenant-provisioning": "cd tenant-provisioning && npm run lint",
+    "lint:tenant-master-service": "cd tenant-master-service && npm run lint",
+    "lint:tenant-config-service": "cd tenant-config-service && npm run lint",
+    "build:tenant-registration": "cd tenant-registration && npm run build",
+    "build:tenant-provisioning": "cd tenant-provisioning && npm run build",
+    "build:tenant-master-service": "cd tenant-master-service && npm run build",
+    "build:tenant-config-service": "cd tenant-config-service && npm run build",
+    "prebuild": "run-p lint:*",
+    "build": "run-p build:*",
+    "postinstall": "run-s install:*",
+    "test:tenant-registration": "cd tenant-registration && npm run test",
+    "test:tenant-provisioning": "cd tenant-provisioning && npm run test",
+    "test:tenant-master-service": "cd tenant-master-service && npm run test",
+    "test:tenant-config-service": "cd tenant-config-service && npm run test",
+    "test": "run-s test:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeoSOFT-Technologies/node-rest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NeoSOFT-Technologies/node-rest/issues"
+  },
+  "homepage": "https://github.com/NeoSOFT-Technologies/node-rest#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^15.0.0",
+    "@commitlint/config-conventional": "^15.0.0",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^7.0.0",
+    "lint-staged": "^12.1.2",
+    "npm-run-all": "^4.1.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+name : CodeQL Configuration
+
+paths:
+  - './multitenacy-rest-service/src'
+  - './tenant-config-service/src'
+  - './tenant-provisioning/src'
+  - './tenant-registration/src'

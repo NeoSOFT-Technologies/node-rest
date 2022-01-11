@@ -1,0 +1,10 @@
+{
+  "./tenant-config-service/{src,apps,libs,test}/**/*.ts": ["npm run --prefix tenant-config-service lint"],
+  "./tenant-master-service/{src,apps,libs,test}/**/*.ts": ["npm run --prefix tenant-master-service lint"],
+  "./tenant-provisioning/{src,apps,libs,test}/**/*.ts": ["npm run --prefix tenant-provisioning lint"],
+  "./tenant-registration/{src,apps,libs,test}/**/*.ts": ["npm run --prefix tenant-registration lint"],
+  "./tenant-config-service/**/*.{ts,js,json,*rc}": ["npm run --prefix tenant-config-service format"],
+  "./tenant-master-service/**/*.{ts,js,json,*rc}": ["npm run --prefix tenant-master-service format"],
+  "./tenant-provisioning/**/*.{ts,js,json,*rc}": ["npm run --prefix tenant-provisioning format"],
+  "./tenant-registration/**/*.{ts,js,json,*rc}": ["npm run --prefix tenant-registration format"]
+}

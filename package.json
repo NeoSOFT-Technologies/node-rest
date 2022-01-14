@@ -22,6 +22,7 @@
     "prebuild": "run-p lint:*",
     "build": "run-p build:*",
     "postinstall": "run-s install:*",
+    "test:rest-service": "cd multitenancy-rest-service && npm run test",
     "test:tenant-registration": "cd tenant-registration && npm run test",
     "test:tenant-provisioning": "cd tenant-provisioning && npm run test",
     "test:tenant-master-service": "cd tenant-master-service && npm run test",

@@ -29,6 +29,7 @@ describe('Testing AppController', () => {
         register: jest.fn(() => of(mockMessage)),
         getTenantConfig: jest.fn(() => of(mockTenantDetails)),
         listAllTenant: jest.fn(() => of([mockTenantDetails])),
+        connect: jest.fn().mockResolvedValue('connected'),
         updateDescription: jest.fn(() => of(mockTenantDetails)),
         deleteTenant: jest.fn(() => of(mockMessage)),
     };
@@ -64,6 +65,13 @@ describe('Testing AppController', () => {
         await appController.listAllTenant(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
+    });
+
+    it('Testing appcontroller "connectDatabase"', async () => {
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        await appController.connectDatabase(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        mockSend.mockRestore();
     });
 
     it('Testing appcontroller "updateDescription"', async () => {

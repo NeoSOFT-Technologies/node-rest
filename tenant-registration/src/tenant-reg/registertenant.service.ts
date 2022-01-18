@@ -32,6 +32,7 @@ export class RegistertenantService {
     const tenantDetails: TenantDetailsDto = {
       tenantId: registered_tenant.id,
       tenantName: registered_tenant.tenantName,
+      password: registered_tenant.password,
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };

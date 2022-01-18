@@ -11,8 +11,10 @@ export class TenantprovisionService {
   constructor(private config: ConfigService) {}
 
   async createDatabase(
-    tenant_name: ProvisionTenantDto,
+    tenant: ProvisionTenantDto,
   ): Promise<Record<string, any>> {
+    const tenantName = tenant.tenantName;
+    const password = tenant.password;
     const query = readFileSync(
       `${__dirname}/scripts/create-database.sql`,
     ).toString();
@@ -20,17 +22,21 @@ export class TenantprovisionService {
 
     return await new Promise((res, rej) => {
       if (query) {
-        db_connection.query(query, ['db-' + tenant_name.tenantName], (err) => {
-          if (err) {
-            rej(err);
-          } else {
-            ConnectionUtils.endConnection(db_connection);
-            res({
-              status: 'Database created successfully',
-              database_name: 'db-' + tenant_name.tenantName,
-            });
-          }
-        });
+        db_connection.query(
+          query,
+          ['db-' + tenantName, tenantName, password],
+          (err) => {
+            if (err) {
+              rej(err);
+            } else {
+              ConnectionUtils.endConnection(db_connection);
+              res({
+                status: 'Database created successfully',
+                database_name: 'db-' + tenantName,
+              });
+            }
+          },
+        );
       }
     });
   }

@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { AppService } from '@app/app.service';
+import { ConnectionUtils } from '@app/connection.utils';
+import { DbDetailsDto } from '@app/dto/db.details.dto';
 
 describe('Testing AppService', () => {
     let appService: AppService;
@@ -75,10 +77,26 @@ describe('Testing AppService', () => {
         mocklistAllTenant.mockRestore();
     });
 
+    it('Testing "connect"', async () => {
+        const dbdetails: DbDetailsDto = {
+            host: 'string',
+            port: 1,
+            username: 'string',
+            password: 'string',
+            dbName: 'string',
+        }
+        const mockgetConnection = jest.spyOn(ConnectionUtils, 'getConnection');
+        mockgetConnection.mockImplementation((input) => Promise.resolve(input));
+        const response = await appService.connect(dbdetails);
+        expect(mockgetConnection).toHaveBeenCalled();
+        expect(response).toEqual(dbdetails);
+        mockgetConnection.mockRestore();
+    });
+
     it('Testing "updateDescription"', async () => {
         const mockMessage = { Message: 'Tenant Updated Successfully' };
         const tenantName = 'string';
-        const newDescription = 'new description'
+        const newDescription = 'new description';
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
         });

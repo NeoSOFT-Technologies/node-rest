@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import config from '@app/tenant-provisioning/config';
 import { TenantprovisionService } from '@app/tenant-provisioning/tenantprovision.service';
 
-describe('Testing RegisTration MicroService Service', () => {
+describe('Testing Provisioning MicroService Service', () => {
   let tenantprovisionService: TenantprovisionService;
 
   beforeAll(async () => {
@@ -27,6 +27,7 @@ describe('Testing RegisTration MicroService Service', () => {
   it('Testing tenantprovisionService createDatabase', async () => {
     const TenantName = {
       tenantName: 'string',
+      password: 'string',
     };
 
     expect(
@@ -66,6 +67,7 @@ describe('Testing RegisTration MicroService Service', () => {
   it('Testing tenantprovisionService ping', async () => {
     const TenantName = {
       tenantName: 'string',
+      password: 'string',
     };
 
     expect(await tenantprovisionService.ping(TenantName)).toBeDefined();

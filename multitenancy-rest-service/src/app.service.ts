@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ConnectionUtils } from './connection.utils';
+import { DbDetailsDto } from './dto/db.details.dto';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 
 @Injectable()
@@ -10,6 +12,9 @@ export class AppService {
   ) { }
   register(tenant: RegisterTenantDto) {
     return this.client1.send({ cmd: 'register-tenant' }, tenant);
+  }
+  connect(dbdetails: DbDetailsDto) {
+    return ConnectionUtils.getConnection(dbdetails);
   }
   getTenantConfig(id: number) {
     return this.client2.send({ cmd: 'get_config' }, id);

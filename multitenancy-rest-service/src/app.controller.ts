@@ -2,13 +2,14 @@ import { Controller, Delete, Get, Patch, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { AppService } from './app.service';
-import { ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { UpdateTenantDto } from './dto/update.tenant.dto ';
 import { DeleteTenantDto } from './dto/delete.tenant.dto';
+import { DbDetailsDto } from './dto/db.details.dto';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService) { }
 
   @Post('register')
   @ApiBody({ type: RegisterTenantDto })
@@ -45,13 +46,28 @@ export class AppController {
     }
   }
 
+  @Get('connect-database')
+  @ApiQuery({ type: DbDetailsDto })
+  async connectDatabase(@Req() req: Request, @Res() res: Response) {
+    try {
+      const dbDetails: DbDetailsDto = req.query as any;
+      const response = await this.appService.connect(dbDetails);
+
+      if (response) {
+        res.send(response);
+      }
+    } catch (e) {
+      return e;
+    }
+  }
+
   @Patch('description')
   @ApiBody({ type: UpdateTenantDto })
   updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.body.tenantName;
       const newDescription: string = req.body.description;
-      const response = this.appService.updateDescription(tenantname,newDescription);
+      const response = this.appService.updateDescription(tenantname, newDescription);
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
       return e;

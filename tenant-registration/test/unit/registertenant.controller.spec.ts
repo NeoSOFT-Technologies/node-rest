@@ -14,6 +14,9 @@ describe('Testing RegisTration MicroService Controller', () => {
   };
   const mockRegistertenantService = {
     register: jest.fn().mockResolvedValue(mockMessage),
+    listAll: jest.fn(),
+    updateDescription: jest.fn(),
+    softDelete: jest.fn(),
   };
   const mockIdentifierService = {
     identify: jest.fn().mockResolvedValue(false),
@@ -39,5 +42,33 @@ describe('Testing RegisTration MicroService Controller', () => {
     expect(
       await registertenantController.registerTenant(TenantDetails),
     ).toEqual(mockMessage);
+  });
+
+  it('Testing listAllTenant', async () => {
+    const mockMessage = { Message: 'All Tenant received Successfully' };
+    mockRegistertenantService.listAll.mockResolvedValue(mockMessage);
+    expect(await registertenantController.listAllTenant()).toEqual(mockMessage);
+  });
+
+  it('Testing updateDescription', async () => {
+    const tenantname = 'string';
+    const newdescription = 'new description';
+    const mockMessage = { Message: 'Tenant Updated Successfully' };
+    mockRegistertenantService.updateDescription.mockResolvedValue(mockMessage);
+    expect(
+      await registertenantController.updateDescription({
+        tenantname,
+        newdescription,
+      }),
+    ).toEqual(mockMessage);
+  });
+
+  it('Testing softDelete', async () => {
+    const tenantname = 'string';
+    const mockMessage = { Message: 'Tenant Deleted Successfully' };
+    mockRegistertenantService.softDelete.mockResolvedValue(mockMessage);
+    expect(await registertenantController.softDelete(tenantname)).toEqual(
+      mockMessage,
+    );
   });
 });

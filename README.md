@@ -122,23 +122,23 @@ Please find below a detailed description of the app's folder structures:
 | .eslintignore            | Config settings for paths to exclude from linting                                             |
 
 ### Microservices
-- [Tenant Registration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-registration.md)
-- [Tenant Master Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-master-service.md)
-- [Tenant Provisioning Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-provisioning.md)
-- [Tenant Configuration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/microservices/tenant-config-service.md)
+- [Tenant Registration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/microservices/tenant-registration.md)
+- [Tenant Master Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/microservices/tenant-master-service.md)
+- [Tenant Provisioning Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/microservices/tenant-provisioning.md)
+- [Tenant Configuration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/microservices/tenant-config-service.md)
 
 ### Consuming Microservices
-- [Multitenancy Rest Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/multitenancy-rest-service.md)
-- [Understand Microservices Communication](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/communication.md)
+- [Multitenancy Rest Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/multitenancy-rest-service.md)
+- [Understand Microservices Communication](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/communication.md)
 - [Video Demonstration](https://user-images.githubusercontent.com/87794374/147342616-5b38b414-fda5-4c11-8ebc-40ebcb59cc5b.mp4)
 
 ## Contributing to this project
 
-Contributions are welcome from anyone and everyone. We encourage you to review the [guiding principles for contributing](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/contribution.md)
+Contributions are welcome from anyone and everyone. We encourage you to review the [guiding principles for contributing](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/contribution.md)
 
-* [Bug reports](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/contribution/bug-reports.md)
-* [Feature requests](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/contribution/feature-requests.md)
-* [Pull requests](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/contribution/pull-requests.md)
+* [Bug reports](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/contribution/bug-reports.md)
+* [Feature requests](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/contribution/feature-requests.md)
+* [Pull requests](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/contribution/pull-requests.md)
 
 ### Issues/Discussions
 
@@ -148,9 +148,9 @@ Contributions are welcome from anyone and everyone. We encourage you to review t
 
 ### Miscellaneous
 
-- [Git commits](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/miscellaneous/git-commits.md)
-- [Clean Docker Images](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/miscellaneous/clean-docker.md)
-- [Installation Pretteri, Husky & Lint](https://github.com/NeoSOFT-Technologies/node-rest/blob/dev/wiki/docs/miscellaneous/installation-pretteri-husky-lint.md)
+- [Git commits](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/miscellaneous/git-commits.md)
+- [Clean Docker Images](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/miscellaneous/clean-docker.md)
+- [Installation Prettier, Husky & Lint](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/miscellaneous/installation-pretteri-husky-lint.md)
 
 ## Stay in touch
 

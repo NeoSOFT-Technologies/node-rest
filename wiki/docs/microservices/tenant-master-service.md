@@ -23,7 +23,7 @@ CLIENT1_HOST=tenant-provisioning
 CLIENT2_HOST=tenant-config-service
  ```
  
- `MICRO_SERVICE_HOST:   `The hostname to which the specified microservice is                              connected
+ `MICRO_SERVICE_HOST:   `The hostname to which the specified microservice is connected
  
  `MICRO_SERVICE_PORT:   `The port number to which the microservice is connected.
  
@@ -34,11 +34,12 @@ CLIENT2_HOST=tenant-config-service
  ### tenant.master.service.ts
  ```
    async masterTenantService(tenantDetails: TenantDetailsDto) {
-    const tenant_name = {
+    const tenant = {
       tenantName: tenantDetails.tenantName,
+      password: tenantDetails.password,
     };
 
-    const message = this.client1.send({ cmd: 'create-database' }, tenant_name);
+    const message = this.client1.send({ cmd: 'create-database' }, tenant);
     const databaseName: string = await new Promise((res, rej) => {
       message.subscribe((next) => {
         res(next.database_name);

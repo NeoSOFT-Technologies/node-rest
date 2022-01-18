@@ -68,7 +68,7 @@ export class Tenant {
   createdDateTime: string;
 }
 ```
-### Utility identifier fr checking duplication of tenant
+### Utility identifier for checking duplication of tenant
 This is important to ensure that there is no duplication of tenant with same details
 ```ts
 # src/tenant-reg/identifier/identifier.service.ts

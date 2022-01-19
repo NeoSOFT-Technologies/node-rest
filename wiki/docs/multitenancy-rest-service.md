@@ -1,6 +1,12 @@
 # Multitenancy Rest Service
 
-This multitenancy-rest-service has been included to interact with the tenant microservices. It has two endpoints namely `/register` and `get-tenant-config/:id`
+This multitenancy-rest-service has been included to interact with the tenant microservices and test its working. It has six endpoints namely
+- `/register`-HTTP POST: It registers a new tenant by consuming tenant-registration microservice
+- `/get-tenant-config/:id`-HTTP GET: It retreives tenant config by consuming tenant-config-service microservice
+- `/all-tenants`-HTTP GET: It retreives all the registered tenant information by consuming tenant-registration microservice
+- `/connect-database`-HTTP GET: It generates the connection string to a tenant database and connects to it
+- `/description`-HTTP PATCH: Sample API to update tenant configuration
+- `/delete-tenant`-HTTP DELETE: Sample API to delete a tenant
 
 ### Installation
 First run this command to install all dependency
@@ -9,7 +15,7 @@ $ npm install
 ```
 
 ### Controller
-The controller include one HTTP POST end-point and one HTTP GET end-point as is shown below in the code
+The controller includes end-points as is shown below in the code
 ```ts
 # app.controller.ts
 @Controller()
@@ -40,6 +46,7 @@ export class AppController {
       return e;
     }
   }
+  ...
 }
 ``` 
 These end point make calls to tenant microservice to communicate via TCP protocol as is shown below
@@ -57,6 +64,7 @@ export class AppService {
   getTenantConfig(id: number) {
     return this.client2.send({ cmd: 'get_config' }, id);
   }
+  ...
 }
 ```
 
@@ -65,5 +73,3 @@ export class AppService {
 $ npm run start
 ```
 We can interact with the API through swagger by navigating to `http://localhost:5000/api/docs` while the application is running
-
-![swagger](https://user-images.githubusercontent.com/87794374/147329878-69b939c6-36d0-4cbc-a8de-73825aab51c2.PNG)

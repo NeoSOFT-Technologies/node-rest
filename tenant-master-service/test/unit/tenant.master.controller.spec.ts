@@ -9,6 +9,7 @@ describe('Tenant Master Controller', () => {
     tenantId: 'string',
     tenantName: 'string',
     tenantDbName: 'string',
+    password: 'string',
     description: 'string',
     createdDateTime: 'string',
     host: 'string',

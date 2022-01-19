@@ -10,9 +10,9 @@ export class TenantprovisionController {
   constructor(private readonly provisionService: TenantprovisionService) {}
 
   @MessagePattern({ cmd: 'create-database' })
-  async createDatabase(tenant_name: ProvisionTenantDto) {
+  async createDatabase(tenant: ProvisionTenantDto) {
     try {
-      return await this.provisionService.createDatabase(tenant_name);
+      return await this.provisionService.createDatabase(tenant);
     } catch (e) {
       return e;
     }

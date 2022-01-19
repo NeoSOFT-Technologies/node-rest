@@ -24,4 +24,7 @@ export class Tenant {
 
   @Column()
   createdDateTime: string;
+
+  @Column({ default: false })
+  isDelete: boolean;
 }

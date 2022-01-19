@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantprovisionController } from '@app/tenant-provisioning/tenantprovision.controller';
 import { TenantprovisionService } from '@app/tenant-provisioning/tenantprovision.service';
 
-describe('Testing RegisTration MicroService Controller', () => {
+describe('Testing Provisioning MicroService Controller', () => {
   let tenantprovisionController: TenantprovisionController;
 
   const mockTenantprovisionService = {
@@ -31,10 +31,11 @@ describe('Testing RegisTration MicroService Controller', () => {
   });
 
   it('Testing tenantprovisionController createDatabase', async () => {
-    const TenantName = {
+    const Tenant = {
       tenantName: 'string',
+      password: 'string',
     };
-    expect(await tenantprovisionController.createDatabase(TenantName)).toEqual({
+    expect(await tenantprovisionController.createDatabase(Tenant)).toEqual({
       Message: 'Tenant Database Provisoned successfully',
     });
   });
@@ -74,6 +75,7 @@ describe('Testing RegisTration MicroService Controller', () => {
   it('Testing tenantprovisionController ping', async () => {
     const TenantName = {
       tenantName: 'string',
+      password: 'string',
     };
 
     expect(await tenantprovisionController.ping(TenantName)).toEqual({

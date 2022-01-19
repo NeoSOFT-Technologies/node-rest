@@ -15,6 +15,9 @@ describe('Testing RegisTration MicroService Service', () => {
   };
   const mockTenantRepository = {
     save: jest.fn().mockResolvedValue(tenant),
+    find: jest.fn().mockResolvedValue(tenant),
+    findOneOrFail: jest.fn().mockResolvedValue(tenant),
+    update: jest.fn().mockResolvedValue(tenant),
   };
   const mockClient = {
     emit: jest.fn(),
@@ -43,5 +46,24 @@ describe('Testing RegisTration MicroService Service', () => {
   it('Testing registerTenant service', async () => {
     const mockMessage = { Message: 'Tenant Registered Successfully' };
     expect(await registertenantService.register(tenant)).toEqual(mockMessage);
+  });
+
+  it('Testing listAll', async () => {
+    expect(await registertenantService.listAll()).toEqual(tenant);
+  });
+
+  it('Testing updateDescription', async () => {
+    expect(
+      await registertenantService.updateDescription(
+        tenant.tenantName,
+        tenant.description,
+      ),
+    ).toEqual(tenant);
+  });
+
+  it('Testing softDelete', async () => {
+    expect(await registertenantService.softDelete(tenant.tenantName)).toEqual(
+      tenant,
+    );
   });
 });

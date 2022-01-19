@@ -14,7 +14,8 @@ For this we use [mysql client](https://www.npmjs.com/package/mysql2) for Node.js
 export const ConnectionUtils = {
   getConnection: function (config: ConfigService) {
     const db_connection = mysql.createConnection({
-      host: config.get('db.host'),
+      host: config.get('tenantdb.host'),
+      port: config.get('tenantdb.port'),
       user: config.get('db.username'),
       password: config.get('db.password'),
       multipleStatements: true,
@@ -33,13 +34,28 @@ export const ConnectionUtils = {
 };
 ``` 
 `host:  ` The hostname of the database to connect to  
+`port:  ` The port to connect to  
 `user:  ` The MySQL user to authenticate as  
 `password:  ` The password of that MySQL user  
 `multipleStatements:  ` Allow multiple mysql statements per query. (Default: false)  
 
 ### SQL script for creating database
 ```sql
-CREATE DATABASE ??;
+SET @db = ?;
+SET @user = ?;
+SET @password = ?;
+SET @createdb = CONCAT('CREATE DATABASE `', @db, '`;');
+PREPARE stmt FROM @createdb;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+SET @createuser = CONCAT('CREATE USER "',@user,'"@"%" IDENTIFIED BY "',@password,'";'); 
+PREPARE stmt FROM @createuser;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+SET @grant = CONCAT('GRANT ALL ON `',@db,'`.* TO "',@user,'"@"%";');
+PREPARE stmt FROM @grant;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 ```
 ### Provision database service
 The SQL script is read to create the database for the tenant
@@ -50,13 +66,15 @@ The SQL script is read to create the database for the tenant
 export class TenantprovisionService {
   constructor(private config: ConfigService) {}
 
-  async createDatabase(tenant_name: ProvisionTenantDto): Promise<Record<string, any>> {
+  async createDatabase(tenant: ProvisionTenantDto): Promise<Record<string, any>> {
+    const tenantName = tenant.tenantName;
+    const password = tenant.password;
     const query = readFileSync(`${__dirname}/scripts/create-database.sql`).toString();
     const db_connection = ConnectionUtils.getConnection(this.config);
 
     return await new Promise((res, rej) => {
       if (query) {
-        db_connection.query(query, ['db-' + tenant_name.tenantName], (err) => {
+        db_connection.query(query, ['db-' + tenantName, tenantName, password], (err) => {
           if (err) {
             rej(err);
           } else {
@@ -78,12 +96,12 @@ export class TenantprovisionService {
 The controller with the message handler based on request-response paradigm. This is important for this service to communicate with tenant-master microservice
 
 ```ts
-# tenantprovision.module.ts
+# tenantprovision.controller.ts
 
 @MessagePattern({ cmd: 'create-database' })
-async createDatabase(tenant_name: ProvisionTenantDto) {
+async createDatabase(tenant: ProvisionTenantDto) {
   try {
-    return await this.provisionService.createDatabase(tenant_name);
+    return await this.provisionService.createDatabase(tenant);
   } catch (e) {
     return e;
   }

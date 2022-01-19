@@ -9,12 +9,13 @@ export class TenantMasterService {
     @Inject('TENANT_CONFIG_SERVICE') private readonly client2: ClientProxy,
   ) {}
   async masterTenantService(tenantDetails: TenantDetailsDto) {
-    const tenant_name = {
+    const tenant = {
       tenantName: tenantDetails.tenantName,
+      password: tenantDetails.password,
     };
 
-    const message = this.client1.send({ cmd: 'create-database' }, tenant_name);
-    const databaseName: string = await new Promise((res, rej) => {
+    const message = this.client1.send({ cmd: 'create-database' }, tenant);
+    const databaseName: string = await new Promise((res) => {
       message.subscribe((next) => {
         res(next.database_name);
       });

@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
-import { observable, Observable, of, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { TenantConfigDto } from './dto/tenant.config.dto';
 import { TenantConfigService } from './tenant.config.service';
 

@@ -30,7 +30,11 @@ export class AppController {
       const tenantId: number = +req.params.id;
 
       const response = this.appService.getTenantConfig(tenantId);
-      response.subscribe(async (result) => res.send(result));
+      const observer = {
+        next: async (result: any) => res.send(result),
+        error: async (error: any) => res.send(error),
+      }
+      response.subscribe(observer);
     } catch (e) {
       return e;
     }

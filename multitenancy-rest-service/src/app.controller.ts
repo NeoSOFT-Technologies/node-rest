@@ -2,16 +2,16 @@ import { Controller, Delete, Get, Patch, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { AppService } from './app.service';
-import { ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdateTenantDto } from './dto/update.tenant.dto ';
 import { DeleteTenantDto } from './dto/delete.tenant.dto';
 import { DbDetailsDto } from './dto/db.details.dto';
 
-@Controller()
+@Controller('api')
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
-  @Post('register')
+  @Post('tenants')
   @ApiBody({ type: RegisterTenantDto })
   registerTenant(@Req() req: Request, @Res() res: Response) {
     try {
@@ -23,7 +23,7 @@ export class AppController {
     }
   }
 
-  @Get('get-tenant-config/:id')
+  @Get('tenants/:id')
   @ApiParam({ name: 'id', required: true, type: Number })
   getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
@@ -36,10 +36,35 @@ export class AppController {
     }
   }
 
-  @Get('all-tenants')
+  @Get('tenants')
   listAllTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const response = this.appService.listAllTenant();
+      response.subscribe(async (result) => res.send(result));
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @Patch('tenants')
+  @ApiBody({ type: UpdateTenantDto })
+  updateDescription(@Req() req: Request, @Res() res: Response) {
+    try {
+      const tenantname: string = req.body.action.tenantName;
+      const newDescription: string = req.body.action.description;
+      const response = this.appService.updateDescription(tenantname, newDescription);
+      response.subscribe(async (result) => res.send(result));
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @Delete('tenants')
+  @ApiBody({ type: DeleteTenantDto })
+  deleteTenant(@Req() req: Request, @Res() res: Response) {
+    try {
+      const tenantname: string = req.body.tenantName;
+      const response = this.appService.deleteTenant(tenantname);
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
       return e;
@@ -56,31 +81,6 @@ export class AppController {
       if (response) {
         res.send(response);
       }
-    } catch (e) {
-      return e;
-    }
-  }
-
-  @Patch('description')
-  @ApiBody({ type: UpdateTenantDto })
-  updateDescription(@Req() req: Request, @Res() res: Response) {
-    try {
-      const tenantname: string = req.body.tenantName;
-      const newDescription: string = req.body.description;
-      const response = this.appService.updateDescription(tenantname, newDescription);
-      response.subscribe(async (result) => res.send(result));
-    } catch (e) {
-      return e;
-    }
-  }
-
-  @Delete('delete-tenant')
-  @ApiBody({ type: DeleteTenantDto })
-  deleteTenant(@Req() req: Request, @Res() res: Response) {
-    try {
-      const tenantname: string = req.body.tenantName;
-      const response = this.appService.deleteTenant(tenantname);
-      response.subscribe(async (result) => res.send(result));
     } catch (e) {
       return e;
     }

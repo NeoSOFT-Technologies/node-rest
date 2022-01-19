@@ -1,8 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateTenantDto {
+class TenantDetails {
   @ApiProperty()
   tenantName: string;
   @ApiProperty()
   description: string;
+}
+
+export class UpdateTenantDto {
+  @ApiProperty()
+  action: TenantDetails;
 }

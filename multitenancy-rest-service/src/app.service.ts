@@ -13,9 +13,6 @@ export class AppService {
   register(tenant: RegisterTenantDto) {
     return this.client1.send({ cmd: 'register-tenant' }, tenant);
   }
-  connect(dbdetails: DbDetailsDto) {
-    return ConnectionUtils.getConnection(dbdetails);
-  }
   getTenantConfig(id: number) {
     return this.client2.send({ cmd: 'get_config' }, id);
   }
@@ -27,5 +24,8 @@ export class AppService {
   }
   deleteTenant(tenantname: string) {
     return this.client1.send({ cmd: 'soft-delete' }, tenantname);
+  }
+  connect(dbdetails: DbDetailsDto) {
+    return ConnectionUtils.getConnection(dbdetails);
   }
 }

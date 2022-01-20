@@ -30,6 +30,14 @@ import config from './config';
           port: 8848,
         },
       },
+      {
+        name: 'CREATE_TABLE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.TENANT_PROVISIONING_HOST,
+          port: 8878,
+        },
+      },
     ]),
   ],
   controllers: [AppController],

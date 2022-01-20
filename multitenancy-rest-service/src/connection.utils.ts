@@ -8,7 +8,7 @@ export const ConnectionUtils = {
     const db_connection = mysql.createConnection({
       host: dbDetails.host,
       port: dbDetails.port,
-      user: dbDetails.username,
+      user: dbDetails.tenantName,
       password: dbDetails.password,
       database: dbDetails.dbName,
     });

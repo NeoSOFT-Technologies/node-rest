@@ -2,10 +2,11 @@ import { Controller, Delete, Get, Patch, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { AppService } from './app.service';
-import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiQuery} from '@nestjs/swagger';
 import { UpdateTenantDto } from './dto/update.tenant.dto ';
 import { DeleteTenantDto } from './dto/delete.tenant.dto';
 import { DbDetailsDto } from './dto/db.details.dto';
+import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
 
 @Controller('api')
 export class AppController {
@@ -86,6 +87,18 @@ export class AppController {
         res.send(response);
       }
     } catch (e) {
+      return e;
+    }
+  }
+
+  @Post('create-table')
+  @ApiBody({ type: ProvisionTenantTableDto })
+  async createTable(@Req() req: Request, @Res() res: Response) {
+    try{
+      const tableDto: ProvisionTenantTableDto = req.body;
+      const response = this.appService.createTable(tableDto);
+      response.subscribe((result) => res.send(result));
+    }catch(e){
       return e;
     }
   }

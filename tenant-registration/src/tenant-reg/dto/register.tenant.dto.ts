@@ -1,5 +1,5 @@
 export class RegisterTenantDto {
-  tenantName?: string;
+  tenantName: string;
   email: string;
   password: string;
   description: string;

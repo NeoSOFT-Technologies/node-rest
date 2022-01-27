@@ -14,12 +14,14 @@ export class RegistertenantService {
     @Inject('Tenant-Master') private readonly client: ClientProxy,
   ) {}
   async register(tenant: RegisterTenantDto) {
-    tenant.tenantName =
-      tenant.email.split('@')[0] +
-      '-' +
-      Date.now().toString(36).slice(-4) +
-      '-' +
-      Math.random().toString(16).slice(-4);
+    if (!tenant.tenantName) {
+      tenant.tenantName =
+        tenant.email.split('@')[0] +
+        '-' +
+        Date.now().toString(36).slice(-4) +
+        '-' +
+        Math.random().toString(16).slice(-4);
+    }
 
     tenant.createdDateTime = new Date()
       .toISOString()

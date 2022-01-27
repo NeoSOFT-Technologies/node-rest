@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Patch, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { AppService } from './app.service';
@@ -7,18 +7,33 @@ import { UpdateTenantDto } from './dto/update.tenant.dto ';
 import { DeleteTenantDto } from './dto/delete.tenant.dto';
 import { DbDetailsDto } from './dto/db.details.dto';
 import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
+import { TenantUserDto } from './dto/tenant.user.dto';
 
 @Controller('api')
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
   @Post('tenants')
+  @UsePipes(new ValidationPipe())
   @ApiBody({ type: RegisterTenantDto })
-  registerTenant(@Req() req: Request, @Res() res: Response) {
+  async registerTenant(@Body() body: RegisterTenantDto, @Res() res: Response) {
     try {
-      const tenant: RegisterTenantDto = req.body;
+      const tenant: RegisterTenantDto = body;
       const response = this.appService.register(tenant);
       response.subscribe((result) => res.send(result));
+      await this.appService.createRealm(tenant.tenantName);
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @Post('user')
+  @UsePipes(new ValidationPipe())
+  @ApiBody({ type: TenantUserDto })
+  async tenantUser(@Body() body: TenantUserDto, @Res() res: Response) {
+    try {
+      const user: TenantUserDto = body;
+      res.send(await this.appService.createUser(user));
     } catch (e) {
       return e;
     }

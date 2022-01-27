@@ -4,6 +4,9 @@ import { ConnectionUtils } from './connection.utils';
 import { DbDetailsDto } from './dto/db.details.dto';
 import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
+import { TenantUserDto } from './dto/tenant.user.dto';
+import { Keycloak } from './iam/keycloak';
+
 
 @Injectable()
 export class AppService {
@@ -11,6 +14,7 @@ export class AppService {
     @Inject('REGISTER_TENANT') private readonly client1: ClientProxy,
     @Inject('GET_TENANT_CONFIG') private readonly client2: ClientProxy,
     @Inject('CREATE_TABLE') private readonly client3: ClientProxy,
+    private readonly keycloak: Keycloak,
   ) { }
   register(tenant: RegisterTenantDto) {
     return this.client1.send({ cmd: 'register-tenant' }, tenant);
@@ -32,5 +36,11 @@ export class AppService {
   }
   createTable(tableDto: ProvisionTenantTableDto){
     return this.client3.send({ cmd: 'create-table' }, tableDto);
+  }
+  createRealm(realmName: string) {
+    return this.keycloak.createRealm(realmName);
+  }
+  createUser(user: TenantUserDto) {
+    return this.keycloak.createUser(user);
   }
 }

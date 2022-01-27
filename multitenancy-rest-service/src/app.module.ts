@@ -4,11 +4,12 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import config from './config';
+import { Keycloak } from './iam/keycloak';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`${process.cwd()}/src/config/env/.env`],
+      envFilePath: [`${process.cwd()}/config/.env`],
       isGlobal: true,
       expandVariables: true,
       load: config,
@@ -41,6 +42,6 @@ import config from './config';
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,Keycloak],
 })
 export class AppModule {}

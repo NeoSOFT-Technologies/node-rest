@@ -34,11 +34,12 @@ export class AppService {
   connect(dbdetails: DbDetailsDto) {
     return ConnectionUtils.getConnection(dbdetails);
   }
-  createTable(tableDto: ProvisionTenantTableDto){
+  createTable(tableDto: ProvisionTenantTableDto) {
     return this.client3.send({ cmd: 'create-table' }, tableDto);
   }
-  createRealm(realmName: string) {
-    return this.keycloak.createRealm(realmName);
+  createRealm(tenantDetails: RegisterTenantDto) {
+    const { tenantName, email, password } = tenantDetails;
+    return this.keycloak.createRealm(tenantName, email, password);
   }
   createUser(user: TenantUserDto) {
     return this.keycloak.createUser(user);

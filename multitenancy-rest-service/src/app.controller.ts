@@ -21,7 +21,7 @@ export class AppController {
       const tenant: RegisterTenantDto = body;
       const response = this.appService.register(tenant);
       response.subscribe((result) => res.send(result));
-      await this.appService.createRealm(tenant.tenantName);
+      await this.appService.createRealm(tenant);
     } catch (e) {
       return e;
     }

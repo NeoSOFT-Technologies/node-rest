@@ -20,6 +20,17 @@ services:
         MYSQL_ROOT_USER: 'root'
         MYSQL_PASSWORD: 'root'
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:16.1.0
+    container_name: 'node_rest_keycloak'
+    networks:
+      - internal
+    ports:
+        - '8080:8080'
+    environment:
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: admin
+
   multitenancy-rest-service:
     build: 
       context: ./multitenancy-rest-service
@@ -33,6 +44,7 @@ services:
       - database
       - tenant-config-service
       - tenant-registration
+      - keycloak
     ports:
       - '5000:5000'
     env_file:

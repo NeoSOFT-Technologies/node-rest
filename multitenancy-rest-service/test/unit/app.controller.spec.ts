@@ -4,13 +4,20 @@ import { AppService } from '@app/app.service';
 import { Request, Response } from 'express';
 import * as httpMocks from 'node-mocks-http';
 import { Observable, of } from 'rxjs';
+import { RegisterTenantDto } from '@app/dto/register.tenant.dto';
 
 describe('Testing AppController', () => {
     let appController: AppController;
 
     const mockRequest: Request = httpMocks.createRequest();
     const mockResponse: Response = httpMocks.createResponse();
+    const mockBody: RegisterTenantDto = {
+        tenantName:'tenantName',
+        email:'tenant@gmail.com',
+        password:'tenant123',
+        description:'This is tenant Database',
 
+    }
     const mockTenantDetails = {
         id: 1,
         tenant_id: 1,
@@ -48,7 +55,7 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "registerTenant"', async () => {
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
-        await appController.registerTenant(mockRequest, mockResponse);
+        await appController.registerTenant(mockBody, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });
@@ -87,4 +94,5 @@ describe('Testing AppController', () => {
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });
+    
 });

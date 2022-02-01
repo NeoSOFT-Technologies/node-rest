@@ -39,6 +39,7 @@ describe('Testing AppController', () => {
         connect: jest.fn().mockResolvedValue('connected'),
         updateDescription: jest.fn(() => of(mockTenantDetails)),
         deleteTenant: jest.fn(() => of(mockMessage)),
+        createTable: jest.fn(() => of(mockMessage))
     };
 
     beforeAll(async () => {
@@ -82,6 +83,12 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "updateDescription"', async () => {
+        mockRequest.body = {
+            action :{
+                tenantName:'string',
+                description:'string'
+            }
+        }
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         await appController.updateDescription(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
@@ -95,4 +102,10 @@ describe('Testing AppController', () => {
         mockSubscribe.mockRestore();
     });
     
+    it('Testing appcontroller "createTable"', async() => {
+        const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        await appController.createTable(mockRequest, mockResponse);
+        expect(mockSubscribe).toHaveBeenCalled();
+        mockSubscribe.mockRestore();
+    });
 });

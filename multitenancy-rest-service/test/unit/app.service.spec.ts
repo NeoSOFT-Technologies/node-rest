@@ -3,6 +3,7 @@ import { of } from 'rxjs';
 import { AppService } from '@app/app.service';
 import { ConnectionUtils } from '@app/connection.utils';
 import { DbDetailsDto } from '@app/dto/db.details.dto';
+import { Keycloak } from '@app/iam/keycloak';
 
 describe('Testing AppService', () => {
     let appService: AppService;
@@ -15,11 +16,16 @@ describe('Testing AppService', () => {
             return of({ Message: 'Tenant Config recieved Successfully' });
         }),
     };
+    const mockClient3 = {
+        send: jest.fn().mockImplementation(() => {
+            return of({ Message: 'Table Created successfully' });
+        }),
+    }
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                AppService,
+                AppService,Keycloak,
                 {
                     provide: 'REGISTER_TENANT',
                     useValue: mockClient1,
@@ -27,6 +33,10 @@ describe('Testing AppService', () => {
                 {
                     provide: 'GET_TENANT_CONFIG',
                     useValue: mockClient2,
+                },
+                {
+                    provide: 'CREATE_TABLE',
+                    useValue: mockClient3,
                 },
             ],
         }).compile();
@@ -40,6 +50,7 @@ describe('Testing AppService', () => {
             email: 'string',
             password: 'string',
             description: 'string',
+            tenantName: 'string'
         };
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
@@ -81,7 +92,7 @@ describe('Testing AppService', () => {
         const dbdetails: DbDetailsDto = {
             host: 'string',
             port: 1,
-            username: 'string',
+            tenantName: 'string',
             password: 'string',
             dbName: 'string',
         }
@@ -120,5 +131,25 @@ describe('Testing AppService', () => {
         expect(mocklistAllTenant).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));
         mocklistAllTenant.mockRestore();
+    });
+
+    it('Testing "createTable"', async() => {
+        const mockMessage = { Message: 'Table Created successfully' };
+        const tableDto = {
+            dbName: 'string',
+            tableName: 'string',
+            columns: [{
+                columnName: 'string',
+                columntype: 'string',
+            }]
+        };
+        mockClient3.send.mockImplementation(() => {
+            return of(mockMessage);
+        });
+        const mockCreateTable = jest.spyOn(mockClient3, 'send');
+        const response = appService.createTable(tableDto);
+        expect(mockCreateTable).toHaveBeenCalled();
+        response.subscribe((result) => expect(result).toEqual(mockMessage));
+        mockCreateTable.mockRestore();
     });
 });

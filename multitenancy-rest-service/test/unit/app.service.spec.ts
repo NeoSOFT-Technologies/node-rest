@@ -7,6 +7,7 @@ import { Keycloak } from '@app/iam/keycloak';
 
 describe('Testing AppService', () => {
     let appService: AppService;
+    let keycloak: Keycloak;
     
     const mockClient1 = {
         send: jest.fn(),
@@ -20,7 +21,11 @@ describe('Testing AppService', () => {
         send: jest.fn().mockImplementation(() => {
             return of({ Message: 'Table Created successfully' });
         }),
-    }
+    };
+    const mockKeycloak = {
+        createRealm: jest.fn(),
+        createUser: jest.fn()
+    };
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -39,9 +44,13 @@ describe('Testing AppService', () => {
                     useValue: mockClient3,
                 },
             ],
-        }).compile();
+        })
+        .overrideProvider(Keycloak)
+        .useValue(mockKeycloak)
+        .compile();
 
         appService = module.get<AppService>(AppService);
+        keycloak = module.get<Keycloak>(Keycloak);
     });
 
     it('Testing "register"', async () => {
@@ -151,5 +160,33 @@ describe('Testing AppService', () => {
         expect(mockCreateTable).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));
         mockCreateTable.mockRestore();
+    });
+
+    it('Testing "createRealm"', async () => {
+        const tenantDetails = {
+            tenantName: 'string',
+            email: 'string',
+            password: 'string',
+            description: 'string'
+        };
+        const mockcreateRealm = jest.spyOn(keycloak, 'createRealm');
+        appService.createRealm(tenantDetails);
+
+        expect(mockcreateRealm).toHaveBeenCalled();
+        mockcreateRealm.mockRestore();
+    });
+
+    it('Testing "createUser"', async () => {
+        const user = {
+            userName:'string',
+            email: 'string',
+            password: 'string',
+            tenantName: 'string',
+        };
+        const mockcreateUser = jest.spyOn(keycloak, 'createUser');
+        appService.createUser(user);
+
+        expect(mockcreateUser).toHaveBeenCalled();
+        mockcreateUser.mockRestore();
     });
 });

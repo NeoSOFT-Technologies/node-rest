@@ -1,9 +1,9 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 import { Injectable } from '@nestjs/common';
-import { Realm } from '../dto/realm.dto';
-import { TenantAdminUser } from '../dto/tenant.adminuser.dto';
-import { TenantUserDto } from '../dto/tenant.user.dto';
+import { Realm } from '@app/dto/realm.dto';
+import { TenantAdminUser } from '@app/dto/tenant.adminuser.dto';
+import { TenantUserDto } from '@app/dto/tenant.user.dto';
 
 @Injectable()
 export class Keycloak {

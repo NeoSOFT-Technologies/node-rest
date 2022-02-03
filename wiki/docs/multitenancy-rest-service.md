@@ -7,6 +7,10 @@ This multitenancy-rest-service has been included to interact with the tenant mic
 - `/connect-database`-HTTP GET: It generates the connection string to a tenant database and connects to it
 - `/description`-HTTP PATCH: Sample API to update tenant configuration
 - `/delete-tenant`-HTTP DELETE: Sample API to delete a tenant
+> The swagger screen is shown in the below image
+
+![Swagger](https://user-images.githubusercontent.com/87708447/152340100-16ca5ab6-4e7a-48e2-9df7-dbfd32563926.png)
+
 
 ### Installation
 First run this command to install all dependency

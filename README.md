@@ -73,7 +73,8 @@ $ docker-compose up #--build
 ```
 > The output of the above command should be shown as below.
 
-![Docker-compose-up](https://user-images.githubusercontent.com/87708447/147568333-c7ea461b-05b2-43fc-92af-4090aadb3b44.png)
+![Docker-compose-up](https://user-images.githubusercontent.com/87708447/152335672-04d94fe3-3f9f-49e5-902e-538b2fbf30ce.png)
+
 
 
 

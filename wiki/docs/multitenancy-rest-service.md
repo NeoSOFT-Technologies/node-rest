@@ -1,12 +1,15 @@
 # Multitenancy Rest Service
 
-This multitenancy-rest-service has been included to interact with the tenant microservices and test its working. It has six endpoints namely
-- `/register`-HTTP POST: It registers a new tenant by consuming tenant-registration microservice
-- `/get-tenant-config/:id`-HTTP GET: It retreives tenant config by consuming tenant-config-service microservice
-- `/all-tenants`-HTTP GET: It retreives all the registered tenant information by consuming tenant-registration microservice
-- `/connect-database`-HTTP GET: It generates the connection string to a tenant database and connects to it
-- `/description`-HTTP PATCH: Sample API to update tenant configuration
-- `/delete-tenant`-HTTP DELETE: Sample API to delete a tenant
+This multitenancy-rest-service has been included to interact with the tenant microservices and test its working. It has the following endpoints namely
+- `Register tenant` `/api/tenants/` - HTTP POST: It registers a new tenant by consuming tenant-registration microservice.
+- `Get All Tenant` `api/tenants/`- HTTP GET: It retreives all the registered tenant information from database.
+- `Update Tenant` `/api/tenants`- HTTP PATCH: Sample API to update tenant configuration.
+- `Deleting Tenant` `api/tenants` - HTTP DELETE: Sample API to delete a tenant.
+- `Tenant Configuration` `/api/tenants/{id}` - HTTP GET: It retrieves configuration of the specified id.
+- `/api/user` - HTTP POST: It will create a user under the specified userName
+- `/api/connect-database`- HTTP GET: It generates the connection string to a tenant database and connects to it.
+- `/api/create-table` - HTTP POST: It creates table in the database of the tenant.
+
 > The swagger screen is shown in the below image
 
 ![Swagger](https://user-images.githubusercontent.com/87708447/152340100-16ca5ab6-4e7a-48e2-9df7-dbfd32563926.png)
@@ -76,4 +79,4 @@ export class AppService {
 ```bash
 $ npm run start
 ```
-We can interact with the API through swagger by navigating to `http://localhost:5000/api/docs` while the application is running
+We can interact with the API through swagger by navigating to `http://localhost:5000/api/docs` while the application is running.

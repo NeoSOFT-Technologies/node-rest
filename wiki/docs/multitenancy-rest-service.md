@@ -10,11 +10,6 @@ This multitenancy-rest-service has been included to interact with the tenant mic
 - `/api/connect-database`- HTTP GET: It generates the connection string to a tenant database and connects to it.
 - `/api/create-table` - HTTP POST: It creates table in the database of the tenant.
 
-> The swagger screen is shown in the below image
-
-![Swagger](https://user-images.githubusercontent.com/87708447/152340100-16ca5ab6-4e7a-48e2-9df7-dbfd32563926.png)
-
-
 ### Installation
 First run this command to install all dependency
 ```bash
@@ -80,3 +75,75 @@ export class AppService {
 $ npm run start
 ```
 We can interact with the API through swagger by navigating to `http://localhost:5000/api/docs` while the application is running.
+
+> The swagger screen is shown in the below image
+
+![Swagger](https://user-images.githubusercontent.com/87708447/152340100-16ca5ab6-4e7a-48e2-9df7-dbfd32563926.png)
+
+---
+## Information Regarding the API
+
+**1. Creating a Tenant**
+
+API Endpoint:  `POST` `/api/tenants/`
+
+**Input:** The input of the schema while creating a tenant is in the form of `JSON` format
+
+```
+{
+  "tenantName": "String",
+  "email": "String",
+  "password": "String",
+  "description": "String"
+}
+```
+**Output:** The scehma of the output is also in the `JSON` format
+
+```
+{
+   "Message": "Tenant Registered Successfully".
+}
+```
+---
+**2. Information Of Tenants**
+API Endpoint: `GET` `/api/tenants`
+
+**Input:** Since this is a `GET` request there are no input parameters.
+**Output:** The schema of the output is in the form of lists which consists of `JSON` objects.
+```
+[
+  {
+    "id": 1,
+    "tenantName": "Value",
+    "email": "Value",
+    "password": "Value",
+    "description": "Value",
+    "createdDateTime": "Value",
+    "isDelete": "Value"
+  },
+  {},
+  ...
+]
+```
+---
+**3. Updating the Tenant's Configuration**
+API Endpoint: `PATCH` `/api/tenants`
+
+**Input:** The schema of this input is in `NESTED JSON` format.
+```
+{
+  "action": {
+    "tenantName": "string",
+    "description": "string"
+  }
+}
+```
+**Output** The schema of the output is also in `JSON` format
+```
+{
+  "generatedMaps": [],
+  "raw": [],
+  "affected": 1
+}
+The `affected` key value 1 means the updation is successfull otherwise it is 0
+```

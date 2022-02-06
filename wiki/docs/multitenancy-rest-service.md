@@ -147,3 +147,45 @@ API Endpoint: `PATCH` `/api/tenants`
 }
 The `affected` key value 1 means the updation is successfull otherwise it is 0
 ```
+---
+**4. Deleting the Tenant's Configuration**
+API Endpoint: `DELETE` `/api/tenants`
+
+**Input:** The schema of this request is in the `JSON` format and `tenantName` is required.
+```
+{
+  "tenantName":"st
+}
+```
+**Output:** The schema of the output is again in `JSON` format which is as follows.
+```
+{
+  "generatedMaps": [],
+  "raw": [],
+  "affected": 1
+}
+```
+>The operation that we are performing here is called as `VIRTUAL DELETE` which states that the entity is not hard deleted from the database which can be used later in order to retrieve from archive etc.
+---
+**5. Get Tenant's Configuration By Parameter**
+API Endpoint: `GET` `/api/tenants/{id}`
+
+**Input:** The input `id` is taken from the `request header` and the processed.
+
+```
+Request URL: `http://localhost:5000/api/tenants/1`
+```
+**Output:** The response of this request is presented in the `JSON` format.
+```
+{
+  "id": Value,
+  "tenantId": Value,
+  "tenantName": "Value",
+  "description": "Value",
+  "createdDateTime": "Value",
+  "tenantDbName": "Value",
+  "host": "Value",
+  "port": Value,
+  "policy": "Value"
+}
+```

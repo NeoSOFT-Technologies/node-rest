@@ -5,7 +5,7 @@
 API Endpoint:  `GET` `/api/tenant-login/`
 
 **Input:** The input for logging in a tenant is 
-| Name                 | Description                  | Schema |
+| Name                 | Description                  | Type   |
 |----------------------|------------------------------|--------|
 | username<br>required | Admin username of the tenant | string |
 | password<br>required | Password of that Tenant      | string |
@@ -18,7 +18,7 @@ API Endpoint:  `GET` `/api/tenant-login/`
 API Endpoint:  `GET` `/api/master-login/`
 
 **Input:** The input for getting master details is 
-| Name                      | Description              | schema |
+| Name                      | Description              | Type   |
 |---------------------------|--------------------------|--------|
 | adminName<br>required     | name of the master admin | string |
 | adminPassword<br>required | admin password           | string |
@@ -49,7 +49,7 @@ API Endpoint:  `GET` `/api/get-tenants/`
 API Endpoint:  `GET` `/api/get-tenant-details/`
 
 **Input:** The input for getting tenant details is 
-| Name                   | Description            | Schema |
+| Name                   | Description            | Type   |
 |------------------------|------------------------|--------|
 | tenantName<br>required | name of the the tenant | string |
 
@@ -72,7 +72,7 @@ API Endpoint:  `GET` `/api/get-tenant-details/`
 API Endpoint:  `GET` `/api/register-tenant/`
 
 **Input:** The input for register a new tenant is 
-| Name                    | Description               | schema |
+| Name                    | Description               | Type   |
 |-------------------------|---------------------------|--------|
 | tenantName<br>required  | name of the new tenant    | string |
 | email<br>required       | email of the tenant       | string |
@@ -83,4 +83,46 @@ API Endpoint:  `GET` `/api/register-tenant/`
 | Name            | Description  |
 |-----------------|--------------|
 | message         | success      |
+---
+
+**6. Tenant Configurations**
+
+API Endpoint: `GET` `/api/get-tenant-details-by-tenantName/`
+
+**Input:** The input for retrieving configuration of specific Tenant is given below
+
+| Name                    | Description               | Type   |
+|-------------------------|---------------------------|--------|
+| tenantName<br>required  | name of the new tenant    | string |
+
+**Output:** Produces `application/json` of the following schema and having the following configuration.
+
+| Name             | Description               | Type    |
+|------------------|---------------------------|---------|
+| tenantName       | name of the tenant        | string  |
+| tenantId         | id of the tenant          | string  |
+| port             | port of database server   | number  |
+| createdDatetime  | date and time of creation | string  |
+| email            | emailll of tenant         | string  |
+| description      | description of tenant     | string  |
+| host             | host of db server         | string  |
+---
+
+**7. Create New User**
+API Endpoint: `POST` `/api/create-new-user/`
+
+**Input:** The input for creating a new user is again in the form of `application/json`
+
+| Name             | Description                                             | Type    |
+|------------------|---------------------------------------------------------|---------|
+| userName         | name of the new user                                    | string  |
+| password         | password to be set by user                              | string  |
+| email            | email of the new user                                   | string  |
+| tenantName       | name of tenant under<br>which the user is to be created | string  |
+
+**Output:** The output i.e the response of this above request should be in the form of `JSON`
+
+| Name       | Type   |
+|------------|--------|
+| message    | string |
 ---

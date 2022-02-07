@@ -1,13 +1,17 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthService } from './auth/auth.service';
+import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import config from './config';
 import { Keycloak } from './iam/keycloak';
 
 @Module({
   imports: [
+    HttpModule,
     ConfigModule.forRoot({
       envFilePath: [`${process.cwd()}/config/.env`],
       isGlobal: true,
@@ -42,6 +46,6 @@ import { Keycloak } from './iam/keycloak';
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService,Keycloak],
+  providers: [AppService, Keycloak, AuthService, KeycloakAuthGuard],
 })
 export class AppModule {}

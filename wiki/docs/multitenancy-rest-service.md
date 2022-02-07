@@ -109,6 +109,7 @@ API Endpoint:  `POST` `/api/tenants/`
 API Endpoint: `GET` `/api/tenants`
 
 **Input:** Since this is a `GET` request there are no input parameters.
+
 **Output:** The schema of the output is in the form of lists which consists of `JSON` objects.
 ```
 [
@@ -187,5 +188,68 @@ Request URL: `http://localhost:5000/api/tenants/1`
   "host": "Value",
   "port": Value,
   "policy": "Value"
+}
+```
+---
+**6. Connect Database**
+API Endpoint: `GET` `/api/connect-database`
+**Input:** The input for this endpoint is in the form of `request query` which is of the following format.
+```
+The parameters are of the following format.
+host: String
+port: Number
+tenantName: String
+password: String
+dbName: String
+```
+> Since our application is dockerised so in `host` we have to add `database` and if it was not dockerised we have to write `host: 127.0.0.1`
+
+**Output:** The output when the credentials are verified is in the `JSON` format.
+```
+{
+  "Message": "Database connected successfuly"
+}
+```
+---
+
+**7. API Ceate Table**
+API Endpoint: `POST` `/api/create-table`
+
+**Input:** The input for this endpoint is in the `JSON` format which consists the following parameters.
+```
+{
+  "dbName": "string",
+  "tableName": "string",
+  "columns": [
+    "string"
+  ]
+}
+```
+**Output:** The output here is a message which is again present in the `JSON` format.
+```
+{
+    "Message": "Table Created Successfully"
+}
+```
+---
+**8. Creating a user under a particular Tenant**
+API Endpoint: `POST` `/api/create-user`
+**Input:** The input for this request is in `JSON` format with the following parameters.
+
+```
+{
+  "userName": "string",
+  "email": "string",
+  "password": "string",
+  "tenantName": "string"
+}
+```
+> Note: `password` is the password of the tenant under which the user is being created.
+
+
+**Output:** The response of this request is present in the `JSON` format
+```
+{
+   "Message": "User created Successfully."
 }
 ```

@@ -111,7 +111,7 @@ API Endpoint: `GET` `/api/get-tenant-details-by-tenantName/`
 **7. Create New User**
 API Endpoint: `POST` `/api/create-new-user/`
 
-**Input:** The input for creating a new user is again in the form of `application/json`
+**Input:** The input for creating a new user is in the form of `application/json`
 
 | Name             | Description                                             | Type    |
 |------------------|---------------------------------------------------------|---------|
@@ -120,9 +120,85 @@ API Endpoint: `POST` `/api/create-new-user/`
 | email            | email of the new user                                   | string  |
 | tenantName       | name of tenant under<br>which the user is to be created | string  |
 
-**Output:** The output i.e the response of this above request should be in the form of `JSON`
+**Output:** The output i.e the response of this above request is in the form of `JSON`
 
 | Name       | Type   |
 |------------|--------|
 | message    | string |
+---
+**8. Updating the Tenant's Configuration**
+API Endpoint: `PATCH` `/api/tenants`
+
+**Input:** The input for editing a tenant's configuratiom is in the form of `application/json` which is nested json. The key is `action` with the value which is a json of the schema
+
+| Name                              | Description                                       | Type   |
+|-----------------------------------|---------------------------------------------------|--------|
+| tenantName<br>required            | name of the tenant                                | string |
+| config(to be updated)<br>required | key value pair of the configuration to be updated | string |
+
+**Output:** The output i.e the response of this above request is in the form of `JSON`
+
+| Name        | Type   |
+|-------------|--------|
+| affected    | number |
+
+The `affected` key value 1 means the updation is successfull otherwise it is 0  
+
+---
+**8. Updating the Tenant's Configuration**
+API Endpoint: `PATCH` `/api/tenants`
+
+**Input:** The input for editing a tenant's configuratiom is in the form of `application/json` which is nested json. The key is `action` with the value which is a json of the schema
+
+| Name                              | Description                                       | Type   |
+|-----------------------------------|---------------------------------------------------|--------|
+| tenantName<br>required            | name of the tenant                                | string |
+| config(to be updated)<br>required | name of the configuration to be updated           | string |
+
+**Output:** The output i.e the response of this above request is in the form of `application/json` which contains a key
+
+| Name        | Type   |
+|-------------|--------|
+| affected    | number |
+
+The `affected` key value 1 means the updation is successfull otherwise it is 0  
+
+---
+**9. Deleting a Tenant**
+API Endpoint: `DELETE` `/api/tenants`
+
+**Input:** The input for this request is in the `JSON` format and `tenantName` is required.
+
+| Name                              | Description                                       | Type   |
+|-----------------------------------|---------------------------------------------------|--------|
+| tenantName<br>required            | name of the tenant to be deleted                              | string |
+
+**Output:** The output i.e the response of this above request is in the form of `application/json` which contains a key
+
+| Name        | Type   |
+|-------------|--------|
+| affected    | number |
+
+The `affected` key value 1 means the updation is successfull otherwise it is 0  
+
+---
+**10. Test Tenant's connectivity with database**
+API Endpoint: `GET` `/api/connect-database`
+
+**Input:** The input for this endpoint is in the form of `request query` which is of the following format.
+
+| Name                   | Description                                 | Type   |
+|------------------------|---------------------------------------------|--------|
+| host<br>required       | host of db server                           | string |
+| port<br>required       | port of db server                           | number |
+| tenantName<br>required | name of the tenant                          | string |
+| dbName<br>required     | name of the tenant's db                     | string |
+| password<br>required   | password of user with CRUD permission on db | string |
+
+**Output:** The output when the credentials are verified is in the `JSON` format.
+
+| Name        | Type    |
+|-------------|---------|
+| message     | success |
+
 ---

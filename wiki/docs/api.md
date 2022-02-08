@@ -5,38 +5,99 @@
 - In the following document we will be writing the information about the various API endpoints that will be using to support our Multi-tenant Architecture.
 
 ---
-**1. Logging in as tenant**
+**1. Tenant Login**
 
-API Endpoint:  `GET` `/api/tenant-login/`
+Request Method:  `POST`  
+API Endpoint:  `/api/login`
 
-**Input:** The input for logging in a tenant is 
-| Name                 | Description                  | Type   |
-|----------------------|------------------------------|--------|
-| username<br>required | Admin username of the tenant | string |
-| password<br>required | Password of that Tenant      | string |
+**Input:**  
+1. Headers
+    | Key          | Value            |
+    |--------------|------------------|
+    | Content-Type | application/json |
+2. Request Body
 
-**Output:** After login page is redirected to `/tenant-dashboard` where the Dashboard is rendered
+    | Name                 | Description             | Type   |
+    |----------------------|-------------------------|--------|
+    | username<br>required | Username of the tenant  | string |
+    | password<br>required | Password of that tenant | string |
+
+3. Request Query
+    | Name   | Description                                          | Type    |
+    |--------|------------------------------------------------------|---------|
+    | master | If request is for master login<br>false in this case | boolean |
+
+**Output:**  Returns an access token
+| Name        | Description  |
+|-------------|--------------|
+| access_token| access token |
 
 ---
-**2. Master Details**
+**2. Master Login**
 
-API Endpoint:  `GET` `/api/master-login/`
+Request Method:  `POST`  
+API Endpoint:  `/api/login`
 
-**Input:** The input for getting master details is 
-| Name                      | Description              | Type   |
-|---------------------------|--------------------------|--------|
-| adminName<br>required     | name of the master admin | string |
-| adminPassword<br>required | admin password           | string |
+**Input:**  
+1. Headers
+    | Key          | Value            |
+    |--------------|------------------|
+    | Content-Type | application/json |
+2. Request Body
 
-**Output:** After login page is redirected to `/master-dashboard` where the master Dashboard is rendered
+    | Name                 | Description             | Type   |
+    |----------------------|-------------------------|--------|
+    | username<br>required | Username of the master  | string |
+    | password<br>required | Password of that master | string |
+
+3. Request Query
+    | Name   | Description                                          | Type    |
+    |--------|------------------------------------------------------|---------|
+    | master | If request is for master login<br>true in this case  | boolean |
+
+**Output:**  Returns an access token
+| Name        | Description  |
+|-------------|--------------|
+| access_token| access token |
 
 ---
-**3. Tenant List**
+**3. API for Forgot Password**
 
-API Endpoint:  `GET` `/api/get-tenants/`
+Request Method: `POST` 
+API Endpoint:  `/api/forgot-password`
+
+**Input:**  
+1. Headers
+    | Key          | Value            |
+    |--------------|------------------|
+    | Content-Type | application/json |
+2. Request Body
+    | Name        | Description      | Type     |
+    |-------------|------------------|----------|
+    | email       | registered email |  string  |
+
+
+**Output:** The output of the following request will be in the form of message which is gonna tell us whether the password has been successfully updated or not.
+
+| Name            | Description                       |
+|-----------------|-----------------------------------|
+| success message | Password Updated Successfully     |
+| failure message | Password Not Updated Successfully |
+
+---
+## /api/tenant
+
+**4. Tenant List**
+
+Request Method:  `GET`  
+API Endpoint:  `/api/tenant`
 > `Note: `Only the admin of the tenants i.e. master admin can use this API
 
-**Input:** No input is required
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
 
 **Output:** Produces `application/json` which contains the array of the following schema
 | Name            | Description                        |
@@ -44,19 +105,25 @@ API Endpoint:  `GET` `/api/get-tenants/`
 | id              | id of table row                    |
 | tenantName      | name of tenant                     |
 | email           | email of tenant                    |
-| password        | password of tenant                 |
 | description     | description of tenant              |
 | createdDateTime | time of creation of tenant         |
-| isDelete        | if the delete is active or deleted |
+| isDeleted       | if the delete is active or deleted |
 ---
-**4. Tenant Details**
+**5. Tenant Details**
 
-API Endpoint:  `GET` `/api/get-tenant-details/`
+Request Method:  `GET`  
+API Endpoint:  `/api/tenant/:id`
 
-**Input:** The input for getting tenant details is 
-| Name                   | Description            | Type   |
-|------------------------|------------------------|--------|
-| tenantName<br>required | name of the the tenant | string |
+**Input:** 
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Path Parameters
+    | Name           | Description            | Type   |
+    |----------------|------------------------|--------|
+    | id<br>required | id of the the tenant   | string |
 
 **Output:** Produces `application/json` of the following schema
 | Name            | Description                   |
@@ -72,76 +139,54 @@ API Endpoint:  `GET` `/api/get-tenant-details/`
 | policy          | policies of tenant            |
 
 ---
-**5. Create new Tenant**
+**6. Create new Tenant**
 
-API Endpoint:  `GET` `/api/register-tenant/`
+Request Method:  `POST`  
+API Endpoint:  `/api/tenant`
 
-**Input:** The input for register a new tenant is 
-| Name                    | Description               | Type   |
-|-------------------------|---------------------------|--------|
-| tenantName<br>required  | name of the new tenant    | string |
-| email<br>required       | email of the tenant       | string |
-| password<br>required    | password of the tenant    | string |
-| description<br>required | description of the tenant | string |
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+
+2. Request Body
+    | Name                    | Description               | Type   |
+    |-------------------------|---------------------------|--------|
+    | tenantName<br>required  | name of the new tenant    | string |
+    | email<br>required       | email of the tenant       | string |
+    | password<br>required    | password of the tenant    | string |
+    | description<br>required | description of the tenant | string |
 
 **Output:** Produces `application/json` of the following schema
-| Name            | Description  |
-|-----------------|--------------|
-| message         | success      |
+| Name     | Description                 |
+|----------|-----------------------------|
+| message  | success                     |
+| id       | registered tenant unique id |
 ---
+**7. Updating a Tenant**
 
-**6. Tenant Configurations**
+Request Method:  `PATCH`  
+API Endpoint: `/api/tenant/:id`
 
-API Endpoint: `GET` `/api/get-tenant-details-by-tenantName/`
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+2. Request Path Parameters
+    | Name           | Description            | Type   |
+    |----------------|------------------------|--------|
+    | id<br>required | id of the the tenant   | string |
+3. Request Body
+    | Name                              | Description                                       | Type   |
+    |-----------------------------------|---------------------------------------------------|--------|
+    | fields(to be updated)<br>required | key value pair of the configuration to be updated | string |
 
-**Input:** The input for retrieving configuration of specific Tenant is given below
-
-| Name                    | Description               | Type   |
-|-------------------------|---------------------------|--------|
-| tenantName<br>required  | name of the new tenant    | string |
-
-**Output:** Produces `application/json` of the following schema and having the following configuration.
-
-| Name             | Description               | Type    |
-|------------------|---------------------------|---------|
-| tenantName       | name of the tenant        | string  |
-| tenantId         | id of the tenant          | string  |
-| port             | port of database server   | number  |
-| createdDatetime  | date and time of creation | string  |
-| email            | emailll of tenant         | string  |
-| description      | description of tenant     | string  |
-| host             | host of db server         | string  |
----
-
-**7. Create New User**
-API Endpoint: `POST` `/api/create-new-user/`
-
-**Input:** The input for creating a new user is in the form of `application/json`
-
-| Name             | Description                                             | Type    |
-|------------------|---------------------------------------------------------|---------|
-| userName         | name of the new user                                    | string  |
-| password         | password to be set by user                              | string  |
-| email            | email of the new user                                   | string  |
-| tenantName       | name of tenant under<br>which the user is to be created | string  |
-
-**Output:** The output i.e the response of this above request is in the form of `JSON`
-
-| Name       | Type   |
-|------------|--------|
-| message    | string |
----
-**8. Updating the Tenant's Configuration**
-API Endpoint: `PATCH` `/api/tenants`
-
-**Input:** The input for editing a tenant's configuratiom is in the form of `application/json` which is nested json. The key is `action` with the value which is a json of the schema
-
-| Name                              | Description                                       | Type   |
-|-----------------------------------|---------------------------------------------------|--------|
-| tenantName<br>required            | name of the tenant                                | string |
-| config(to be updated)<br>required | key value pair of the configuration to be updated | string |
-
-**Output:** The output i.e the response of this above request is in the form of `JSON`
+**Output:** Produces `application/json` of the following schema  
 
 | Name        | Type   |
 |-------------|--------|
@@ -150,35 +195,23 @@ API Endpoint: `PATCH` `/api/tenants`
 The `affected` key value 1 means the updation is successfull otherwise it is 0  
 
 ---
-**8. Updating the Tenant's Configuration**
-API Endpoint: `PATCH` `/api/tenants`
+**8. Deleting a Tenant**
 
-**Input:** The input for editing a tenant's configuratiom is in the form of `application/json` which is nested json. The key is `action` with the value which is a json of the schema
+Request Method: `DELETE`  
+API Endpoint:  `/api/tenant`
 
-| Name                              | Description                                       | Type   |
-|-----------------------------------|---------------------------------------------------|--------|
-| tenantName<br>required            | name of the tenant                                | string |
-| config(to be updated)<br>required | name of the configuration to be updated           | string |
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+2. Request Body
+    | Name                              | Description                        | Type   |
+    |-----------------------------------|------------------------------------|--------|
+    | tenantName<br>required            | name of the tenant to be deleted   | string |
 
-**Output:** The output i.e the response of this above request is in the form of `application/json` which contains a key
-
-| Name        | Type   |
-|-------------|--------|
-| affected    | number |
-
-The `affected` key value 1 means the updation is successfull otherwise it is 0  
-
----
-**9. Deleting a Tenant**
-API Endpoint: `DELETE` `/api/tenants`
-
-**Input:** The input for this request is in the `JSON` format and `tenantName` is required.
-
-| Name                              | Description                                       | Type   |
-|-----------------------------------|---------------------------------------------------|--------|
-| tenantName<br>required            | name of the tenant to be deleted                              | string |
-
-**Output:** The output i.e the response of this above request is in the form of `application/json` which contains a key
+**Output:** Produces `application/json` of the following schema  
 
 | Name        | Type   |
 |-------------|--------|
@@ -187,41 +220,91 @@ API Endpoint: `DELETE` `/api/tenants`
 The `affected` key value 1 means the updation is successfull otherwise it is 0  
 
 ---
-**10. Test Tenant's connectivity with database**
-API Endpoint: `GET` `/api/connect-database`
+## /api/tenant/config
 
-**Input:** The input for this endpoint is in the form of `request query` which is of the following format.
+**9. Tenant Configurations**
 
-| Name                   | Description                                 | Type   |
-|------------------------|---------------------------------------------|--------|
-| host<br>required       | host of db server                           | string |
-| port<br>required       | port of db server                           | number |
-| tenantName<br>required | name of the tenant                          | string |
-| dbName<br>required     | name of the tenant's db                     | string |
-| password<br>required   | password of user with CRUD permission on db | string |
+Request Method:  `GET`  
+API Endpoint: `/api/tenant/config/:id`
 
-**Output:** The output when the credentials are verified is in the `JSON` format.
+**Input:** 
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Path Parameters
+    | Name           | Description            | Type   |
+    |----------------|------------------------|--------|
+    | id<br>required | id of the the tenant   | string |
+
+**Output:** Produces `application/json` of the following schema
+
+| Name             | Description                   |
+|------------------|-------------------------------|
+| tenantId         | id of the tenant              |
+| tenantName       | name of the tenant            |
+| description      | description of tenant         |
+| createdDatetime  | date and time of creation     |
+| tenantDbName     | db name provisioned to tenant |
+| host             | host of db server             |
+| port             | port of database server       |
+---
+## /api/user
+
+**10. Create New User**
+
+Request Method:  `POST`  
+API Endpoint: `/api/user`
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Body
+    | Name             | Description                                             | Type    |
+    |------------------|---------------------------------------------------------|---------|
+    | userName         | name of the new user                                    | string  |
+    | password         | password to be set by user                              | string  |
+    | email            | email of the new user                                   | string  |
+    | tenantName       | name of tenant under<br>which the user is to be created | string  |
+
+**Output:** Produces `application/json` of the following schema  
+| Name       | Description                 |
+|------------|-----------------------------|
+| message    | success                     |
+| id         | registered tenant unique id |
+
+
+---
+## Miscellaneous
+
+**11. Test Tenant's connectivity with database**
+
+Request Method: `GET`  
+API Endpoint:  `/api/connect-database`
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+2. Request Query
+    | Name                   | Description                                 | Type   |
+    |------------------------|---------------------------------------------|--------|
+    | host<br>required       | host of db server                           | string |
+    | port<br>required       | port of db server                           | number |
+    | tenantName<br>required | name of the tenant                          | string |
+    | dbName<br>required     | name of the tenant's db                     | string |
+    | password<br>required   | password of user with CRUD permission on db | string |
+
+**Output:** Produces `application/json` of the following schema  
 
 | Name        | Description    |
 |-------------|----------------|
 | message     | success        |
-
----
-
-**11. API for Forgot Password**
-API Endpoint: `POST` `/api/forgot-password`
-
-**Input:** The input for this endpoint is in the form of `JSON` format which will ask user for its registered email.
-
-| Name        | Description      | Type     |
-|-------------|------------------|----------|
-| email       | registered email |  string  |
-
-**Output:** The output of the following request will be in the form of message which is gonna tell us whether the password has been successfully updated or not.
-
-| Name            | Description                       |
-|-----------------|-----------------------------------|
-| success message | Password Updated Successfully     |
-| failure message | Password Not Updated Successfully |
 
 ---

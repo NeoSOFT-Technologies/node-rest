@@ -1,4 +1,9 @@
 ## Information regarding API's
+
+- API is the acronym for ***Application Programming Interface**, which is a software intermediary that allows two applications to talk to each other. 
+- A document or standard that describes how to build or use such a connection or interface is called an API specification.
+- In the following document we will be writing the information about the various API endpoints that will be using to support our Multi-tenant Architecture.
+
 ---
 **1. Logging in as tenant**
 
@@ -197,8 +202,26 @@ API Endpoint: `GET` `/api/connect-database`
 
 **Output:** The output when the credentials are verified is in the `JSON` format.
 
-| Name        | Type    |
-|-------------|---------|
-| message     | success |
+| Name        | Description    |
+|-------------|----------------|
+| message     | success        |
+
+---
+
+**11. API for Forgot Password**
+API Endpoint: `POST` `/api/forgot-password`
+
+**Input:** The input for this endpoint is in the form of `JSON` format which will ask user for its registered email.
+
+| Name        | Description      | Type     |
+|-------------|------------------|----------|
+| email       | registered email |  string  |
+
+**Output:** The output of the following request will be in the form of message which is gonna tell us whether the password has been successfully updated or not.
+
+| Name            | Description                       |
+|-----------------|-----------------------------------|
+| success message | Password Updated Successfully     |
+| failure message | Password Not Updated Successfully |
 
 ---

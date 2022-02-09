@@ -5,6 +5,7 @@
 - In the following document we will be writing the information about the various API endpoints that will be using to support our Multi-tenant Architecture.
 
 ---
+
 **1. Tenant Login**
 
 Request Method:  `POST`  
@@ -15,6 +16,7 @@ API Endpoint:  `/api/login`
     | Key          | Value            |
     |--------------|------------------|
     | Content-Type | application/json |
+
 2. Request Body
 
     | Name                 | Description             | Type   |
@@ -33,6 +35,7 @@ API Endpoint:  `/api/login`
 | access_token| access token |
 
 ---
+
 **2. Master Login**
 
 Request Method:  `POST`  
@@ -61,9 +64,11 @@ API Endpoint:  `/api/login`
 | access_token| access token |
 
 ---
+
 **3. API for Forgot Password**
 
 Request Method: `POST` 
+
 API Endpoint:  `/api/forgot-password`
 
 **Input:**  
@@ -107,8 +112,9 @@ API Endpoint:  `/api/tenant`
 | email           | email of tenant                    |
 | description     | description of tenant              |
 | createdDateTime | time of creation of tenant         |
-| isDeleted       | if the delete is active or deleted |
+| isDeleted       | if the tenant is active or deleted |
 ---
+
 **5. Tenant Details**
 
 Request Method:  `GET`  
@@ -206,6 +212,7 @@ API Endpoint:  `/api/tenant`
     |---------------|-----------------------|
     | Authorization | Bearer [ACCESS_TOKEN] |
     | Content-Type  | application/json      |
+
 2. Request Body
     | Name                              | Description                        | Type   |
     |-----------------------------------|------------------------------------|--------|
@@ -278,11 +285,115 @@ API Endpoint: `/api/user`
 | message    | success                     |
 | id         | registered tenant unique id |
 
+---
+**11. User List**
 
+Request Method:  `GET`  
+API Endpoint:  `/api/user`
+> `Note: `Only the admin of the user i.e. tenant under which the users are created can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+**Output:** Produces `application/json` which contains the array of the following schema
+| Name            | Description                        |
+|-----------------|------------------------------------|
+| id              | id of table row                    |
+| userName        | name of user                       |
+| email           | email of user                      |
+| createdDateTime | time of creation of user           |
+| isDeleted       | if the user is active or deleted   |
+---
+
+**12. User Configuration**
+
+Request Method:  `GET`  
+API Endpoint: `/api/user/:id`
+
+**Input**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Path Parameters
+    | Name           | Description            | Type   |
+    |----------------|------------------------|--------|
+    | id<br>required | id of the the user     | string |
+
+**Output:** Produces `application/json` of the following schema
+
+| Name             | Description                                             | Type   |
+|------------------|---------------------------------------------------------|--------| 
+| userId           | id of new user                                          | string |  
+| username         | username created by user                                | string |
+| tenantName       | name of tenant under<br>which the user is to be created | string |
+| createdDateTime  | date and time when the user is created                  | string |
+
+---
+**13. Updating a User**
+
+Request Method:  `PATCH`  
+API Endpoint: `/api/user/:id`
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Path Parameters
+    | Name           | Description            | Type   |
+    |----------------|------------------------|--------|
+    | id<br>required | id of the the user     | string |
+
+3. Request Body
+    | Name                              | Description                                       | Type   |
+    |-----------------------------------|---------------------------------------------------|--------|
+    | fields(to be updated)<br>required | key value pair of the configuration to be updated | string |
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name        | Type   |
+|-------------|--------|
+| affected    | number |
+
+The `affected` key value 1 means the updation is successfull otherwise it is 0
+
+---
+
+**14. Deleting a User**
+
+Request Method: `DELETE`  
+API Endpoint:  `/api/tenant`
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Body
+    | Name                              | Description                        | Type   |
+    |-----------------------------------|------------------------------------|--------|
+    | userName<br>required              | name of the user to be deleted     | string |
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name        | Type   |
+|-------------|--------|
+| affected    | number |
+
+The `affected` key value 1 means the updation is successfull otherwise it is 0
 ---
 ## Miscellaneous
 
-**11. Test Tenant's connectivity with database**
+**15. Test Tenant's connectivity with database**
 
 Request Method: `GET`  
 API Endpoint:  `/api/connect-database`
@@ -302,6 +413,39 @@ API Endpoint:  `/api/connect-database`
     | password<br>required   | password of user with CRUD permission on db | string |
 
 **Output:** Produces `application/json` of the following schema  
+
+| Name        | Description    |
+|-------------|----------------|
+| message     | success        |
+
+---
+
+**16. Test Creation of Table in Tenant's Database**
+
+Request Method: `POST`  
+API Endpoint:  `/api/create-table`
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Body
+    | Name                   | Description                        | Type      |
+    |------------------------|------------------------------------|-----------|
+    | dbName                 | Database Name                      | string    |
+    | tableName              | Name of the table to be created    | string    |
+    | columns                | Column names of table              | ColumnDto |
+
+3. Schema for Column DTO is as follows
+    | Name                   | Description                        | Type      |
+    |------------------------|------------------------------------|-----------|
+    | columnName             | Name of the column                 | string    |
+    | columnType             | Column Datatype                    | any       |
+
+** Output**
+Produces `application/json` of the following schema  
 
 | Name        | Description    |
 |-------------|----------------|

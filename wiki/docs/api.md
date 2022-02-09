@@ -290,6 +290,7 @@ API Endpoint: `/api/user`
 
 Request Method:  `GET`  
 API Endpoint:  `/api/user`
+
 > `Note: `Only the admin of the user i.e. tenant under which the users are created can use this API
 
 **Input:**
@@ -304,6 +305,7 @@ API Endpoint:  `/api/user`
 | id              | id of table row                    |
 | userName        | name of user                       |
 | email           | email of user                      |
+| tenantName      | tenatName of the user              |
 | createdDateTime | time of creation of user           |
 | isDeleted       | if the user is active or deleted   |
 ---
@@ -320,9 +322,10 @@ API Endpoint: `/api/user/:id`
     | Authorization | Bearer [ACCESS_TOKEN] |
 
 2. Request Path Parameters
-    | Name           | Description            | Type   |
-    |----------------|------------------------|--------|
-    | id<br>required | id of the the user     | string |
+    | Name                  | Description                        | Type   |
+    |-----------------------|------------------------------------|--------|
+    | id<br>required        | id of the the user                 | string |
+    | tenantName<br>required| name of the tenant of the user     | string |
 
 **Output:** Produces `application/json` of the following schema
 
@@ -347,11 +350,13 @@ API Endpoint: `/api/user/:id`
     | Content-Type  | application/json      |
 
 2. Request Path Parameters
-    | Name           | Description            | Type   |
-    |----------------|------------------------|--------|
-    | id<br>required | id of the the user     | string |
+    | Name                    | Description            | Type   |
+    |-------------------------|------------------------|--------|
+    | id<br>required          | id of the the user     | string |
+    | tenantName<br>required  | tenantName of the user | string |
 
 3. Request Body
+
     | Name                              | Description                                       | Type   |
     |-----------------------------------|---------------------------------------------------|--------|
     | fields(to be updated)<br>required | key value pair of the configuration to be updated | string |
@@ -369,7 +374,7 @@ The `affected` key value 1 means the updation is successfull otherwise it is 0
 **14. Deleting a User**
 
 Request Method: `DELETE`  
-API Endpoint:  `/api/tenant`
+API Endpoint:  `/api/user`
 
 **Input:**
 1. Headers
@@ -382,6 +387,7 @@ API Endpoint:  `/api/tenant`
     | Name                              | Description                        | Type   |
     |-----------------------------------|------------------------------------|--------|
     | userName<br>required              | name of the user to be deleted     | string |
+    | tenantName<br>required            | name of the tenant of the user     | string |
 
 **Output:** Produces `application/json` of the following schema  
 
@@ -437,10 +443,6 @@ API Endpoint:  `/api/create-table`
     | dbName                 | Database Name                      | string    |
     | tableName              | Name of the table to be created    | string    |
     | columns                | Column names of table              | ColumnDto |
-
-3. Schema for Column DTO is as follows
-    | Name                   | Description                        | Type      |
-    |------------------------|------------------------------------|-----------|
     | columnName             | Name of the column                 | string    |
     | columnType             | Column Datatype                    | any       |
 

@@ -1,6 +1,6 @@
 ## Information regarding API's
 
-- API is the acronym for ***Application Programming Interface**, which is a software intermediary that allows two applications to talk to each other. 
+- API is the acronym for **Application Programming Interface**, which is a software intermediary that allows two applications to talk to each other. 
 - A document or standard that describes how to build or use such a connection or interface is called an API specification.
 - In the following document we will be writing the information about the various API endpoints that will be using to support our Multi-tenant Architecture.
 
@@ -96,7 +96,7 @@ API Endpoint:  `/api/forgot-password`
 
 Request Method:  `GET`  
 API Endpoint:  `/api/tenant`
-> `Note: `Only the admin of the tenants i.e. master admin can use this API
+> `Note:` Only the admin of the tenants i.e. master admin can use this API
 
 **Input:**
 1. Headers
@@ -398,7 +398,7 @@ API Endpoint:  `/api/user`
 The `affected` key value 1 means the updation is successfull otherwise it is 0
 
 ---
-## Miscellaneous
+## Testing API's
 
 **15. Test Tenant's connectivity with database**
 

@@ -396,6 +396,7 @@ API Endpoint:  `/api/user`
 | affected    | number |
 
 The `affected` key value 1 means the updation is successfull otherwise it is 0
+
 ---
 ## Miscellaneous
 
@@ -443,11 +444,15 @@ API Endpoint:  `/api/create-table`
     | dbName                 | Database Name                      | string    |
     | tableName              | Name of the table to be created    | string    |
     | columns                | Column names of table              | ColumnDto |
+    
+    Schema for Column DTO is as follows
+     
+    | Name                   | Description                        | Type      |
+    |------------------------|------------------------------------|-----------|
     | columnName             | Name of the column                 | string    |
     | columnType             | Column Datatype                    | any       |
 
-** Output**
-Produces `application/json` of the following schema  
+**Output:** Produces `application/json` of the following schema  
 
 | Name        | Description    |
 |-------------|----------------|

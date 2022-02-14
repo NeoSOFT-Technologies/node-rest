@@ -8,6 +8,8 @@ import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import config from './config';
 import { Keycloak } from './iam/keycloak';
+import { KeycloakRealm } from './iam/keycloakRealm';
+import { KeycloakUser } from './iam/keycloakUser';
 
 @Module({
   imports: [
@@ -46,6 +48,6 @@ import { Keycloak } from './iam/keycloak';
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService, Keycloak, AuthService, KeycloakAuthGuard],
+  providers: [AppService, AuthService, KeycloakAuthGuard, Keycloak, KeycloakUser, KeycloakRealm],
 })
 export class AppModule {}

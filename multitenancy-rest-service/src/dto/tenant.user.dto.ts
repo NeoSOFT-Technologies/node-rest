@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
-export class RegisterTenantDto {
+export class TenantUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  tenantName: string;
+  userName: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -22,7 +22,6 @@ export class RegisterTenantDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  description: string;
-
-  createdDateTime?: string;
+  @IsString()
+  tenantName: string;
 }

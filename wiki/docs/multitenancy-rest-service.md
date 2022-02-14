@@ -1,12 +1,14 @@
 # Multitenancy Rest Service
 
-This multitenancy-rest-service has been included to interact with the tenant microservices and test its working. It has six endpoints namely
-- `/register`-HTTP POST: It registers a new tenant by consuming tenant-registration microservice
-- `/get-tenant-config/:id`-HTTP GET: It retreives tenant config by consuming tenant-config-service microservice
-- `/all-tenants`-HTTP GET: It retreives all the registered tenant information by consuming tenant-registration microservice
-- `/connect-database`-HTTP GET: It generates the connection string to a tenant database and connects to it
-- `/description`-HTTP PATCH: Sample API to update tenant configuration
-- `/delete-tenant`-HTTP DELETE: Sample API to delete a tenant
+This multitenancy-rest-service has been included to interact with the tenant microservices and test its working. It has the following endpoints namely
+- `Register tenant` `/api/tenants/` - HTTP POST: It registers a new tenant by consuming tenant-registration microservice.
+- `Get All Tenant` `api/tenants/`- HTTP GET: It retreives all the registered tenant information from database.
+- `Update Tenant` `/api/tenants`- HTTP PATCH: Sample API to update tenant configuration.
+- `Deleting Tenant` `api/tenants` - HTTP DELETE: Sample API to delete a tenant.
+- `Tenant Configuration` `/api/tenants/{id}` - HTTP GET: It retrieves configuration of the specified id.
+- `/api/user` - HTTP POST: It will create a user under the specified userName
+- `/api/connect-database`- HTTP GET: It generates the connection string to a tenant database and connects to it.
+- `/api/create-table` - HTTP POST: It creates table in the database of the tenant.
 
 ### Installation
 First run this command to install all dependency
@@ -72,4 +74,182 @@ export class AppService {
 ```bash
 $ npm run start
 ```
-We can interact with the API through swagger by navigating to `http://localhost:5000/api/docs` while the application is running
+We can interact with the API through swagger by navigating to `http://localhost:5000/api/docs` while the application is running.
+
+> The swagger screen is shown in the below image
+
+![Swagger](https://user-images.githubusercontent.com/87708447/152340100-16ca5ab6-4e7a-48e2-9df7-dbfd32563926.png)
+
+---
+## Information Regarding the API
+
+**1. Creating a Tenant**
+
+API Endpoint:  `POST` `/api/tenants/`
+
+**Input:** The input of the schema while creating a tenant is in the form of `JSON` format
+
+```
+{
+  "tenantName": "String",
+  "email": "String",
+  "password": "String",
+  "description": "String"
+}
+```
+**Output:** The scehma of the output is also in the `JSON` format
+
+```
+{
+   "Message": "Tenant Registered Successfully".
+}
+```
+---
+**2. Information Of Tenants**
+API Endpoint: `GET` `/api/tenants`
+
+**Input:** Since this is a `GET` request there are no input parameters.
+
+**Output:** The schema of the output is in the form of lists which consists of `JSON` objects.
+```
+[
+  {
+    "id": 1,
+    "tenantName": "Value",
+    "email": "Value",
+    "password": "Value",
+    "description": "Value",
+    "createdDateTime": "Value",
+    "isDelete": "Value"
+  },
+  {},
+  ...
+]
+```
+---
+**3. Updating the Tenant's Configuration**
+API Endpoint: `PATCH` `/api/tenants`
+
+**Input:** The schema of this input is in `NESTED JSON` format.
+```
+{
+  "action": {
+    "tenantName": "string",
+    "description": "string"
+  }
+}
+```
+**Output** The schema of the output is also in `JSON` format
+```
+{
+  "generatedMaps": [],
+  "raw": [],
+  "affected": 1
+}
+The `affected` key value 1 means the updation is successfull otherwise it is 0
+```
+---
+**4. Deleting the Tenant's Configuration**
+API Endpoint: `DELETE` `/api/tenants`
+
+**Input:** The schema of this request is in the `JSON` format and `tenantName` is required.
+```
+{
+  "tenantName":"st
+}
+```
+**Output:** The schema of the output is again in `JSON` format which is as follows.
+```
+{
+  "generatedMaps": [],
+  "raw": [],
+  "affected": 1
+}
+```
+>The operation that we are performing here is called as `VIRTUAL DELETE` which states that the entity is not hard deleted from the database which can be used later in order to retrieve from archive etc.
+---
+**5. Get Tenant's Configuration By Parameter**
+API Endpoint: `GET` `/api/tenants/{id}`
+
+**Input:** The input `id` is taken from the `request header` and the processed.
+
+```
+Request URL: `http://localhost:5000/api/tenants/1`
+```
+**Output:** The response of this request is presented in the `JSON` format.
+```
+{
+  "id": Value,
+  "tenantId": Value,
+  "tenantName": "Value",
+  "description": "Value",
+  "createdDateTime": "Value",
+  "tenantDbName": "Value",
+  "host": "Value",
+  "port": Value,
+  "policy": "Value"
+}
+```
+---
+**6. Connect Database**
+API Endpoint: `GET` `/api/connect-database`
+**Input:** The input for this endpoint is in the form of `request query` which is of the following format.
+```
+The parameters are of the following format.
+host: String
+port: Number
+tenantName: String
+password: String
+dbName: String
+```
+> Since our application is dockerised so in `host` we have to add `database` and if it was not dockerised we have to write `host: 127.0.0.1`
+
+**Output:** The output when the credentials are verified is in the `JSON` format.
+```
+{
+  "Message": "Database connected successfuly"
+}
+```
+---
+
+**7. API Ceate Table**
+API Endpoint: `POST` `/api/create-table`
+
+**Input:** The input for this endpoint is in the `JSON` format which consists the following parameters.
+```
+{
+  "dbName": "string",
+  "tableName": "string",
+  "columns": [
+    "string"
+  ]
+}
+```
+**Output:** The output here is a message which is again present in the `JSON` format.
+```
+{
+    "Message": "Table Created Successfully"
+}
+```
+---
+**8. Creating a user under a particular Tenant**
+API Endpoint: `POST` `/api/create-user`
+**Input:** The input for this request is in `JSON` format with the following parameters.
+
+```
+{
+  "userName": "string",
+  "email": "string",
+  "password": "string",
+  "tenantName": "string"
+}
+```
+> Note: `password` is the password of the tenant under which the user is being created.
+
+
+**Output:** The response of this request is present in the `JSON` format
+```
+{
+   "Message": "User created Successfully."
+}
+```

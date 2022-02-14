@@ -6,7 +6,7 @@ export class DbDetailsDto {
   @ApiProperty()
   port: number;
   @ApiProperty()
-  username: string;
+  tenantName: string;
   @ApiProperty()
   password: string;
   @ApiProperty()

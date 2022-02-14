@@ -1,5 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
+import { throwError } from 'rxjs';
 import { TenantConfigDto } from './dto/tenant.config.dto';
 import { TenantConfigService } from './tenant.config.service';
 
@@ -18,9 +19,13 @@ export class TenantConfigController {
   @MessagePattern({ cmd: 'get_config' })
   async getConfig(tenantId: number) {
     try {
+      const isIntegerValue = Number.isInteger(tenantId);
+      if (!isIntegerValue) {
+        throw new Error('Wrong Integer Entered');
+      }
       return await this.tenantConfigService.getConfig(tenantId);
     } catch (e) {
-      return e;
+      return throwError(() => e);
     }
   }
 }

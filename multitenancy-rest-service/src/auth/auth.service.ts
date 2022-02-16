@@ -2,27 +2,30 @@ import { Injectable } from "@nestjs/common";
 import { stringify } from "querystring";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
+    constructor(private config: ConfigService) { }
+
     tokenURL: string;
     logoutURL: string;
     validateURL: string;
     clientId: string = '';
     clientSecret: string = '';
 
-    keycloakServer = process.env.KEYCLOAK_SERVER;
+    keycloakServer = this.config.get('keycloak.server');
 
-    async getAccessToken(query) {
-        const {credentials, tenantName, clientId, clientSecret} = query;
+    async getAccessToken(body) {
+        const { username, password, tenantName, clientId, clientSecret } = body;
         this.tokenURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/token`;
         this.clientId = clientId;
-        this.clientSecret =clientSecret;
+        this.clientSecret = clientSecret;
         const params: string = stringify({
-            username: credentials.username,
-            password: credentials.password,
+            username: username,
+            password: password,
             grant_type: 'password',
-            client_id: clientId,
+            client_id: this.clientId,
             client_secret: this.clientSecret,
         });
         const headers = {
@@ -31,19 +34,20 @@ export class AuthService {
             }
         }
         const response = await axios.post(this.tokenURL, params, headers);
+        return response;
+    }
+
+    async logout(params) {
+        const { tenantName } = params;
+        const query = stringify({
+            redirect_uri: 'https://www.google.com'  //remember to change this
+        });
+
+        this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout?${query}`;
+        const response = await axios.get(this.logoutURL);
         return {
             data: response.data
         };
-    }
-    
-    async logout(params) {
-        const {tenantName} = params;
-        const query = stringify({
-            redirect_uri: 'http://logout URI'
-        });
-
-        this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout/${query}`;
-        const response = await axios.get(this.logoutURL);
     }
 
     async validateToken(token) {

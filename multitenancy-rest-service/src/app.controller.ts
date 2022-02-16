@@ -19,10 +19,10 @@ export class AppController {
     private readonly authService: AuthService
   ) { }
 
-  @Get('login')
-  async token(@Req() req: Request,@Res() res: Response) {
+  @Post('login')
+  async login(@Req() req: Request, @Res() res: Response) {
     try {
-      res.send((await this.authService.getAccessToken(req.query)).data.access_token);
+      res.send((await this.authService.getAccessToken(req.body)).data);
       // login successful
     } catch (e) {
       return e;
@@ -30,7 +30,7 @@ export class AppController {
   }
   
   @Get('logout')
-  async logout(@Req() req: Request,@Res() res: Response) {
+  async logout(@Req() req: Request, @Res() res: Response) {
     try {
       res.send(await this.authService.logout(req.query));
       // logout successful
@@ -46,8 +46,8 @@ export class AppController {
     try {
       const tenant: RegisterTenantDto = body;
       const response = this.appService.register(tenant);
-      response.subscribe((result) => res.send(result));
       await this.appService.createRealm(tenant);
+      response.subscribe((result) => res.send(result));
     } catch (e) {
       return e;
     }

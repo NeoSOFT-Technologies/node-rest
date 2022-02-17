@@ -29,10 +29,10 @@ export class AppController {
     }
   }
   
-  @Get('logout')
+  @Post('logout')
   async logout(@Req() req: Request, @Res() res: Response) {
     try {
-      res.send(await this.authService.logout(req.query));
+      res.sendStatus(await this.authService.logout(req.body));
       // logout successful
     } catch (e) {
       return e;

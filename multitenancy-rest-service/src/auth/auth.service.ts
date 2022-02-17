@@ -22,8 +22,8 @@ export class AuthService {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         const params: string = stringify({
-            username: username,
-            password: password,
+            username,
+            password,
             grant_type: 'password',
             client_id: this.clientId,
             client_secret: this.clientSecret,
@@ -37,17 +37,23 @@ export class AuthService {
         return response;
     }
 
-    async logout(params) {
-        const { tenantName } = params;
-        const query = stringify({
-            redirect_uri: 'https://www.google.com'  //remember to change this
+    async logout(body) {
+        const { tenantName, refreshToken } = body;        
+        this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout`;
+        const params = stringify({
+            refresh_token: refreshToken,
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
         });
 
-        this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout?${query}`;
-        const response = await axios.get(this.logoutURL);
-        return {
-            data: response.data
-        };
+        const headers = {
+            headers: {
+                "content-type": "application/x-www-form-urlencoded",
+            }
+        }
+        const response = await axios.post(this.logoutURL, params, headers);
+        return response.status;
+
     }
 
     async validateToken(token) {

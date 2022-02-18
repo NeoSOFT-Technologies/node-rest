@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { IHttpClient, IHttpClientRequestParameters } from "./interfaces/httpclient";
 
-export class HttpClient implements IHttpClient {
+class HttpClient implements IHttpClient {
     async post<T = any, D = any>(parameters: IHttpClientRequestParameters<D>): Promise<T> {
         const { url, payload, headers } = parameters
         const options: AxiosRequestConfig = {
@@ -9,10 +9,6 @@ export class HttpClient implements IHttpClient {
         }
 
         try {
-            // console.log('url: ',url);
-            // console.log('payload: ',payload);
-            // console.log('headers: ',headers);
-            
             return await axios.post(url, payload, options);
         } catch (e) {
             console.log('inside error:',e.response.data);
@@ -21,3 +17,5 @@ export class HttpClient implements IHttpClient {
         }
     }
 }
+const httpClient =  new HttpClient();
+export default httpClient;

@@ -3,7 +3,7 @@ import { stringify } from "querystring";
 import jwt_decode from "jwt-decode";
 import { ConfigService } from "@nestjs/config";
 import { CredentialsDto, LogoutDto } from "../dto";
-import { HttpClient } from "../utils";
+import { httpClient } from "../utils";
 
 @Injectable()
 export class AuthService {
@@ -34,8 +34,7 @@ export class AuthService {
         }
 
         try {
-            const hp = new HttpClient();
-            const response = hp.post({
+            const response = await httpClient.post({
                 url: this.tokenURL,
                 payload: params,
                 headers: headers
@@ -59,7 +58,7 @@ export class AuthService {
                 "content-type": "application/x-www-form-urlencoded",
         }
         try {
-            const response = await new HttpClient().post({
+            const response = await httpClient.post({
                 url: this.logoutURL,
                 payload: params,
                 headers: headers
@@ -83,7 +82,7 @@ export class AuthService {
                 "content-type": "application/x-www-form-urlencoded",
         }
         try {
-            const response = await new HttpClient().post({
+            const response = await httpClient.post({
                 url: this.validateURL,
                 payload: params,
                 headers: headers

@@ -64,7 +64,7 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "login"', async () => {
-        mockRequest.body = {
+        const mockBody = {
             username: 'username',
             password: 'password',
             tenantName: 'tenantName',
@@ -72,18 +72,18 @@ describe('Testing AppController', () => {
             clientSecret: 'clientSecret',
         }
         const mockgetAccessToken = jest.spyOn(authService, 'getAccessToken');
-        await appController.login(mockRequest, mockResponse);
+        await appController.login(mockBody, mockResponse);
         expect(mockgetAccessToken).toHaveBeenCalled();
         mockgetAccessToken.mockRestore();
     });
 
     it('Testing appcontroller "logout"', async () => {
-        mockRequest.body = {
+        const mockBody = {
             tenantName: 'tenantName',
             refreshToken: 'refreshToken',
         }
         const mocklogout = jest.spyOn(authService, 'logout');
-        await appController.logout(mockRequest, mockResponse);
+        await appController.logout(mockBody, mockResponse);
         expect(mocklogout).toHaveBeenCalled();
         mocklogout.mockRestore();
     });

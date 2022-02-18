@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { stringify } from "querystring";
-import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { ConfigService } from "@nestjs/config";
+import { CredentialsDto, LogoutDto } from "../dto";
+import { HttpClient } from "../utils";
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
 
     keycloakServer = this.config.get('keycloak.server');
 
-    async getAccessToken(body) {
+    async getAccessToken(body: CredentialsDto) {
         const { username, password, tenantName, clientId, clientSecret } = body;
         this.tokenURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/token`;
         this.clientId = clientId;
@@ -29,16 +30,24 @@ export class AuthService {
             client_secret: this.clientSecret,
         });
         const headers = {
-            headers: {
                 "content-type": "application/x-www-form-urlencoded",
-            }
         }
-        const response = await axios.post(this.tokenURL, params, headers);
-        return response;
+
+        try {
+            const hp = new HttpClient();
+            const response = hp.post({
+                url: this.tokenURL,
+                payload: params,
+                headers: headers
+            })
+            return response;
+        } catch (e) {
+            throw e
+        }
     }
 
-    async logout(body) {
-        const { tenantName, refreshToken } = body;        
+    async logout(body: LogoutDto) {
+        const { tenantName, refreshToken } = body;
         this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout`;
         const params = stringify({
             refresh_token: refreshToken,
@@ -47,16 +56,21 @@ export class AuthService {
         });
 
         const headers = {
-            headers: {
                 "content-type": "application/x-www-form-urlencoded",
-            }
         }
-        const response = await axios.post(this.logoutURL, params, headers);
-        return response.status;
-
+        try {
+            const response = await new HttpClient().post({
+                url: this.logoutURL,
+                payload: params,
+                headers: headers
+            })
+            return response.status;
+        } catch (e) {
+            throw e
+        }
     }
 
-    async validateToken(token) {
+    async validateToken(token: string) {
         const { iss }: any = jwt_decode(token);
 
         this.validateURL = `${iss}/protocol/openid-connect/token/introspect`;
@@ -66,15 +80,21 @@ export class AuthService {
             client_secret: this.clientSecret,
         });
         const headers = {
-            headers: {
                 "content-type": "application/x-www-form-urlencoded",
-            }
         }
-        const response = await axios.post(this.validateURL, params, headers);
-        return response.data.active;
+        try {
+            const response = await new HttpClient().post({
+                url: this.validateURL,
+                payload: params,
+                headers: headers
+            })
+            return response.data.active;
+        } catch (e) {
+            throw e
+        }
     }
 
-    async getUserRoles(token) {
+    async getUserRoles(token: string) {
         const { realm_access }: any = jwt_decode(token);
 
         let roles: string[] = [];

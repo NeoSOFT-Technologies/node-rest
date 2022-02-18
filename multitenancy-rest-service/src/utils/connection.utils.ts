@@ -1,7 +1,6 @@
 import * as mysql from 'mysql2';
-import { ConfigService } from '@nestjs/config';
 import Connection from 'mysql2/typings/mysql/lib/Connection';
-import { DbDetailsDto } from './dto/db.details.dto';
+import { DbDetailsDto } from '../dto/db.details.dto';
 
 export const ConnectionUtils = {
   getConnection: async function (dbDetails: DbDetailsDto) {

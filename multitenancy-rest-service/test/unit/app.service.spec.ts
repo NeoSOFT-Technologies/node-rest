@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { AppService } from '@app/app.service';
-import { ConnectionUtils } from '@app/connection.utils';
+import { ConnectionUtils } from '@app/utils';
 import { DbDetailsDto } from '@app/dto/db.details.dto';
 import { KeycloakUser } from '@app/iam/keycloakUser';
 import { KeycloakRealm } from '@app/iam/keycloakRealm';

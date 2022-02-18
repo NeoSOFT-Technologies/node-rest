@@ -1,6 +1,8 @@
 # Multitenancy Rest Service
 
 This multitenancy-rest-service has been included to interact with the tenant microservices and test its working. It has the following endpoints namely
+- `Login` `/api/login/` - HTTP POST: It provides the access token after authenticating the user.
+- `Logout` `/api/logout/` - HTTP POST: It revokes the provided access token.
 - `Register tenant` `/api/tenants/` - HTTP POST: It registers a new tenant by consuming tenant-registration microservice.
 - `Get All Tenant` `api/tenants/`- HTTP GET: It retreives all the registered tenant information from database.
 - `Update Tenant` `/api/tenants`- HTTP PATCH: Sample API to update tenant configuration.
@@ -24,26 +26,32 @@ The controller includes end-points as is shown below in the code
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post('register')
+  @Post('tenants')
+  @UsePipes(new ValidationPipe())
   @ApiBody({ type: RegisterTenantDto })
-  registerTenant(@Req() req: Request, @Res() res: Response) {
+  async registerTenant(@Body() body: RegisterTenantDto, @Res() res: Response) {
     try {
-      const tenant: RegisterTenantDto = req.body;
+      const tenant: RegisterTenantDto = body;
       const response = this.appService.register(tenant);
+      await this.appService.createRealm(tenant);
       response.subscribe((result) => res.send(result));
     } catch (e) {
-      return e;
+      return res.status(HttpStatus.UNAUTHORIZED).send(e);
     }
   }
 
-  @Get('get-tenant-config/:id')
+  @Get('tenants/:id')
   @ApiParam({ name: 'id', required: true, type: Number })
   getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantId: number = +req.params.id;
 
       const response = this.appService.getTenantConfig(tenantId);
-      response.subscribe(async (result) => res.send(result));
+      const observer = {
+        next: async (result: any) => res.send(result),
+        error: async (error: any) => res.send(error),
+      }
+      response.subscribe(observer);
     } catch (e) {
       return e;
     }
@@ -83,7 +91,52 @@ We can interact with the API through swagger by navigating to `http://localhost:
 ---
 ## Information Regarding the API
 
-**1. Creating a Tenant**
+**1. Log in**
+
+API Endpoint:  `POST` `/api/login/`
+
+**Input:** The input of the schema while logging in the form of `JSON` format
+
+```
+{
+  "username": "String",
+  "password": "String",
+  "tenantName": "String",
+  "clientId": "String"
+  "clientSecret": "String"
+}
+```
+**Output:** The scehma of the output is also in the `JSON` format
+
+```
+{
+    "access_token": "ACCESS TOKEN",
+    "expires_in": 300,
+    "refresh_expires_in": 1800,
+    "refresh_token": "REFRESH TOKEN",
+    "token_type": "Bearer",
+    "not-before-policy": 0,
+    "session_state": "",
+    "scope": "profile email"
+}
+```
+---
+**2. Log Out**
+
+API Endpoint:  `POST` `/api/logout/`
+
+**Input:** The input of the schema logging out is in the form of `JSON` format
+
+```
+{
+  "tenantName": "String",
+  "refreshToken": "String",
+}
+```
+**Output:** The output has no content with status code `204`
+
+---
+**3. Creating a Tenant**
 
 API Endpoint:  `POST` `/api/tenants/`
 
@@ -105,7 +158,7 @@ API Endpoint:  `POST` `/api/tenants/`
 }
 ```
 ---
-**2. Information Of Tenants**
+**4. Information Of Tenants**
 API Endpoint: `GET` `/api/tenants`
 
 **Input:** Since this is a `GET` request there are no input parameters.
@@ -127,7 +180,7 @@ API Endpoint: `GET` `/api/tenants`
 ]
 ```
 ---
-**3. Updating the Tenant's Configuration**
+**5. Updating the Tenant's Configuration**
 API Endpoint: `PATCH` `/api/tenants`
 
 **Input:** The schema of this input is in `NESTED JSON` format.
@@ -149,7 +202,7 @@ API Endpoint: `PATCH` `/api/tenants`
 The `affected` key value 1 means the updation is successfull otherwise it is 0
 ```
 ---
-**4. Deleting the Tenant's Configuration**
+**6. Deleting the Tenant's Configuration**
 API Endpoint: `DELETE` `/api/tenants`
 
 **Input:** The schema of this request is in the `JSON` format and `tenantName` is required.
@@ -168,7 +221,7 @@ API Endpoint: `DELETE` `/api/tenants`
 ```
 >The operation that we are performing here is called as `VIRTUAL DELETE` which states that the entity is not hard deleted from the database which can be used later in order to retrieve from archive etc.
 ---
-**5. Get Tenant's Configuration By Parameter**
+**7. Get Tenant's Configuration By Parameter**
 API Endpoint: `GET` `/api/tenants/{id}`
 
 **Input:** The input `id` is taken from the `request header` and the processed.
@@ -191,7 +244,7 @@ Request URL: `http://localhost:5000/api/tenants/1`
 }
 ```
 ---
-**6. Connect Database**
+**8. Connect Database**
 API Endpoint: `GET` `/api/connect-database`
 **Input:** The input for this endpoint is in the form of `request query` which is of the following format.
 ```
@@ -212,7 +265,7 @@ dbName: String
 ```
 ---
 
-**7. API Ceate Table**
+**9. API Ceate Table**
 API Endpoint: `POST` `/api/create-table`
 
 **Input:** The input for this endpoint is in the `JSON` format which consists the following parameters.
@@ -232,7 +285,7 @@ API Endpoint: `POST` `/api/create-table`
 }
 ```
 ---
-**8. Creating a user under a particular Tenant**
+**10. Creating a user under a particular Tenant**
 API Endpoint: `POST` `/api/create-user`
 **Input:** The input for this request is in `JSON` format with the following parameters.
 

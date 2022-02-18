@@ -11,8 +11,6 @@ class HttpClient implements IHttpClient {
         try {
             return await axios.post(url, payload, options);
         } catch (e) {
-            console.log('inside error:',e.response.data);
-            
             throw e.response.data
         }
     }

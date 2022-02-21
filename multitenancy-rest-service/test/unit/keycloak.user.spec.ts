@@ -67,4 +67,9 @@ describe('Testing Keycloak User Service', () => {
         const response = await keycloakUserService.createUser(mockTenantuser);
         expect(response).toEqual('User created successfully');
     });
+
+    it('Testing "createAdminUser" method', async () => {
+        const response = await keycloakUserService.createAdminUser('string','string','string');
+        expect(response.id).toEqual('id');
+    });
 });

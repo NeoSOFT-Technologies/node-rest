@@ -102,8 +102,6 @@ API Endpoint:  `POST` `/api/login/`
   "username": "String",
   "password": "String",
   "tenantName": "String",
-  "clientId": "String"
-  "clientSecret": "String"
 }
 ```
 **Output:** The scehma of the output is also in the `JSON` format

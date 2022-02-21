@@ -20,13 +20,4 @@ export class CredentialsDto {
   @IsString()
   tenantName: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  clientId: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  clientSecret: string;
 }

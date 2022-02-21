@@ -38,8 +38,6 @@ describe('Testing Auth Service', () => {
             username: 'string',
             password: 'string',
             tenantName: 'string',
-            clientId: 'string',
-            clientSecret: 'string'
         }
 
         const mockAcessToken = jest.spyOn(axios, 'post').mockResolvedValue('access-token');

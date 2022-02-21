@@ -7,21 +7,22 @@ import { httpClient } from "../utils";
 
 @Injectable()
 export class AuthService {
-    constructor(private config: ConfigService) { }
+    constructor(private config: ConfigService) {
+        this.keycloakServer = this.config.get('keycloak.server');
+        this.clientId = this.config.get('client.id');;
+        this.clientSecret = this.config.get('client.secret');;
+    }
 
     tokenURL: string;
     logoutURL: string;
     validateURL: string;
-    clientId: string = '';
-    clientSecret: string = '';
-
-    keycloakServer = this.config.get('keycloak.server');
+    keycloakServer: string;
+    clientId: string;
+    clientSecret: string;
 
     async getAccessToken(body: CredentialsDto) {
-        const { username, password, tenantName, clientId, clientSecret } = body;
+        const { username, password, tenantName } = body;
         this.tokenURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/token`;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
         const params: string = stringify({
             username,
             password,
@@ -30,7 +31,7 @@ export class AuthService {
             client_secret: this.clientSecret,
         });
         const headers = {
-                "content-type": "application/x-www-form-urlencoded",
+            "content-type": "application/x-www-form-urlencoded",
         }
 
         try {
@@ -55,7 +56,7 @@ export class AuthService {
         });
 
         const headers = {
-                "content-type": "application/x-www-form-urlencoded",
+            "content-type": "application/x-www-form-urlencoded",
         }
         try {
             const response = await httpClient.post({
@@ -79,7 +80,7 @@ export class AuthService {
             client_secret: this.clientSecret,
         });
         const headers = {
-                "content-type": "application/x-www-form-urlencoded",
+            "content-type": "application/x-www-form-urlencoded",
         }
         try {
             const response = await httpClient.post({

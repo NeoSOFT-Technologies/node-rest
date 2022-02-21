@@ -32,8 +32,6 @@ The parameters required by this function are:
 - `username` : Username of registered user
 - `password` : Password
 - `tenantName` : Tenantname under which user is rgistered
-- `clientId` : Client Id of the confidential client whose access is requested
-- `clientSecret` : Client secret of the that confidential client
 
 We get the access token and refresh token which we can use further for authorisation.
 

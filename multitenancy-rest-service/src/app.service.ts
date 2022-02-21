@@ -1,10 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ConnectionUtils } from './connection.utils';
-import { DbDetailsDto } from './dto/db.details.dto';
-import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
-import { RegisterTenantDto } from './dto/register.tenant.dto';
-import { TenantUserDto } from './dto/tenant.user.dto';
+import { ConnectionUtils } from './utils';
+import { DbDetailsDto, ProvisionTenantTableDto, RegisterTenantDto, TenantUserDto } from './dto';
 import { KeycloakRealm } from './iam/keycloakRealm';
 import { KeycloakUser } from './iam/keycloakUser';
 

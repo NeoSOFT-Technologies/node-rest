@@ -1,16 +1,17 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body, Controller, Delete, Get, HttpStatus,
+  Patch, Post, Req, Res, UseGuards, UsePipes, ValidationPipe
+} from '@nestjs/common';
 import { Request, Response } from 'express';
-import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { AppService } from './app.service';
 import { ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { UpdateTenantDto } from './dto/update.tenant.dto ';
-import { DeleteTenantDto } from './dto/delete.tenant.dto';
-import { DbDetailsDto } from './dto/db.details.dto';
-import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
-import { TenantUserDto } from './dto/tenant.user.dto';
 import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
+import {
+  CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto,
+  ProvisionTenantTableDto, RegisterTenantDto, TenantUserDto, UpdateTenantDto
+} from './dto';
 
 @Controller('api')
 export class AppController {
@@ -19,23 +20,27 @@ export class AppController {
     private readonly authService: AuthService
   ) { }
 
-  @Get('login')
-  async token(@Req() req: Request,@Res() res: Response) {
+  @Post('login')
+  @UsePipes(new ValidationPipe())
+  @ApiBody({ type: CredentialsDto })
+  async login(@Body() body: CredentialsDto, @Res() res: Response) {
     try {
-      res.send((await this.authService.getAccessToken(req.query)).data.access_token);
+      res.send((await this.authService.getAccessToken(body)).data);
       // login successful
     } catch (e) {
-      return e;
+      return res.status(HttpStatus.UNAUTHORIZED).send(e);
     }
   }
-  
-  @Get('logout')
-  async logout(@Req() req: Request,@Res() res: Response) {
+
+  @Post('logout')
+  @UsePipes(new ValidationPipe())
+  @ApiBody({ type: LogoutDto })
+  async logout(@Body() body: LogoutDto, @Res() res: Response) {
     try {
-      res.send(await this.authService.logout(req.query));
+      res.sendStatus(await this.authService.logout(body));
       // logout successful
     } catch (e) {
-      return e;
+      return res.status(HttpStatus.UNAUTHORIZED).send(e);
     }
   }
 
@@ -46,10 +51,10 @@ export class AppController {
     try {
       const tenant: RegisterTenantDto = body;
       const response = this.appService.register(tenant);
-      response.subscribe((result) => res.send(result));
       await this.appService.createRealm(tenant);
+      response.subscribe((result) => res.send(result));
     } catch (e) {
-      return e;
+      return res.status(HttpStatus.UNAUTHORIZED).send(e);
     }
   }
 

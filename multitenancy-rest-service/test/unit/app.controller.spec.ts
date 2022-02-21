@@ -6,14 +6,16 @@ import * as httpMocks from 'node-mocks-http';
 import { Observable, of } from 'rxjs';
 import { RegisterTenantDto } from '@app/dto/register.tenant.dto';
 import { TenantUserDto } from '@app/dto/tenant.user.dto';
+import { AuthService } from '@app/auth/auth.service';
 
 describe('Testing AppController', () => {
     let appController: AppController;
     let appService: AppService;
+    let authService: AuthService;
 
     const mockRequest: Request = httpMocks.createRequest();
     const mockResponse: Response = httpMocks.createResponse();
-    
+
     const mockTenantDetails = {
         id: 1,
         tenant_id: 1,
@@ -23,7 +25,7 @@ describe('Testing AppController', () => {
         tenantDbName: 'string',
         host: 'string',
         port: 1,
-      };
+    };
 
     const mockMessage = { Message: 'Testing' };
 
@@ -40,25 +42,58 @@ describe('Testing AppController', () => {
         createUser: jest.fn()
     };
 
+    const mockAuthService = {
+        getAccessToken: jest.fn().mockResolvedValue('token'),
+        logout: jest.fn().mockResolvedValue('204')
+    };
+
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [AppController],
-            providers: [AppService],
+            providers: [AppService, AuthService],
         })
             .overrideProvider(AppService)
             .useValue(mockAppService)
+            .overrideProvider(AuthService)
+            .useValue(mockAuthService)
             .compile();
 
         appController = module.get<AppController>(AppController);
         appService = module.get<AppService>(AppService);
+        authService = module.get<AuthService>(AuthService);
+    });
+
+    it('Testing appcontroller "login"', async () => {
+        const mockBody = {
+            username: 'username',
+            password: 'password',
+            tenantName: 'tenantName',
+            clientId: 'clientId',
+            clientSecret: 'clientSecret',
+        }
+        const mockgetAccessToken = jest.spyOn(authService, 'getAccessToken');
+        await appController.login(mockBody, mockResponse);
+        expect(mockgetAccessToken).toHaveBeenCalled();
+        mockgetAccessToken.mockRestore();
+    });
+
+    it('Testing appcontroller "logout"', async () => {
+        const mockBody = {
+            tenantName: 'tenantName',
+            refreshToken: 'refreshToken',
+        }
+        const mocklogout = jest.spyOn(authService, 'logout');
+        await appController.logout(mockBody, mockResponse);
+        expect(mocklogout).toHaveBeenCalled();
+        mocklogout.mockRestore();
     });
 
     it('Testing appcontroller "registerTenant"', async () => {
         const mockBody: RegisterTenantDto = {
-            tenantName:'tenantName',
-            email:'tenant@gmail.com',
-            password:'tenant123',
-            description:'This is tenant Database',
+            tenantName: 'tenantName',
+            email: 'tenant@gmail.com',
+            password: 'tenant123',
+            description: 'This is tenant Database',
         }
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         const createRealm = jest.spyOn(appService, 'createRealm');
@@ -70,10 +105,10 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "tenantUser"', async () => {
         const mockBody: TenantUserDto = {
-            userName:'userName',
-            email:'tenant@gmail.com',
-            password:'tenant123',
-            tenantName:'tenantName',
+            userName: 'userName',
+            email: 'tenant@gmail.com',
+            password: 'tenant123',
+            tenantName: 'tenantName',
         }
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createUser = jest.spyOn(appService, 'createUser');
@@ -106,9 +141,9 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "updateDescription"', async () => {
         mockRequest.body = {
-            action :{
-                tenantName:'string',
-                description:'string'
+            action: {
+                tenantName: 'string',
+                description: 'string'
             }
         }
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
@@ -123,8 +158,8 @@ describe('Testing AppController', () => {
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });
-    
-    it('Testing appcontroller "createTable"', async() => {
+
+    it('Testing appcontroller "createTable"', async () => {
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         await appController.createTable(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();

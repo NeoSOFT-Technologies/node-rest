@@ -1,4 +1,3 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -13,7 +12,6 @@ import { KeycloakUser } from './iam/keycloakUser';
 
 @Module({
   imports: [
-    HttpModule,
     ConfigModule.forRoot({
       envFilePath: [`${process.cwd()}/config/.env`],
       isGlobal: true,

@@ -1,14 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { AppService } from '@app/app.service';
-import { ConnectionUtils } from '@app/connection.utils';
+import { ConnectionUtils } from '@app/utils';
 import { DbDetailsDto } from '@app/dto/db.details.dto';
-import { Keycloak } from '@app/iam/keycloak';
+import { KeycloakUser } from '@app/iam/keycloakUser';
+import { KeycloakRealm } from '@app/iam/keycloakRealm';
 
 describe('Testing AppService', () => {
     let appService: AppService;
-    let keycloak: Keycloak;
-    
+    let keycloakUser: KeycloakUser;
+    let keycloakRealm: KeycloakRealm;
+
     const mockClient1 = {
         send: jest.fn(),
     };
@@ -22,15 +24,18 @@ describe('Testing AppService', () => {
             return of({ Message: 'Table Created successfully' });
         }),
     };
-    const mockKeycloak = {
-        createRealm: jest.fn(),
+    const mockKeycloakUser = {
         createUser: jest.fn()
+    };
+
+    const mockKeycloakRealm = {
+        createRealm: jest.fn(),
     };
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                AppService,Keycloak,
+                AppService, KeycloakUser, KeycloakRealm,
                 {
                     provide: 'REGISTER_TENANT',
                     useValue: mockClient1,
@@ -45,12 +50,15 @@ describe('Testing AppService', () => {
                 },
             ],
         })
-        .overrideProvider(Keycloak)
-        .useValue(mockKeycloak)
-        .compile();
+            .overrideProvider(KeycloakUser)
+            .useValue(mockKeycloakUser)
+            .overrideProvider(KeycloakRealm)
+            .useValue(mockKeycloakRealm)
+            .compile();
 
         appService = module.get<AppService>(AppService);
-        keycloak = module.get<Keycloak>(Keycloak);
+        keycloakUser = module.get<KeycloakUser>(KeycloakUser);
+        keycloakRealm = module.get<KeycloakRealm>(KeycloakRealm);
     });
 
     it('Testing "register"', async () => {
@@ -142,7 +150,7 @@ describe('Testing AppService', () => {
         mocklistAllTenant.mockRestore();
     });
 
-    it('Testing "createTable"', async() => {
+    it('Testing "createTable"', async () => {
         const mockMessage = { Message: 'Table Created successfully' };
         const tableDto = {
             dbName: 'string',
@@ -169,7 +177,7 @@ describe('Testing AppService', () => {
             password: 'string',
             description: 'string'
         };
-        const mockcreateRealm = jest.spyOn(keycloak, 'createRealm');
+        const mockcreateRealm = jest.spyOn(keycloakRealm, 'createRealm');
         appService.createRealm(tenantDetails);
 
         expect(mockcreateRealm).toHaveBeenCalled();
@@ -178,12 +186,12 @@ describe('Testing AppService', () => {
 
     it('Testing "createUser"', async () => {
         const user = {
-            userName:'string',
+            userName: 'string',
             email: 'string',
             password: 'string',
             tenantName: 'string',
         };
-        const mockcreateUser = jest.spyOn(keycloak, 'createUser');
+        const mockcreateUser = jest.spyOn(keycloakUser, 'createUser');
         appService.createUser(user);
 
         expect(mockcreateUser).toHaveBeenCalled();

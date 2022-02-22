@@ -48,11 +48,15 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
 
 describe('Testing Keycloak Realm Service', () =>{
     let keycloakRealmService: KeycloakRealm
-
+    const mockService = {
+        createAdminUser: jest.fn().mockResolvedValue({
+            id: 'id'
+        })
+    };
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [Keycloak, KeycloakRealm, ConfigService, KeycloakUser],
-        }).compile();
+        }).overrideProvider(KeycloakUser).useValue(mockService).compile();
 
         keycloakRealmService = module.get<KeycloakRealm>(KeycloakRealm);
     });

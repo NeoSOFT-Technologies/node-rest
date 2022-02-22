@@ -15,32 +15,6 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     }),
                     addRealmRoleMappings: jest.fn(),
                 },
-                realms: {
-                    create: jest.fn().mockResolvedValue({
-                        realmName: 'string'
-                    })
-                },
-                roles: {
-                    create: jest.fn(),
-                    findOneByName: jest.fn().mockResolvedValue({
-                        id: 'id',
-                        name: 'name'
-                    }),
-                    createComposite: jest.fn()
-                },
-                clients: {
-                    find: jest.fn().mockResolvedValue([
-                        {
-                            clientId: 'realm-management',
-                            id: 'id'
-                        }
-                    ]),
-                    listRoles: jest.fn().mockResolvedValue([
-                        {
-                            id:'id'
-                        }
-                    ])
-                }
             };
         })
     };

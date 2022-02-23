@@ -33,7 +33,6 @@ export class KeycloakAuthGuard implements CanActivate {
 
     const token = parts[1];
     const isTokenActive: boolean = await this.authenticationService.validateToken(token);
-    console.log('from guard ',isTokenActive);
     
     if (!isTokenActive) {
       throw new HttpException(

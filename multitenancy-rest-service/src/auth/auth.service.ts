@@ -1,52 +1,76 @@
 import { Injectable } from "@nestjs/common";
 import { stringify } from "querystring";
-import axios from "axios";
 import jwt_decode from "jwt-decode";
+import { ConfigService } from "@nestjs/config";
+import { CredentialsDto, LogoutDto } from "../dto";
+import { httpClient } from "../utils";
 
 @Injectable()
 export class AuthService {
+    constructor(private config: ConfigService) {
+        this.keycloakServer = this.config.get('keycloak.server');
+        this.clientId = this.config.get('client.id');;
+        this.clientSecret = this.config.get('client.secret');;
+    }
+
     tokenURL: string;
     logoutURL: string;
     validateURL: string;
-    clientId: string = '';
-    clientSecret: string = '';
+    keycloakServer: string;
+    clientId: string;
+    clientSecret: string;
 
-    keycloakServer = process.env.KEYCLOAK_SERVER;
-
-    async getAccessToken(query) {
-        const {credentials, tenantName, clientId, clientSecret} = query;
+    async getAccessToken(body: CredentialsDto) {
+        const { username, password, tenantName } = body;
         this.tokenURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/token`;
-        this.clientId = clientId;
-        this.clientSecret =clientSecret;
         const params: string = stringify({
-            username: credentials.username,
-            password: credentials.password,
+            username,
+            password,
             grant_type: 'password',
-            client_id: clientId,
+            client_id: this.clientId,
             client_secret: this.clientSecret,
         });
         const headers = {
-            headers: {
-                "content-type": "application/x-www-form-urlencoded",
-            }
+            "content-type": "application/x-www-form-urlencoded",
         }
-        const response = await axios.post(this.tokenURL, params, headers);
-        return {
-            data: response.data
-        };
+
+        try {
+            const response = await httpClient.post({
+                url: this.tokenURL,
+                payload: params,
+                headers: headers
+            })
+            return response;
+        } catch (e) {
+            throw e
+        }
     }
-    
-    async logout(params) {
-        const {tenantName} = params;
-        const query = stringify({
-            redirect_uri: 'http://logout URI'
+
+    async logout(body: LogoutDto) {
+        const { tenantName, refreshToken } = body;
+        this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout`;
+        const params = stringify({
+            refresh_token: refreshToken,
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
         });
 
-        this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout/${query}`;
-        const response = await axios.get(this.logoutURL);
+        const headers = {
+            "content-type": "application/x-www-form-urlencoded",
+        }
+        try {
+            const response = await httpClient.post({
+                url: this.logoutURL,
+                payload: params,
+                headers: headers
+            })
+            return response.status;
+        } catch (e) {
+            throw e
+        }
     }
 
-    async validateToken(token) {
+    async validateToken(token: string) {
         const { iss }: any = jwt_decode(token);
 
         this.validateURL = `${iss}/protocol/openid-connect/token/introspect`;
@@ -56,15 +80,21 @@ export class AuthService {
             client_secret: this.clientSecret,
         });
         const headers = {
-            headers: {
-                "content-type": "application/x-www-form-urlencoded",
-            }
+            "content-type": "application/x-www-form-urlencoded",
         }
-        const response = await axios.post(this.validateURL, params, headers);
-        return response.data.active;
+        try {
+            const response = await httpClient.post({
+                url: this.validateURL,
+                payload: params,
+                headers: headers
+            })
+            return response.data.active;
+        } catch (e) {
+            throw e
+        }
     }
 
-    async getUserRoles(token) {
+    async getUserRoles(token: string) {
         const { realm_access }: any = jwt_decode(token);
 
         let roles: string[] = [];

@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Keycloak } from '@app/iam/keycloak';
+import { KeycloakRealm } from '@app/iam/keycloakRealm';
+import { ConfigService } from '@nestjs/config';
+import { KeycloakUser } from '@app/iam/keycloakUser';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
@@ -43,14 +46,30 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
     };
 });
 
-describe('Testing KeyCloak Service', () => {
-    let keycloak: Keycloak;
+describe('Testing Keycloak User Service', () => {
+    let keycloakUserService: KeycloakUser;
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak],
+            providers: [Keycloak, KeycloakRealm, ConfigService, KeycloakUser],
         }).compile();
 
-        keycloak = module.get<Keycloak>(Keycloak);
+        keycloakUserService = module.get<KeycloakUser>(KeycloakUser);
+    });
+
+    it('Tetsing "createUser" method', async () => {
+        const mockTenantuser = {
+            userName:'string',
+            email:'stirng',
+            password:'string',
+            tenantName:'string'
+        };
+        const response = await keycloakUserService.createUser(mockTenantuser);
+        expect(response).toEqual('User created successfully');
+    });
+
+    it('Testing "createAdminUser" method', async () => {
+        const response = await keycloakUserService.createAdminUser('string','string','string');
+        expect(response.id).toEqual('id');
     });
 });

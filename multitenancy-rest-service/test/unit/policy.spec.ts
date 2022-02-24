@@ -40,7 +40,7 @@ describe('Testing Keycloak Auth Policy', () => {
         keycloakAuthPolicy = module.get<KeycloakAuthPolicy>(KeycloakAuthPolicy);
     });
 
-    it('Tetsing "createPolicy" method', async () => {
+    it('Testing "createPolicy" method', async () => {
         const mockTenantuser = {
             userName: 'string',
             email: 'stirng',

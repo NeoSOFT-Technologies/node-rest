@@ -29,7 +29,7 @@ describe('Testing Keycloak User Service', () => {
         keycloakUserService = module.get<KeycloakUser>(KeycloakUser);
     });
 
-    it('Tetsing "createUser" method', async () => {
+    it('Testing "createUser" method', async () => {
         const mockTenantuser = {
             userName:'string',
             email:'stirng',

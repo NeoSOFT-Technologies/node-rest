@@ -32,7 +32,7 @@ describe('Testing Keycloak Auth Resource', () => {
         keycloakAuthResource = module.get<KeycloakAuthResource>(KeycloakAuthResource);
     });
 
-    it('Tetsing "createResource" method', async () => {
+    it('Testing "createResource" method', async () => {
         const mockTenantuser = {
             userName: 'string',
             email: 'stirng',

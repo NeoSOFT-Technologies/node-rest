@@ -33,7 +33,7 @@ describe('Testing KeyCloak Service', () => {
         keycloak = module.get<Keycloak>(Keycloak);
     });
 
-    it('Tetsing "init" method', async () => {
+    it('Testing "init" method', async () => {
         const kcAdminClient = new KcAdminClient();
         const mockauth = jest.spyOn(kcAdminClient, 'auth');
         await keycloak.init('username', 'password', kcAdminClient)

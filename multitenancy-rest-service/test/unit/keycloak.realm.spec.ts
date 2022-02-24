@@ -59,7 +59,7 @@ describe('Testing Keycloak Realm Service', () =>{
         keycloakRealmService = module.get<KeycloakRealm>(KeycloakRealm);
     });
 
-    it('Tetsing "createRealm" method', async () => {
+    it('Testing "createRealm" method', async () => {
         const response = await keycloakRealmService.createRealm('string', 'string', 'string');
         expect(response).toEqual('Realm created successfully');
     });

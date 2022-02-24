@@ -3,13 +3,15 @@ import { of } from 'rxjs';
 import { AppService } from '@app/app.service';
 import { ConnectionUtils } from '@app/utils';
 import { DbDetailsDto } from '@app/dto/db.details.dto';
-import { KeycloakUser } from '@app/iam/keycloakUser';
-import { KeycloakRealm } from '@app/iam/keycloakRealm';
+import { Keycloak, KeycloakRealm, KeycloakUser, KeycloakClient, KeycloakAuthPolicy, KeycloakAuthResource } from '@app/iam';
+import { ConfigService } from '@nestjs/config';
 
 describe('Testing AppService', () => {
     let appService: AppService;
     let keycloakUser: KeycloakUser;
     let keycloakRealm: KeycloakRealm;
+    let keycloakAuthResource: KeycloakAuthResource;
+    let keycloakAuthPolicy: KeycloakAuthPolicy;
 
     const mockClient1 = {
         send: jest.fn(),
@@ -32,10 +34,18 @@ describe('Testing AppService', () => {
         createRealm: jest.fn(),
     };
 
+    const mockKeycloakAuthResource = {
+        createResource: jest.fn(),
+    };
+    const mockKeycloakAuthPolicy = {
+        createPolicy: jest.fn(),
+    };
+
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                AppService, KeycloakUser, KeycloakRealm,
+                Keycloak, ConfigService, KeycloakClient, AppService, KeycloakUser,
+                KeycloakRealm, KeycloakAuthPolicy, KeycloakAuthResource,
                 {
                     provide: 'REGISTER_TENANT',
                     useValue: mockClient1,
@@ -54,11 +64,17 @@ describe('Testing AppService', () => {
             .useValue(mockKeycloakUser)
             .overrideProvider(KeycloakRealm)
             .useValue(mockKeycloakRealm)
+            .overrideProvider(KeycloakAuthResource)
+            .useValue(mockKeycloakAuthResource)
+            .overrideProvider(KeycloakAuthPolicy)
+            .useValue(mockKeycloakAuthPolicy)
             .compile();
 
         appService = module.get<AppService>(AppService);
         keycloakUser = module.get<KeycloakUser>(KeycloakUser);
         keycloakRealm = module.get<KeycloakRealm>(KeycloakRealm);
+        keycloakAuthResource = module.get<KeycloakAuthResource>(KeycloakAuthResource);
+        keycloakAuthPolicy = module.get<KeycloakAuthPolicy>(KeycloakAuthPolicy);
     });
 
     it('Testing "register"', async () => {
@@ -196,5 +212,38 @@ describe('Testing AppService', () => {
 
         expect(mockcreateUser).toHaveBeenCalled();
         mockcreateUser.mockRestore();
+    });
+
+    it('Testing "createPolicy"', async () => {
+        const body = {
+            userName: 'string',
+            email: 'string',
+            password: 'string',
+            tenantName: 'string',
+            clientName: 'string',
+            policyType: 'string',
+            policyDetails: { name: 'string' },
+        };
+        const mockPolicy = jest.spyOn(keycloakAuthPolicy, 'createPolicy');
+        appService.createPolicy(body);
+
+        expect(mockPolicy).toHaveBeenCalled();
+        mockPolicy.mockRestore();
+    });
+
+    it('Testing "createResource"', async () => {
+        const body = {
+            userName: 'string',
+            email: 'string',
+            password: 'string',
+            tenantName: 'string',
+            clientName: 'string',
+            resourceDetails: { name: 'string' },
+        };
+        const mockResource = jest.spyOn(keycloakAuthResource, 'createResource');
+        appService.createResource(body);
+
+        expect(mockResource).toHaveBeenCalled();
+        mockResource.mockRestore();
     });
 });

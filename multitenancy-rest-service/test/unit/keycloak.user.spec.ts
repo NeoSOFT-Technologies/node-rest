@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Keycloak } from '@app/iam/keycloak';
-import { KeycloakRealm } from '@app/iam/keycloakRealm';
 import { ConfigService } from '@nestjs/config';
-import { KeycloakUser } from '@app/iam/keycloakUser';
+import { Keycloak, KeycloakRealm, KeycloakUser } from '@app/iam';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {

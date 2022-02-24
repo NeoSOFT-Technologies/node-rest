@@ -4,6 +4,7 @@ import { ConfigService } from "@nestjs/config";
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Keycloak } from "./keycloak";
 import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
+import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
 
 
 @Injectable()
@@ -28,6 +29,12 @@ export class KeycloakUser {
             }],
             realm: realmName
         });
+    };
+
+    public async findUser(client: KcAdminClient): Promise<UserRepresentation> {
+        const users = await client.users.find();
+        const admin = users.filter((user) => user.username === 'adminuser');
+        return admin[0];
     };
 
     public async createUser(user: TenantUserDto): Promise<any> {

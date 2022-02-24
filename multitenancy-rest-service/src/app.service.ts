@@ -1,10 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ConnectionUtils } from './utils';
-import { DbDetailsDto, ProvisionTenantTableDto, RegisterTenantDto, TenantUserDto } from './dto';
-import { KeycloakRealm } from './iam/keycloakRealm';
-import { KeycloakUser } from './iam/keycloakUser';
-
+import { DbDetailsDto, PolicyDto, ProvisionTenantTableDto, RegisterTenantDto, ResourceDto, TenantUserDto } from './dto';
+import { KeycloakAuthPolicy, KeycloakAuthResource, KeycloakRealm, KeycloakUser } from './iam';
 
 @Injectable()
 export class AppService {
@@ -14,7 +12,9 @@ export class AppService {
     @Inject('CREATE_TABLE') private readonly client3: ClientProxy,
     private readonly keycloakUser: KeycloakUser,
     private readonly keycloakRealm: KeycloakRealm,
-  ) {}
+    private readonly keycloakAuthPolicy: KeycloakAuthPolicy,
+    private readonly keycloakAuthResource: KeycloakAuthResource,
+  ) { }
   register(tenant: RegisterTenantDto) {
     return this.client1.send({ cmd: 'register-tenant' }, tenant);
   }
@@ -42,5 +42,13 @@ export class AppService {
   }
   createUser(user: TenantUserDto) {
     return this.keycloakUser.createUser(user);
+  }
+  createPolicy(body: PolicyDto) {
+    const { clientName, policyType, policyDetails, ...user } = body;
+    return this.keycloakAuthPolicy.createPolicy(user, clientName, policyType, policyDetails);
+  }
+  createResource(body: ResourceDto) {
+    const { clientName, resourceDetails, ...user } = body;
+    return this.keycloakAuthResource.createResource(user, clientName, resourceDetails);
   }
 }

@@ -39,7 +39,9 @@ describe('Testing AppController', () => {
         deleteTenant: jest.fn(() => of(mockMessage)),
         createTable: jest.fn(() => of(mockMessage)),
         createRealm: jest.fn(),
-        createUser: jest.fn()
+        createUser: jest.fn(),
+        createResource: jest.fn(),
+        createPolicy: jest.fn()
     };
 
     const mockAuthService = {
@@ -164,5 +166,40 @@ describe('Testing AppController', () => {
         await appController.createTable(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
+    });
+
+    it('Testing appcontroller "resource"', async () => {
+        const mockBody = {
+            userName: 'string',
+            email: 'string',
+            password: 'string',
+            tenantName: 'string',
+            clientName: 'string',
+            resourceDetails: { name: 'string' },
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const createResource = jest.spyOn(appService, 'createResource');
+        await appController.resource(mockBody, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(createResource).toHaveBeenCalledWith(mockBody);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "policy"', async () => {
+        const mockBody = {
+            userName: 'string',
+            email: 'string',
+            password: 'string',
+            tenantName: 'string',
+            clientName: 'string',
+            policyType: 'string',
+            policyDetails: { name: 'string' },
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const createPolicy = jest.spyOn(appService, 'createPolicy');
+        await appController.policy(mockBody, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(createPolicy).toHaveBeenCalledWith(mockBody);
+        mockSend.mockRestore();
     });
 });

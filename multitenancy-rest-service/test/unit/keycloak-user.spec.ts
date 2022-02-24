@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Keycloak } from '@app/iam/keycloak';
-import { KeycloakRealm } from '@app/iam/keycloakRealm';
 import { ConfigService } from '@nestjs/config';
-import { KeycloakUser } from '@app/iam/keycloakUser';
+import { Keycloak, KeycloakRealm, KeycloakUser } from '@app/iam';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
@@ -15,32 +13,6 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     }),
                     addRealmRoleMappings: jest.fn(),
                 },
-                realms: {
-                    create: jest.fn().mockResolvedValue({
-                        realmName: 'string'
-                    })
-                },
-                roles: {
-                    create: jest.fn(),
-                    findOneByName: jest.fn().mockResolvedValue({
-                        id: 'id',
-                        name: 'name'
-                    }),
-                    createComposite: jest.fn()
-                },
-                clients: {
-                    find: jest.fn().mockResolvedValue([
-                        {
-                            clientId: 'realm-management',
-                            id: 'id'
-                        }
-                    ]),
-                    listRoles: jest.fn().mockResolvedValue([
-                        {
-                            id:'id'
-                        }
-                    ])
-                }
             };
         })
     };
@@ -57,7 +29,7 @@ describe('Testing Keycloak User Service', () => {
         keycloakUserService = module.get<KeycloakUser>(KeycloakUser);
     });
 
-    it('Tetsing "createUser" method', async () => {
+    it('Testing "createUser" method', async () => {
         const mockTenantuser = {
             userName:'string',
             email:'stirng',

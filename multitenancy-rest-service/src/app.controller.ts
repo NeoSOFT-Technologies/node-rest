@@ -1,16 +1,16 @@
 import {
-  Body, Controller, Delete, Get, HttpStatus,
+  Body, Controller, Delete, Get, HttpCode, HttpStatus,
   Patch, Post, Req, Res, UseGuards, UsePipes, ValidationPipe
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppService } from './app.service';
-import { ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
 import {
-  CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto,
-  ProvisionTenantTableDto, RegisterTenantDto, TenantUserDto, UpdateTenantDto
+  CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, PolicyDto, ProvisionTenantTableDto,
+  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto
 } from './dto';
 
 @Controller('api')
@@ -88,6 +88,7 @@ export class AppController {
   }
 
   @Get('tenants')
+  @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
   listAllTenant(@Req() req: Request, @Res() res: Response) {
@@ -121,6 +122,24 @@ export class AppController {
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
       return e;
+    }
+  }
+
+  @Post('resource')
+  async resource(@Body() body: ResourceDto, @Res() res: Response) {
+    try {
+      res.send(await this.appService.createResource(body));
+    } catch (e) {
+      return res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Post('policy')
+  async policy(@Body() body: PolicyDto, @Res() res: Response) {
+    try {
+      res.send(await this.appService.createPolicy(body));
+    } catch (e) {
+      return res.status(e.response.status).send(e.response.data);
     }
   }
 

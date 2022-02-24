@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Keycloak } from '@app/iam/keycloak';
-import { KeycloakRealm } from '@app/iam/keycloakRealm';
 import { ConfigService } from '@nestjs/config';
-import { KeycloakUser } from '@app/iam/keycloakUser';
+import { Keycloak, KeycloakRealm, KeycloakUser } from '@app/iam';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
@@ -48,16 +46,20 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
 
 describe('Testing Keycloak Realm Service', () =>{
     let keycloakRealmService: KeycloakRealm
-
+    const mockService = {
+        createAdminUser: jest.fn().mockResolvedValue({
+            id: 'id'
+        })
+    };
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [Keycloak, KeycloakRealm, ConfigService, KeycloakUser],
-        }).compile();
+        }).overrideProvider(KeycloakUser).useValue(mockService).compile();
 
         keycloakRealmService = module.get<KeycloakRealm>(KeycloakRealm);
     });
 
-    it('Tetsing "createRealm" method', async () => {
+    it('Testing "createRealm" method', async () => {
         const response = await keycloakRealmService.createRealm('string', 'string', 'string');
         expect(response).toEqual('Realm created successfully');
     });

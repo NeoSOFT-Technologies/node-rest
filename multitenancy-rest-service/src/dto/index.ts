@@ -9,6 +9,8 @@ import { TenantUserDto } from "./tenant.user.dto";
 import { UpdateTenantDto } from "./update.tenant.dto ";
 import { ResourceDto } from "./resource.dto";
 import { PolicyDto } from "./policy.dto";
+import { ClientDto } from "./client.dto";
+import { TenantCredentialsDto } from "./tenant-credentials.dto";
 
 export {
     columnDto,
@@ -21,5 +23,7 @@ export {
     TenantUserDto,
     UpdateTenantDto,
     ResourceDto,
-    PolicyDto
+    PolicyDto,
+    ClientDto,
+    TenantCredentialsDto
 }

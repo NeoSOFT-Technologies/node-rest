@@ -10,6 +10,7 @@ describe('Testing AppService', () => {
     let appService: AppService;
     let keycloakUser: KeycloakUser;
     let keycloakRealm: KeycloakRealm;
+    let keycloakClient: KeycloakClient;
     let keycloakAuthResource: KeycloakAuthResource;
     let keycloakAuthPolicy: KeycloakAuthPolicy;
 
@@ -37,8 +38,13 @@ describe('Testing AppService', () => {
     const mockKeycloakAuthResource = {
         createResource: jest.fn(),
     };
+
     const mockKeycloakAuthPolicy = {
         createPolicy: jest.fn(),
+    };
+
+    const mockKeycloakClient = {
+        createClient: jest.fn(),
     };
 
     beforeAll(async () => {
@@ -64,6 +70,8 @@ describe('Testing AppService', () => {
             .useValue(mockKeycloakUser)
             .overrideProvider(KeycloakRealm)
             .useValue(mockKeycloakRealm)
+            .overrideProvider(KeycloakClient)
+            .useValue(mockKeycloakClient)
             .overrideProvider(KeycloakAuthResource)
             .useValue(mockKeycloakAuthResource)
             .overrideProvider(KeycloakAuthPolicy)
@@ -73,6 +81,7 @@ describe('Testing AppService', () => {
         appService = module.get<AppService>(AppService);
         keycloakUser = module.get<KeycloakUser>(KeycloakUser);
         keycloakRealm = module.get<KeycloakRealm>(KeycloakRealm);
+        keycloakClient = module.get<KeycloakClient>(KeycloakClient);
         keycloakAuthResource = module.get<KeycloakAuthResource>(KeycloakAuthResource);
         keycloakAuthPolicy = module.get<KeycloakAuthPolicy>(KeycloakAuthPolicy);
     });
@@ -214,12 +223,26 @@ describe('Testing AppService', () => {
         mockcreateUser.mockRestore();
     });
 
+    it('Testing "createClient"', async () => {
+        const body = {
+            tenantName: 'string',
+            password: 'string',
+            clientDetails: { 
+                clientId: "test-client",
+                rootUrl: "www.testUrl.com",
+            },
+        };
+        const mockcreateClient = jest.spyOn(keycloakClient, 'createClient');
+        appService.createClient(body);
+
+        expect(mockcreateClient).toHaveBeenCalled();
+        mockcreateClient.mockRestore();
+    });
+
     it('Testing "createPolicy"', async () => {
         const body = {
-            userName: 'string',
-            email: 'string',
-            password: 'string',
             tenantName: 'string',
+            password: 'string',
             clientName: 'string',
             policyType: 'string',
             policyDetails: { name: 'string' },
@@ -233,10 +256,8 @@ describe('Testing AppService', () => {
 
     it('Testing "createResource"', async () => {
         const body = {
-            userName: 'string',
-            email: 'string',
-            password: 'string',
             tenantName: 'string',
+            password: 'string',
             clientName: 'string',
             resourceDetails: { name: 'string' },
         };

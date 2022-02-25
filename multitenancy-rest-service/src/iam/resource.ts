@@ -1,6 +1,6 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Injectable } from '@nestjs/common';
-import { TenantUserDto } from '@app/dto/tenant.user.dto';
+import { TenantCredentialsDto } from '@app/dto';
 import { ConfigService } from '@nestjs/config';
 import { Keycloak } from "./keycloak";
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
@@ -17,7 +17,7 @@ export class KeycloakAuthResource {
         private config: ConfigService
     ) { }
 
-    public async createResource(user: TenantUserDto, clientName: string, resourceDetails: ResourceRepresentation): Promise<any> {
+    public async createResource(user: TenantCredentialsDto, clientName: string, resourceDetails: ResourceRepresentation): Promise<any> {
         try {
             this.kcTenantAdminClient = new KcAdminClient({
                 baseUrl: this.config.get('keycloak.server'),

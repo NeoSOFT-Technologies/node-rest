@@ -6,12 +6,8 @@ export class PolicyDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  userName: string;
+  tenantName: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -20,11 +16,6 @@ export class PolicyDto {
       'one special character'
   })
   password: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  tenantName: string;
 
   policyType:string
   clientName:string

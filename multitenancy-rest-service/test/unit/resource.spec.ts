@@ -34,10 +34,8 @@ describe('Testing Keycloak Auth Resource', () => {
 
     it('Testing "createResource" method', async () => {
         const mockTenantuser = {
-            userName: 'string',
-            email: 'stirng',
+            tenantName: 'string',
             password: 'string',
-            tenantName: 'string'
         };
         const mockclientName = 'string';
         const resourceDetails = {

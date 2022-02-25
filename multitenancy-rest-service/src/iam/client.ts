@@ -1,9 +1,9 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Injectable } from '@nestjs/common';
-import { TenantUserDto } from '@app/dto/tenant.user.dto';
 import { ConfigService } from '@nestjs/config';
 import { Keycloak } from "./keycloak";
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
+import { TenantCredentialsDto } from '@app/dto';
 
 @Injectable()
 export class KeycloakClient {
@@ -13,7 +13,7 @@ export class KeycloakClient {
         private config: ConfigService
     ) { }
 
-    public async createClient(user: TenantUserDto): Promise<any> {
+    public async createClient(user: TenantCredentialsDto, clientDetails: ClientRepresentation): Promise<any> {
         try {
             this.kcTenantAdminClient = new KcAdminClient({
                 baseUrl: this.config.get('keycloak.server'),
@@ -21,18 +21,11 @@ export class KeycloakClient {
             });
 
             await this.keycloak.init('adminuser', user.password, this.kcTenantAdminClient);
-            await this.kcTenantAdminClient.clients.create({
-                clientId: 'my-nest-application',
-                baseUrl: 'http://localhost:5000',
-                authorizationServicesEnabled: true,
-                access: {
-                    'confidential': true
-                }
-            })
+            await this.kcTenantAdminClient.clients.create(clientDetails);
 
             return 'Client created successfully';
         } catch (error) {
-            return error;
+            throw error;
         }
     };
 

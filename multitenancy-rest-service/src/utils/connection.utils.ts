@@ -1,6 +1,6 @@
 import * as mysql from 'mysql2';
 import Connection from 'mysql2/typings/mysql/lib/Connection';
-import { DbDetailsDto } from '../dto/db.details.dto';
+import { DbDetailsDto } from '@app/dto';
 
 export const ConnectionUtils = {
   getConnection: async function (dbDetails: DbDetailsDto) {

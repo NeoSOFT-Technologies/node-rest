@@ -1,6 +1,6 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Injectable } from '@nestjs/common';
-import { TenantUserDto } from '@app/dto/tenant.user.dto';
+import { TenantCredentialsDto } from '@app/dto';
 import { ConfigService } from '@nestjs/config';
 import { Keycloak } from "./keycloak";
 import PolicyRepresentation, { Logic } from '@keycloak/keycloak-admin-client/lib/defs/policyRepresentation';
@@ -19,7 +19,7 @@ export class KeycloakAuthPolicy {
         private config: ConfigService
     ) { }
 
-    public async createPolicy(user: TenantUserDto, clientName: string, policyType: string, policyDetails: PolicyRepresentation): Promise<any> {
+    public async createPolicy(user: TenantCredentialsDto, clientName: string, policyType: string, policyDetails: PolicyRepresentation): Promise<any> {
         try {
             this.kcTenantAdminClient = new KcAdminClient({
                 baseUrl: this.config.get('keycloak.server'),

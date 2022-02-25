@@ -9,8 +9,8 @@ import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
 import {
-  CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, PolicyDto, ProvisionTenantTableDto,
-  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto
+  ClientDto, CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, PolicyDto,
+  ProvisionTenantTableDto, RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto
 } from './dto';
 
 @Controller('api')
@@ -122,6 +122,15 @@ export class AppController {
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
       return e;
+    }
+  }
+
+  @Post('client')
+  async tenantClient(@Body() body: ClientDto, @Res() res: Response) {
+    try {
+      res.send(await this.appService.createClient(body));
+    } catch (e) {
+      return res.status(e.response.status).send(e.response.data);
     }
   }
 

@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { stringify } from "querystring";
 import jwt_decode from "jwt-decode";
 import { ConfigService } from "@nestjs/config";
-import { CredentialsDto, LogoutDto } from "../dto";
-import { httpClient } from "../utils";
+import { CredentialsDto, LogoutDto } from "@app/dto";
+import { httpClient } from "@app/utils";
 
 @Injectable()
 export class AuthService {

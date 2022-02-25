@@ -42,10 +42,8 @@ describe('Testing Keycloak Auth Policy', () => {
 
     it('Testing "createPolicy" method', async () => {
         const mockTenantuser = {
-            userName: 'string',
-            email: 'stirng',
+            tenantName: 'string',
             password: 'string',
-            tenantName: 'string'
         };
         const mockclientName = 'string';
         const policyType = 'user';

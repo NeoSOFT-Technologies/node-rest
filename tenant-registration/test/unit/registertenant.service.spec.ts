@@ -13,9 +13,10 @@ describe('Testing RegisTration MicroService Service', () => {
     description: 'string',
     createdDateTime: 'string',
   };
+  const count = 50;
   const mockTenantRepository = {
     save: jest.fn().mockResolvedValue(tenant),
-    find: jest.fn().mockResolvedValue(tenant),
+    findAndCount: jest.fn().mockResolvedValue([[tenant], count]),
     findOneOrFail: jest.fn().mockResolvedValue(tenant),
     update: jest.fn().mockResolvedValue(tenant),
   };
@@ -49,7 +50,7 @@ describe('Testing RegisTration MicroService Service', () => {
   });
 
   it('Testing listAll', async () => {
-    expect(await registertenantService.listAll()).toEqual(tenant);
+    expect(await registertenantService.listAll()).toEqual([[tenant], count]);
   });
 
   it('Testing updateDescription', async () => {

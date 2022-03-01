@@ -22,8 +22,8 @@ export class AppService {
   getTenantConfig(id: number) {
     return this.client2.send({ cmd: 'get_config' }, id);
   }
-  listAllTenant() {
-    return this.client1.send({ cmd: 'list-all-tenant' }, '');
+  listAllTenant(page: number) {
+    return this.client1.send({ cmd: 'list-all-tenant' }, page);
   }
   updateDescription(tenantname: string, newdescription: string) {
     return this.client1.send({ cmd: 'update-description' }, { tenantname, newdescription });

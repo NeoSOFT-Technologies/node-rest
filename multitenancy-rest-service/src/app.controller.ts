@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, HttpCode, HttpStatus,
+  Body, Controller, Delete, Get, HttpStatus,
   Patch, Post, Req, Res, UseGuards, UsePipes, ValidationPipe
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -88,13 +88,18 @@ export class AppController {
   }
 
   @Get('tenants')
+  @ApiQuery({ name: 'page', type: 'number' })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
   listAllTenant(@Req() req: Request, @Res() res: Response) {
     try {
-      const response = this.appService.listAllTenant();
-      response.subscribe(async (result) => res.send(result));
+      const page: number = req.query.page as any;
+      const response = this.appService.listAllTenant(page);
+      response.subscribe(async (result) => {
+        const [data, count] = result;
+        res.send({ data, count })
+      });
     } catch (e) {
       return e;
     }

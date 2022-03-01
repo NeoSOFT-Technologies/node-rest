@@ -6,14 +6,14 @@ import { RegistertenantService } from '@app/tenant-reg/registertenant.service';
 describe('Testing RegisTration MicroService Controller', () => {
   let registertenantController: RegistertenantController;
 
-  const mockMessage = { Message: 'Tenant Registered Successfully' };
   const TenantDetails = {
+    tenantName: 'string',
     email: 'string',
     password: 'string',
     description: 'string',
   };
   const mockRegistertenantService = {
-    register: jest.fn().mockResolvedValue(mockMessage),
+    register: jest.fn(),
     listAll: jest.fn(),
     updateDescription: jest.fn(),
     softDelete: jest.fn(),
@@ -39,6 +39,8 @@ describe('Testing RegisTration MicroService Controller', () => {
   });
 
   it('Testing registerTenantcontroller registerTenant', async () => {
+    const mockMessage = { Message: 'Tenant Registered Successfully' };
+    mockRegistertenantService.register.mockResolvedValue(mockMessage);
     expect(
       await registertenantController.registerTenant(TenantDetails),
     ).toEqual(mockMessage);
@@ -47,7 +49,9 @@ describe('Testing RegisTration MicroService Controller', () => {
   it('Testing listAllTenant', async () => {
     const mockMessage = { Message: 'All Tenant received Successfully' };
     mockRegistertenantService.listAll.mockResolvedValue(mockMessage);
-    expect(await registertenantController.listAllTenant()).toEqual(mockMessage);
+    expect(await registertenantController.listAllTenant(1)).toEqual(
+      mockMessage,
+    );
   });
 
   it('Testing updateDescription', async () => {

@@ -122,8 +122,9 @@ describe('Testing AppService', () => {
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
         });
+        const page = 1;
         const mocklistAllTenant = jest.spyOn(mockClient1, 'send');
-        const response = appService.listAllTenant();
+        const response = appService.listAllTenant(page);
 
         expect(mocklistAllTenant).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));

@@ -26,9 +26,9 @@ export class RegistertenantController {
   }
 
   @MessagePattern({ cmd: 'list-all-tenant' })
-  async listAllTenant() {
+  async listAllTenant(page: number) {
     try {
-      return await this.tenantService.listAll();
+      return await this.tenantService.listAll(page);
     } catch (e) {
       return e;
     }

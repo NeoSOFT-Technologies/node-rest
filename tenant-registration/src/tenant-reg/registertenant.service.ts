@@ -43,8 +43,11 @@ export class RegistertenantService {
     return { Message: 'Tenant Registered Successfully' };
   }
 
-  listAll(): Promise<Tenant[]> {
-    return this.tenantRepository.find();
+  listAll(page = 1): Promise<[Tenant[], number]> {
+    return this.tenantRepository.findAndCount({
+      take: 5,
+      skip: 5 * (page - 1),
+    });
   }
 
   async updateDescription(tenantname: string, newdescription: string) {

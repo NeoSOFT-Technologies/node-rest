@@ -14,7 +14,6 @@ import {
   ScopeDto
 } from './dto';
 
-@ApiTags('API List')
 @Controller('api')
 export class AppController {
   constructor(
@@ -23,6 +22,7 @@ export class AppController {
   ) { }
 
   @Post('login')
+  @ApiTags('Authentication')
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: CredentialsDto })
   async login(@Body() body: CredentialsDto, @Res() res: Response) {
@@ -35,6 +35,7 @@ export class AppController {
   }
 
   @Post('logout')
+  @ApiTags('Authentication')
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: LogoutDto })
   async logout(@Body() body: LogoutDto, @Res() res: Response) {
@@ -47,6 +48,7 @@ export class AppController {
   }
 
   @Post('tenants')
+  @ApiTags('Tenants')
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: RegisterTenantDto })
   async registerTenant(@Body() body: RegisterTenantDto, @Res() res: Response) {
@@ -61,6 +63,7 @@ export class AppController {
   }
 
   @Post('user')
+  @ApiTags('User')
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: TenantUserDto })
   async tenantUser(@Body() body: TenantUserDto, @Res() res: Response) {
@@ -73,6 +76,7 @@ export class AppController {
   }
 
   @Get('tenants/:id')
+  @ApiTags('Tenants')
   @ApiParam({ name: 'id', required: true, type: Number })
   getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
@@ -90,6 +94,7 @@ export class AppController {
   }
 
   @Get('tenants')
+  @ApiTags('Tenants')
   @ApiQuery({ name: 'page', type: 'number', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
@@ -108,6 +113,7 @@ export class AppController {
   }
 
   @Patch('tenants')
+  @ApiTags('Tenants')
   @ApiBody({ type: UpdateTenantDto })
   updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
@@ -121,6 +127,7 @@ export class AppController {
   }
 
   @Delete('tenants')
+  @ApiTags('Tenants')
   @ApiBody({ type: DeleteTenantDto })
   deleteTenant(@Req() req: Request, @Res() res: Response) {
     try {
@@ -133,6 +140,7 @@ export class AppController {
   }
 
   @Post('client')
+  @ApiTags('Keycloak')
   async tenantClient(@Body() body: ClientDto, @Res() res: Response) {
     try {
       res.send(await this.appService.createClient(body));
@@ -142,6 +150,7 @@ export class AppController {
   }
 
   @Post('resource')
+  @ApiTags('Keycloak')
   async resource(@Body() body: ResourceDto, @Res() res: Response) {
     try {
       res.send(await this.appService.createResource(body));
@@ -151,6 +160,7 @@ export class AppController {
   }
 
   @Post('policy')
+  @ApiTags('Keycloak')
   async policy(@Body() body: PolicyDto, @Res() res: Response) {
     try {
       res.send(await this.appService.createPolicy(body));
@@ -160,15 +170,17 @@ export class AppController {
   }
 
   @Post('scope')
-  async scope(@Body() body:ScopeDto, @Res() res: Response) {
-    try{
+  @ApiTags('Keycloak')
+  async scope(@Body() body: ScopeDto, @Res() res: Response) {
+    try {
       res.send(await this.appService.createScope(body));
-    }catch(e){
+    } catch (e) {
       return res.status(e.response.status).send(e.response.data);
     }
   }
 
   @Get('connect-database')
+  @ApiTags('Miscellaneous')
   @ApiQuery({ type: DbDetailsDto })
   async connectDatabase(@Req() req: Request, @Res() res: Response) {
     try {
@@ -184,6 +196,7 @@ export class AppController {
   }
 
   @Post('create-table')
+  @ApiTags('Miscellaneous')
   @ApiBody({ type: ProvisionTenantTableDto })
   async createTable(@Req() req: Request, @Res() res: Response) {
     try {

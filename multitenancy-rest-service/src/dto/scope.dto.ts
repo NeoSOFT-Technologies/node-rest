@@ -1,8 +1,8 @@
 import { ScopeRepresentationDto } from "./scope.representation.dto";
 
-export class ScopeDto{
+export class ScopeDto {
     tenantName: string;
     password: string;
-    clientName:string;
+    clientName: string;
     scopeDetails: ScopeRepresentationDto;
 }

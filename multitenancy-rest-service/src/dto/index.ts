@@ -11,6 +11,8 @@ import { ResourceDto } from "./resource.dto";
 import { PolicyDto } from "./policy.dto";
 import { ClientDto } from "./client.dto";
 import { TenantCredentialsDto } from "./tenant-credentials.dto";
+import { ScopeDto } from "./scope.dto";
+import { ScopeRepresentationDto } from "./scope.representation.dto";
 
 export {
     columnDto,
@@ -25,5 +27,7 @@ export {
     ResourceDto,
     PolicyDto,
     ClientDto,
-    TenantCredentialsDto
+    TenantCredentialsDto,
+    ScopeDto,
+    ScopeRepresentationDto
 }

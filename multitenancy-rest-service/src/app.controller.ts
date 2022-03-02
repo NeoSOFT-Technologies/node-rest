@@ -90,13 +90,13 @@ export class AppController {
   }
 
   @Get('tenants')
-  @ApiQuery({ name: 'page', type: 'number' })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
   listAllTenant(@Req() req: Request, @Res() res: Response) {
     try {
-      const page: number = req.query.page as any;
+      const page: number = req.query.page as any || 1;
       const response = this.appService.listAllTenant(page);
       response.subscribe(async (result) => {
         const [data, count] = result;

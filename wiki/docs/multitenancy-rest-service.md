@@ -4,7 +4,7 @@ This multitenancy-rest-service has been included to interact with the tenant mic
 - `Login` `/api/login/` - HTTP POST: It provides the access token after authenticating the user.
 - `Logout` `/api/logout/` - HTTP POST: It revokes the provided access token.
 - `Register tenant` `/api/tenants/` - HTTP POST: It registers a new tenant by consuming tenant-registration microservice.
-- `Get All Tenant` `api/tenants/`- HTTP GET: It retreives all the registered tenant information from database.
+- `Get All Tenant` `api/tenants/`- HTTP GET: It retreives all the registered tenant information from database.The output has been paginated to reduce load time
 - `Update Tenant` `/api/tenants`- HTTP PATCH: Sample API to update tenant configuration.
 - `Deleting Tenant` `api/tenants` - HTTP DELETE: Sample API to delete a tenant.
 - `Tenant Configuration` `/api/tenants/{id}` - HTTP GET: It retrieves configuration of the specified id.
@@ -159,11 +159,12 @@ API Endpoint:  `POST` `/api/tenants/`
 **4. Information Of Tenants**
 API Endpoint: `GET` `/api/tenants`
 
-**Input:** Since this is a `GET` request there are no input parameters.
+**Input:** Query parameter page number
 
-**Output:** The schema of the output is in the form of lists which consists of `JSON` objects.
-```
-[
+**Output:** The schema of the output is in the form of `JSON`
+```json
+{
+  "data": [
   {
     "id": 1,
     "tenantName": "Value",
@@ -173,10 +174,16 @@ API Endpoint: `GET` `/api/tenants`
     "createdDateTime": "Value",
     "isDelete": "Value"
   },
-  {},
+  {
+    ...
+  },
   ...
-]
+ ],
+  "count": 12
+}
 ```
+The `"data"` key contains the tenants array limited to 5 tenants and `"count"` contains the total tenants available
+
 ---
 **5. Updating the Tenant's Configuration**
 API Endpoint: `PATCH` `/api/tenants`

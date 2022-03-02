@@ -122,6 +122,7 @@ Please find below a detailed description of the app's folder structures:
 
 ### Consuming Microservices
 - [Multitenancy Rest Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/multitenancy-rest-service.md)
+- [Authentication](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/auth.md)
 - [Understand Microservices Communication](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/communication.md)
 - [Video Demonstration](https://user-images.githubusercontent.com/87794374/147342616-5b38b414-fda5-4c11-8ebc-40ebcb59cc5b.mp4)
 

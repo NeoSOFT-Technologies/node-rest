@@ -113,6 +113,9 @@ API Endpoint:  `/api/tenant`
 | description     | description of tenant              |
 | createdDateTime | time of creation of tenant         |
 | isDeleted       | if the tenant is active or deleted |
+
+**`Note`:** The output is paginated and is to be handled accordingly on the client side
+
 ---
 
 **5. Tenant Details**

@@ -30,7 +30,7 @@ export class KeycloakAuthScope{
                 },
                 scopeDetails
             );
-            return 'Scope created Successfully';
+            return 'Scope created successfully';
 
         } catch(error){
             throw error;

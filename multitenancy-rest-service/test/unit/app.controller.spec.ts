@@ -42,7 +42,8 @@ describe('Testing AppController', () => {
         createUser: jest.fn(),
         createResource: jest.fn(),
         createPolicy: jest.fn(),
-        createClient: jest.fn()
+        createClient: jest.fn(),
+        createScope: jest.fn()
     };
 
     const mockAuthService = {
@@ -200,6 +201,23 @@ describe('Testing AppController', () => {
         await appController.policy(mockBody, mockResponse);
         expect(mockSend).toHaveBeenCalled();
         expect(createPolicy).toHaveBeenCalledWith(mockBody);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "scope"', async () => {
+        const mockBody = {
+            tenantName: 'string',
+            password: 'string',
+            clientName: 'string',
+            scopeDetails: {
+                name: 'string'
+            }
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const createScope = jest.spyOn(appService, 'createScope');
+        await appController.scope(mockBody, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(createScope).toHaveBeenCalledWith(mockBody);
         mockSend.mockRestore();
     });
 

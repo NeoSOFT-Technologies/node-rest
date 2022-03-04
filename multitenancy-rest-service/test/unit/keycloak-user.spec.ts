@@ -12,6 +12,8 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     create: jest.fn().mockResolvedValue({
                         id: 'id'
                     }),
+                    find: jest.fn().mockResolvedValue('sample-user'),
+                    count: jest.fn().mockResolvedValue('sample-count'),
                     addRealmRoleMappings: jest.fn(),
                 },
                 roles: {
@@ -59,11 +61,8 @@ describe('Testing Keycloak User Service', () => {
             },
             token: 'Bearer token'
         };
-        const mockAxiosGet = jest.spyOn(axios, 'get').mockResolvedValueOnce({ data: 'sample-user' });
-        mockAxiosGet.mockResolvedValueOnce({ data: 'sample-count' })
         const response = await keycloakUserService.getUsers(mockData);
         expect(response).toEqual({ data: 'sample-user', count: 'sample-count' });
-        mockAxiosGet.mockRestore();
     });
 
     it('Testing "createAdminUser" method', async () => {

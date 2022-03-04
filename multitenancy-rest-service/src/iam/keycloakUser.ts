@@ -70,37 +70,28 @@ export class KeycloakUser {
         }
     };
 
-    public async getUsers(data: { query: UsersQueryDto, token: string }): Promise<{ data: any, count: any }> {
+    public async getUsers(data: { query: UsersQueryDto, token: string }): Promise<{ data: UserRepresentation[], count: number }> {
         try {
             let { tenantName, page = 1 } = data.query;
-            const url = `${this.keycloakServer}/admin/realms/${tenantName}/users`;
-            const headers = {
-                "Authorization": data.token,
-            };
-            const params = {
+            const { token } = data;
+            const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
+                baseUrl: this.config.get('keycloak.server'),
+                realmName: tenantName,
+            });
+            const parts = token.split(' ')
+            kcTenantAdminClient.accessToken = parts[1];
+
+            const users = await kcTenantAdminClient.users.find({
                 briefRepresentation: true,
                 first: (page - 1) * 5,
                 max: 5
+            });
+            const count = await kcTenantAdminClient.users.count();
+
+            return {
+                data: users,
+                count
             };
-
-            try {
-                const response = await httpClient.get({
-                    url,
-                    payload: params,
-                    headers
-                });
-
-                const count = await httpClient.get({
-                    url: `${url}/count`,
-                    headers
-                });
-                return {
-                    data: response.data,
-                    count: count.data
-                };
-            } catch (e) {
-                throw e
-            }
 
         } catch (error) {
             throw error;

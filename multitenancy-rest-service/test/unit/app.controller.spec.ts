@@ -109,10 +109,13 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "tenantUser"', async () => {
         const mockBody: TenantUserDto = {
-            userName: 'userName',
-            email: 'tenant@gmail.com',
-            password: 'tenant123',
             tenantName: 'tenantName',
+            password: 'tenant123',
+            userDetails:{
+                userName: 'userName',
+                email: 'tenant@gmail.com',
+                password: 'user123'
+            }
         }
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createUser = jest.spyOn(appService, 'createUser');

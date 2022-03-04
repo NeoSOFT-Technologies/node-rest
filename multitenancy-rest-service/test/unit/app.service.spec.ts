@@ -220,10 +220,13 @@ describe('Testing AppService', () => {
 
     it('Testing "createUser"', async () => {
         const user = {
-            userName: 'string',
-            email: 'string',
-            password: 'string',
             tenantName: 'string',
+            password: 'string',
+            userDetails:{
+                userName: 'string',
+                email: 'string',
+                password: 'string'
+            }
         };
         const mockcreateUser = jest.spyOn(keycloakUser, 'createUser');
         appService.createUser(user);

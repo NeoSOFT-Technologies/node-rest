@@ -50,7 +50,6 @@ describe('Testing Keycloak Authorization Scope', () => {
         }
 
         const response = await keycloakAuthScope.createScope(mockTenantuser, mockclientName, mockscopeDetails);
-        // const response = await keycloakAuthPolicy.createPolicy(mockTenantuser, mockclientName, policyType, mockpolicyDetails);
         expect(response).toEqual('Scope created successfully');
     });
 });

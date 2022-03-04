@@ -9,9 +9,8 @@ import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
 import {
-  ClientDto, CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, PolicyDto,
-  ProvisionTenantTableDto, RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto,
-  ScopeDto
+  ClientDto, CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, PolicyDto, ProvisionTenantTableDto,
+  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto, ScopeDto, UsersQueryDto
 } from './dto';
 
 @Controller('api')
@@ -30,7 +29,7 @@ export class AppController {
       res.send((await this.authService.getAccessToken(body)).data);
       // login successful
     } catch (e) {
-      return res.status(HttpStatus.UNAUTHORIZED).send(e);
+      return res.status(e.response.status).send(e.response.data);
     }
   }
 
@@ -43,7 +42,7 @@ export class AppController {
       res.sendStatus(await this.authService.logout(body));
       // logout successful
     } catch (e) {
-      return res.status(HttpStatus.UNAUTHORIZED).send(e);
+      return res.status(e.response.status).send(e.response.data);
     }
   }
 
@@ -59,19 +58,6 @@ export class AppController {
       response.subscribe((result) => res.send(result));
     } catch (e) {
       return res.status(HttpStatus.UNAUTHORIZED).send(e);
-    }
-  }
-
-  @Post('user')
-  @ApiTags('User')
-  @UsePipes(new ValidationPipe())
-  @ApiBody({ type: TenantUserDto })
-  async tenantUser(@Body() body: TenantUserDto, @Res() res: Response) {
-    try {
-      const user: TenantUserDto = body;
-      res.send(await this.appService.createUser(user));
-    } catch (e) {
-      return e;
     }
   }
 
@@ -136,6 +122,35 @@ export class AppController {
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
       return e;
+    }
+  }
+
+  @Post('user')
+  @ApiTags('User')
+  @UsePipes(new ValidationPipe())
+  async tenantUser(@Body() body: TenantUserDto, @Res() res: Response) {
+    try {
+      res.send(await this.appService.createUser(body));
+    } catch (e) {
+      return res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Get('user')
+  @ApiTags('User')
+  @ApiQuery({ type: UsersQueryDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async listAllUser(@Req() req: Request, @Res() res: Response) {
+    try {
+      const data = {
+        query: req.query as any,
+        token: req.headers['authorization']
+      }
+      res.send(await this.appService.listAllUser(data));
+    } catch (e) {
+      return res.status(e.response.status).send(e.response.data);
     }
   }
 

@@ -13,6 +13,8 @@ import { ClientDto } from "./client.dto";
 import { TenantCredentialsDto } from "./tenant-credentials.dto";
 import { ScopeDto } from "./scope.dto";
 import { ScopeRepresentationDto } from "./scope.representation.dto";
+import { UserDetailsDto } from "./user.details.dto";
+import { UsersQueryDto } from "./users.query.dto";
 
 export {
     columnDto,
@@ -29,5 +31,7 @@ export {
     ClientDto,
     TenantCredentialsDto,
     ScopeDto,
-    ScopeRepresentationDto
+    ScopeRepresentationDto,
+    UserDetailsDto,
+    UsersQueryDto
 }

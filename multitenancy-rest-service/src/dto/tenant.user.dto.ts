@@ -1,16 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, Matches, ValidateNested } from 'class-validator';
+import { UserDetailsDto } from './user.details.dto';
 
 export class TenantUserDto {
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  userName: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  tenantName: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -20,8 +18,7 @@ export class TenantUserDto {
   })
   password: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  tenantName: string;
+  @ValidateNested({ each: true })
+  @Type(() => UserDetailsDto)
+  userDetails: UserDetailsDto;
 }

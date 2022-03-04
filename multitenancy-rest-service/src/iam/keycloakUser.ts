@@ -1,21 +1,25 @@
-import { TenantUserDto } from "@app/dto/tenant.user.dto";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Keycloak } from "./keycloak";
 import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
+import { TenantCredentialsDto, UserDetailsDto, UsersQueryDto } from "../dto";
+import RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/roleRepresentation";
+import { httpClient } from "../utils";
 
 
 @Injectable()
 export class KeycloakUser {
     private kcMasterAdminClient: KcAdminClient;
-    
+
     constructor(
         private keycloak: Keycloak,
         private config: ConfigService) {
         this.kcMasterAdminClient = keycloak.kcMasterAdminClient
+        this.keycloakServer = this.config.get('keycloak.server');
     }
+    keycloakServer: string;
 
     public async createAdminUser(realmName: string, email: string, password: string): Promise<TenantAdminUser> {
         return await this.kcMasterAdminClient.users.create({
@@ -37,7 +41,7 @@ export class KeycloakUser {
         return admin[0];
     };
 
-    public async createUser(user: TenantUserDto): Promise<any> {
+    public async createUser(user: TenantCredentialsDto, userDetails: UserDetailsDto): Promise<any> {
         try {
             const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
                 baseUrl: this.config.get('keycloak.server'),
@@ -46,14 +50,82 @@ export class KeycloakUser {
 
             await this.keycloak.init('adminuser', user.password, kcTenantAdminClient);
 
-            await kcTenantAdminClient.users.create({
-                username: user.userName,
-                email: user.email,
-                realm: user.tenantName
+            const createdUser = await kcTenantAdminClient.users.create({
+                username: userDetails.userName,
+                email: userDetails.email,
+                enabled: true,
+                credentials: [{
+                    temporary: false,
+                    type: 'password',
+                    value: userDetails.password,
+                }]
             });
+
+            const userRole: RoleRepresentation = await this.createUserRole(kcTenantAdminClient)
+            await this.UserRoleMapping(kcTenantAdminClient, createdUser, userRole)
+
             return 'User created successfully';
         } catch (error) {
-            return error;
+            throw error;
         }
     };
+
+    public async getUsers(data: { query: UsersQueryDto, token: string }): Promise<{ data: any, count: any }> {
+        try {
+            let { tenantName, page = 1 } = data.query;
+            const url = `${this.keycloakServer}/admin/realms/${tenantName}/users`;
+            const headers = {
+                "Authorization": data.token,
+            };
+            const params = {
+                briefRepresentation: true,
+                first: (page - 1) * 5,
+                max: 5
+            };
+
+            try {
+                const response = await httpClient.get({
+                    url,
+                    payload: params,
+                    headers
+                });
+
+                const count = await httpClient.get({
+                    url: `${url}/count`,
+                    headers
+                });
+                return {
+                    data: response.data,
+                    count: count.data
+                };
+            } catch (e) {
+                throw e
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    private async createUserRole(client: KcAdminClient): Promise<RoleRepresentation> {
+        await client.roles.create({
+            name: 'user'
+        });
+        return await client.roles.findOneByName({
+            name: 'user'
+        });
+    };
+
+    private async UserRoleMapping(client: KcAdminClient, createdUser: { id: string }, userRole: RoleRepresentation): Promise<void> {
+        await client.users.addRealmRoleMappings({
+            id: createdUser.id,
+            roles: [
+                {
+                    id: userRole.id,
+                    name: userRole.name,
+                },
+            ]
+        });
+    };
+
 }

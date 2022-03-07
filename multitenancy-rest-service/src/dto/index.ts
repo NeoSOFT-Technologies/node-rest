@@ -15,6 +15,8 @@ import { ScopeDto } from "./scope.dto";
 import { ScopeRepresentationDto } from "./scope.representation.dto";
 import { UserDetailsDto } from "./user.details.dto";
 import { UsersQueryDto } from "./users.query.dto";
+import { DeleteUserDto } from "./user.delete.dto";
+import { UpdateUserDto } from "./user.update.dto";
 
 export {
     columnDto,
@@ -33,5 +35,7 @@ export {
     ScopeDto,
     ScopeRepresentationDto,
     UserDetailsDto,
-    UsersQueryDto
+    UsersQueryDto,
+    DeleteUserDto,
+    UpdateUserDto
 }

@@ -10,7 +10,7 @@ import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
 import {
   ClientDto, CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, PolicyDto, ProvisionTenantTableDto,
-  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto, ScopeDto, UsersQueryDto
+  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto, ScopeDto, UsersQueryDto, DeleteUserDto, UpdateUserDto
 } from './dto';
 
 @Controller('api')
@@ -64,6 +64,9 @@ export class AppController {
   @Get('tenants/:id')
   @ApiTags('Tenants')
   @ApiParam({ name: 'id', required: true, type: Number })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
   getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantId: number = +req.params.id;
@@ -101,6 +104,9 @@ export class AppController {
   @Patch('tenants')
   @ApiTags('Tenants')
   @ApiBody({ type: UpdateTenantDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
   updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.body.action.tenantName;
@@ -115,6 +121,9 @@ export class AppController {
   @Delete('tenants')
   @ApiTags('Tenants')
   @ApiBody({ type: DeleteTenantDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
   deleteTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.body.tenantName;
@@ -127,10 +136,15 @@ export class AppController {
 
   @Post('user')
   @ApiTags('User')
+  @ApiBody({ type: TenantUserDto })
   @UsePipes(new ValidationPipe())
-  async tenantUser(@Body() body: TenantUserDto, @Res() res: Response) {
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async tenantUser(@Req() req: Request, @Res() res: Response) {
     try {
-      res.send(await this.appService.createUser(body));
+      const token = req.headers['authorization'];
+      res.send(await this.appService.createUser(req.body, token));
     } catch (e) {
       return res.status(e.response.status).send(e.response.data);
     }
@@ -151,6 +165,46 @@ export class AppController {
       res.send(await this.appService.listAllUser(data));
     } catch (e) {
       return res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Patch('user')
+  @ApiTags('User')
+  @ApiBody({ type: UpdateUserDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async updateUser(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.updateUser(req.body, token));
+    } catch (e) {
+      if (e.response.statusCode) {
+        return res.status(e.response.statusCode).send(e.response.message);
+      }
+      else if (e.response.status) {
+        return res.status(e.response.status).send(e.response.data);
+      }
+    }
+  }
+
+  @Delete('user')
+  @ApiTags('User')
+  @ApiBody({ type: DeleteUserDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async deleteUser(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.deleteUser(req.body, token));
+    } catch (e) {
+      if (e.response.statusCode) {
+        return res.status(e.response.statusCode).send(e.response.message);
+      }
+      else if (e.response.status) {
+        return res.status(e.response.status).send(e.response.data);
+      }
     }
   }
 

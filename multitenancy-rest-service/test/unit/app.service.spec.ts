@@ -29,7 +29,10 @@ describe('Testing AppService', () => {
         }),
     };
     const mockKeycloakUser = {
-        createUser: jest.fn()
+        createUser: jest.fn(),
+        getUsers: jest.fn(),
+        updateUser: jest.fn(),
+        deleteUser: jest.fn()
     };
 
     const mockKeycloakRealm = {
@@ -221,25 +224,69 @@ describe('Testing AppService', () => {
     it('Testing "createUser"', async () => {
         const user = {
             tenantName: 'string',
-            password: 'string',
-            userDetails:{
+            userDetails: {
                 userName: 'string',
                 email: 'string',
                 password: 'string'
             }
         };
+        const token = 'Bearer token';
         const mockcreateUser = jest.spyOn(keycloakUser, 'createUser');
-        appService.createUser(user);
+        appService.createUser(user, token);
 
         expect(mockcreateUser).toHaveBeenCalled();
         mockcreateUser.mockRestore();
+    });
+
+    it('Testing "listAllUser"', async () => {
+        const data = {
+            query: {
+                tenantName: 'string',
+                page: 1,
+            },
+            token: 'Bearer token'
+        };
+        const mockgetUsers = jest.spyOn(keycloakUser, 'getUsers');
+        appService.listAllUser(data);
+
+        expect(mockgetUsers).toHaveBeenCalled();
+        mockgetUsers.mockRestore();
+    });
+
+    it('Testing "updateUser"', async () => {
+        const body = {
+            tenantName: 'tenantName',
+            userName: 'userName',
+            action: {
+                firstName: 'firstName'
+            }
+        };
+        const token = 'Bearer token';
+        const mockupdateUser = jest.spyOn(keycloakUser, 'updateUser');
+        appService.updateUser(body, token);
+
+        expect(mockupdateUser).toHaveBeenCalled();
+        mockupdateUser.mockRestore();
+    });
+
+    it('Testing "deleteUser"', async () => {
+        const body = {
+            tenantName: 'tenantName',
+            userName: 'userName',
+        };
+        const token = 'Bearer token';
+        const mockdeleteUser = jest.spyOn(keycloakUser, 'deleteUser');
+        appService.deleteUser(body, token);
+
+        expect(mockdeleteUser).toHaveBeenCalled();
+        mockdeleteUser.mockRestore();
     });
 
     it('Testing "createClient"', async () => {
         const body = {
             tenantName: 'string',
             password: 'string',
-            clientDetails: { 
+            clientDetails: {
                 clientId: "test-client",
                 rootUrl: "www.testUrl.com",
             },
@@ -280,7 +327,7 @@ describe('Testing AppService', () => {
         mockResource.mockRestore();
     });
 
-    it('Testing "createScope"', async() => {
+    it('Testing "createScope"', async () => {
         const body = {
             tenantName: 'string',
             password: 'string',

@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ConnectionUtils } from './utils';
 import {
-  ClientDto, DbDetailsDto, PolicyDto, ProvisionTenantTableDto,
-  RegisterTenantDto, ResourceDto, TenantUserDto, UsersQueryDto
+  ClientDto, DbDetailsDto, DeleteUserDto, PolicyDto, ProvisionTenantTableDto,
+  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateUserDto, UsersQueryDto
 } from './dto';
 import {
   KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient,
@@ -49,12 +49,20 @@ export class AppService {
     const { tenantName, email, password } = tenantDetails;
     return this.keycloakRealm.createRealm(tenantName, email, password);
   }
-  createUser(body: TenantUserDto) {
+  createUser(body: TenantUserDto, token: string) {
     const { userDetails, ...user } = body;
-    return this.keycloakUser.createUser(user, userDetails);
+    return this.keycloakUser.createUser(user, userDetails, token);
   }
   listAllUser(data: { query: UsersQueryDto, token: string }) {
     return this.keycloakUser.getUsers(data);
+  }
+  updateUser(body: UpdateUserDto, token: string) {
+    const { tenantName, userName, action } = body;
+    return this.keycloakUser.updateUser(tenantName, userName, action, token);
+  }
+  deleteUser(body: DeleteUserDto, token: string) {
+    const { tenantName, userName } = body;
+    return this.keycloakUser.deleteUser(tenantName, userName, token);
   }
   createClient(body: ClientDto) {
     const { clientDetails, ...user } = body;

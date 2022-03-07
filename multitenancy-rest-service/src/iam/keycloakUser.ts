@@ -1,12 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Keycloak } from "./keycloak";
 import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
-import { TenantCredentialsDto, UserDetailsDto, UsersQueryDto } from "../dto";
+import { UserDetailsDto, UsersQueryDto } from "../dto";
 import RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/roleRepresentation";
-import { httpClient } from "../utils";
 
 
 @Injectable()
@@ -16,7 +15,7 @@ export class KeycloakUser {
     constructor(
         private keycloak: Keycloak,
         private config: ConfigService) {
-        this.kcMasterAdminClient = keycloak.kcMasterAdminClient
+        this.kcMasterAdminClient = this.keycloak.kcMasterAdminClient
         this.keycloakServer = this.config.get('keycloak.server');
     }
     keycloakServer: string;
@@ -41,14 +40,15 @@ export class KeycloakUser {
         return admin[0];
     };
 
-    public async createUser(user: TenantCredentialsDto, userDetails: UserDetailsDto): Promise<any> {
+    public async createUser(user: { tenantName: string }, userDetails: UserDetailsDto, token: string): Promise<string> {
         try {
             const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
-                baseUrl: this.config.get('keycloak.server'),
+                baseUrl: this.keycloakServer,
                 realmName: user.tenantName
             });
+            const parts = token.split(' ')
+            kcTenantAdminClient.setAccessToken(parts[1]);
 
-            await this.keycloak.init('adminuser', user.password, kcTenantAdminClient);
 
             const createdUser = await kcTenantAdminClient.users.create({
                 username: userDetails.userName,
@@ -75,11 +75,11 @@ export class KeycloakUser {
             let { tenantName, page = 1 } = data.query;
             const { token } = data;
             const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
-                baseUrl: this.config.get('keycloak.server'),
+                baseUrl: this.keycloakServer,
                 realmName: tenantName,
             });
             const parts = token.split(' ')
-            kcTenantAdminClient.accessToken = parts[1];
+            kcTenantAdminClient.setAccessToken(parts[1]);
 
             const users = await kcTenantAdminClient.users.find({
                 briefRepresentation: true,
@@ -93,6 +93,65 @@ export class KeycloakUser {
                 count
             };
 
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    public async updateUser(tenantName: string, userName: string, userDetails: UserRepresentation, token: string) {
+        try {
+            const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
+                baseUrl: this.keycloakServer,
+                realmName: tenantName,
+            });
+            const parts = token.split(' ')
+            kcTenantAdminClient.setAccessToken(parts[1]);
+            const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
+                username: userName
+            });
+            if (!user[0]) {
+                throw new NotFoundException('User not found');
+            };
+
+            await kcTenantAdminClient.users.update(
+                {
+                    id: user[0].id
+                },
+                {
+                    ...user[0],
+                    ...userDetails
+                }
+            );
+
+            return 'User updated successfully';
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    public async deleteUser(tenantName: string, userName: string, token: string) {
+        try {
+
+            const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
+                baseUrl: this.keycloakServer,
+                realmName: tenantName,
+            });
+            const parts = token.split(' ')
+            kcTenantAdminClient.setAccessToken(parts[1]);
+
+            const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
+                username: userName
+            });
+
+            if (!user[0]) {
+                throw new NotFoundException('User not found');
+            };
+
+            await kcTenantAdminClient.users.del({
+                id: user[0].id
+            });
+
+            return 'User deleted Successfully';
         } catch (error) {
             throw error;
         }

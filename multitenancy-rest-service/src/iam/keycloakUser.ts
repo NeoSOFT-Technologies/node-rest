@@ -161,8 +161,6 @@ export class KeycloakUser {
             name: 'user'
         });
         if (!userRole) {
-            console.log('inside if');
-
             await client.roles.create({
                 name: 'user'
             });

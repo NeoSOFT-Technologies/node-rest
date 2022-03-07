@@ -1,6 +1,11 @@
 import PolicyRepresentation from '@keycloak/keycloak-admin-client/lib/defs/policyRepresentation';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
+
+class PolicyDetails implements PolicyRepresentation {
+  name?: string;
+  description?: string;
+}
 
 export class PolicyDto {
   @ApiProperty()
@@ -17,7 +22,7 @@ export class PolicyDto {
   })
   password: string;
 
-  policyType:string
-  clientName:string
-  policyDetails: PolicyRepresentation
+  policyType: string
+  clientName: string
+  policyDetails: PolicyDetails
 }

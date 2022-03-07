@@ -2,6 +2,11 @@ import ResourceRepresentation from '@keycloak/keycloak-admin-client/lib/defs/res
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
+class ResourceDetails implements ResourceRepresentation {
+  name?: string;
+  uris?: string[];
+}
+
 export class ResourceDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -16,6 +21,6 @@ export class ResourceDto {
   })
   password: string;
 
-  clientName:string
-  resourceDetails: ResourceRepresentation
+  clientName: string;
+  resourceDetails: ResourceDetails
 }

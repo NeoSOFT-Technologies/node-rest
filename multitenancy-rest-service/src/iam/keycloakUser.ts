@@ -7,7 +7,6 @@ import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRep
 import { UserDetailsDto, UsersQueryDto } from "../dto";
 import RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/roleRepresentation";
 
-
 @Injectable()
 export class KeycloakUser {
     private kcMasterAdminClient: KcAdminClient;
@@ -98,7 +97,7 @@ export class KeycloakUser {
         }
     };
 
-    public async updateUser(tenantName: string, userName: string, userDetails: UserRepresentation, token: string) {
+    public async updateUser(tenantName: string, userName: string, userDetails: UserRepresentation, token: string): Promise<string> {
         try {
             const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
                 baseUrl: this.keycloakServer,
@@ -106,6 +105,7 @@ export class KeycloakUser {
             });
             const parts = token.split(' ')
             kcTenantAdminClient.setAccessToken(parts[1]);
+
             const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
                 username: userName
             });
@@ -129,9 +129,8 @@ export class KeycloakUser {
         }
     };
 
-    public async deleteUser(tenantName: string, userName: string, token: string) {
+    public async deleteUser(tenantName: string, userName: string, token: string): Promise<string> {
         try {
-
             const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
                 baseUrl: this.keycloakServer,
                 realmName: tenantName,
@@ -158,12 +157,21 @@ export class KeycloakUser {
     };
 
     private async createUserRole(client: KcAdminClient): Promise<RoleRepresentation> {
-        await client.roles.create({
+        let userRole = await client.roles.findOneByName({
             name: 'user'
         });
-        return await client.roles.findOneByName({
-            name: 'user'
-        });
+        if (!userRole) {
+            console.log('inside if');
+
+            await client.roles.create({
+                name: 'user'
+            });
+
+            userRole = await client.roles.findOneByName({
+                name: 'user'
+            });
+        }
+        return userRole;
     };
 
     private async UserRoleMapping(client: KcAdminClient, createdUser: { id: string }, userRole: RoleRepresentation): Promise<void> {
@@ -177,5 +185,4 @@ export class KeycloakUser {
             ]
         });
     };
-
 }

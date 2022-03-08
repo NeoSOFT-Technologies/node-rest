@@ -17,6 +17,7 @@ import { UserDetailsDto } from "./user.details.dto";
 import { UsersQueryDto } from "./users.query.dto";
 import { DeleteUserDto } from "./user.delete.dto";
 import { UpdateUserDto } from "./user.update.dto";
+import { PermissionDto } from "./permission.dto";
 
 export {
     columnDto,
@@ -37,5 +38,6 @@ export {
     UserDetailsDto,
     UsersQueryDto,
     DeleteUserDto,
-    UpdateUserDto
+    UpdateUserDto,
+    PermissionDto
 }

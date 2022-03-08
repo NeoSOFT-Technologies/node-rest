@@ -10,7 +10,7 @@ import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
 import {
   ClientDto, CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, PolicyDto, ProvisionTenantTableDto,
-  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto, ScopeDto, UsersQueryDto, DeleteUserDto, UpdateUserDto
+  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateTenantDto, ScopeDto, UsersQueryDto, PermissionDto, UpdateUserDto, DeleteUserDto
 } from './dto';
 
 @Controller('api')
@@ -244,6 +244,16 @@ export class AppController {
     try {
       res.send(await this.appService.createScope(body));
     } catch (e) {
+      return res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Post('permission')
+  @ApiTags('Keycloak')
+  async permission(@Body() body: PermissionDto, @Res() res: Response){
+    try {
+      res.send(await this.appService.createPermission(body));
+    }catch(e){
       return res.status(e.response.status).send(e.response.data);
     }
   }

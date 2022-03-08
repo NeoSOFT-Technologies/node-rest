@@ -5,6 +5,7 @@ import { KeycloakClient } from "./client"
 import { KeycloakAuthPolicy } from "./policy"
 import { KeycloakAuthResource } from "./resource"
 import { KeycloakAuthScope } from "./scope"
+import { KeycloakAuthPermission } from "./permission"
 
 export {
     Keycloak,
@@ -13,5 +14,6 @@ export {
     KeycloakClient,
     KeycloakAuthPolicy,
     KeycloakAuthResource,
-    KeycloakAuthScope
+    KeycloakAuthScope,
+    KeycloakAuthPermission
 }

@@ -2,12 +2,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ConnectionUtils } from './utils';
 import {
-  ClientDto, DbDetailsDto, DeleteUserDto, PolicyDto, ProvisionTenantTableDto,
+  ClientDto, DbDetailsDto, DeleteUserDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
   RegisterTenantDto, ResourceDto, TenantUserDto, UpdateUserDto, UsersQueryDto
 } from './dto';
 import {
   KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient,
-  KeycloakRealm, KeycloakUser, KeycloakAuthScope
+  KeycloakRealm, KeycloakUser, KeycloakAuthScope, KeycloakAuthPermission
 } from './iam';
 import { ScopeDto } from './dto';
 
@@ -22,7 +22,8 @@ export class AppService {
     private readonly keycloakClient: KeycloakClient,
     private readonly keycloakAuthPolicy: KeycloakAuthPolicy,
     private readonly keycloakAuthResource: KeycloakAuthResource,
-    private readonly keycloakAuthScope: KeycloakAuthScope
+    private readonly keycloakAuthScope: KeycloakAuthScope,
+    private readonly keycloakAuthPermission: KeycloakAuthPermission
   ) { }
   register(tenant: RegisterTenantDto) {
     return this.client1.send({ cmd: 'register-tenant' }, tenant);
@@ -79,5 +80,9 @@ export class AppService {
   createScope(body: ScopeDto) {
     const { clientName, scopeDetails, ...user } = body;
     return this.keycloakAuthScope.createScope(user, clientName, scopeDetails);
+  }
+  createPermission(body: PermissionDto){
+    const { clientName, permissionType, permissionDetails, ...user } = body;
+    return this.keycloakAuthPermission.createPermission(user, clientName, permissionType, permissionDetails); 
   }
 }

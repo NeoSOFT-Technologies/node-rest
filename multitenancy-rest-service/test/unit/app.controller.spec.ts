@@ -45,7 +45,8 @@ describe('Testing AppController', () => {
         createResource: jest.fn(),
         createPolicy: jest.fn(),
         createClient: jest.fn(),
-        createScope: jest.fn()
+        createScope: jest.fn(),
+        createPermission: jest.fn()
     };
 
     const mockAuthService = {
@@ -287,6 +288,24 @@ describe('Testing AppController', () => {
         await appController.scope(mockBody, mockResponse);
         expect(mockSend).toHaveBeenCalled();
         expect(createScope).toHaveBeenCalledWith(mockBody);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "permission"', async() => {
+        const mockBody = {
+            tenantName: 'string',
+            password: 'string',
+            clientName: 'string',
+            permissionType: 'string',
+            permissionDetails: {
+                name: 'string'
+            }
+        }
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const createPermission = jest.spyOn(appService, 'createPermission');
+        await appController.permission(mockBody, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(createPermission).toHaveBeenCalledWith(mockBody);
         mockSend.mockRestore();
     });
 

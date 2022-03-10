@@ -7,15 +7,6 @@ export class PermissionDto{
     @IsNotEmpty()
     @IsString()
     tenantName: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
-      message: 'password must be minimum eight characters, at least one uppercase letter, one lowercase letter, one number and ' +
-        'one special character'
-    })
-    password: string;
-
     
     permissionType: string;
     clientName: string;

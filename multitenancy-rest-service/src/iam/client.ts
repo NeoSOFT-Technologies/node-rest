@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Keycloak } from "./keycloak";
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
-import { TenantCredentialsDto } from '@app/dto';
+import { ClientDto } from '../dto';
 
 @Injectable()
 export class KeycloakClient {
@@ -13,25 +13,42 @@ export class KeycloakClient {
         private config: ConfigService
     ) { }
 
-    public async createClient(user: TenantCredentialsDto, clientDetails: ClientRepresentation): Promise<any> {
-        try {
-            this.kcTenantAdminClient = new KcAdminClient({
-                baseUrl: this.config.get('keycloak.server'),
-                realmName: user.tenantName
-            });
+    public async createClient(body: ClientDto, token: string): Promise<{
+        clientId: string;
+        clientSecret: string;
+    }> {
+        const { tenantName, clientDetails } = body;
+        this.kcTenantAdminClient = new KcAdminClient({
+            baseUrl: this.config.get('keycloak.server'),
+            realmName: tenantName
+        });
 
-            await this.keycloak.init('adminuser', user.password, this.kcTenantAdminClient);
-            await this.kcTenantAdminClient.clients.create(clientDetails);
+        const parts = token.split(' ')
+        this.kcTenantAdminClient.setAccessToken(parts[1]);
 
-            return 'Client created successfully';
-        } catch (error) {
-            throw error;
-        }
+        await this.kcTenantAdminClient.clients.create(clientDetails);
+        const clientSecret = await this.generateSecret(this.kcTenantAdminClient, clientDetails.clientId);
+
+        return {
+            clientId: clientDetails.clientId,
+            clientSecret
+        };
     };
 
     public async findClient(kcclient: KcAdminClient, clientName: string): Promise<ClientRepresentation> {
         const clients = await kcclient.clients.find();
         const client = clients.filter((client) => client.clientId === clientName);
         return client[0];
+    };
+
+    private async generateSecret(kcclient: KcAdminClient, clientName: string): Promise<string> {
+        const clients = await kcclient.clients.find();
+        const client = clients.filter((client) => client.clientId === clientName);
+        const newCredential = await kcclient.clients.generateNewClientSecret(
+            {
+                id: client[0].id,
+            },
+        );
+        return newCredential.value;
     };
 };

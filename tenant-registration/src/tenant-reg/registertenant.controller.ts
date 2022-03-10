@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, RpcException } from '@nestjs/microservices';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { IdentifierService } from './identifier/identifier.service';
 import { RegistertenantService } from './registertenant.service';
@@ -22,6 +22,15 @@ export class RegistertenantController {
       return await this.tenantService.register(tenant);
     } catch (e) {
       return e;
+    }
+  }
+
+  @MessagePattern({ cmd: 'get-client-id-secret' })
+  async getClientIdSecret(tenantName: string) {
+    try {
+      return await this.tenantService.getIdSecret(tenantName);
+    } catch (e) {
+      throw new RpcException(e);
     }
   }
 

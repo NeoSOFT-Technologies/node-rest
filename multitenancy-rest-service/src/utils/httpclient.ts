@@ -9,11 +9,7 @@ class HttpClient implements IHttpClient {
             params: payload
         }
 
-        try {
-            return await axios.get(url, options);
-        } catch (e) {
-            throw e
-        }
+        return await axios.get(url, options);
     }
 
     async post<T = any, D = any>(parameters: IHttpClientRequestParameters<D>): Promise<T> {
@@ -22,11 +18,7 @@ class HttpClient implements IHttpClient {
             headers: headers
         }
 
-        try {
-            return await axios.post(url, payload, options);
-        } catch (e) {
-            throw e
-        }
+        return await axios.post(url, payload, options);
     }
 }
 const httpClient = new HttpClient();

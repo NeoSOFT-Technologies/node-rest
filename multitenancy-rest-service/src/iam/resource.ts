@@ -1,12 +1,11 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Injectable } from '@nestjs/common';
-import { TenantCredentialsDto } from '@app/dto';
 import { ConfigService } from '@nestjs/config';
 import { Keycloak } from "./keycloak";
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
 import ScopeRepresentation from '@keycloak/keycloak-admin-client/lib/defs/scopeRepresentation';
-import ResourceRepresentation from '@keycloak/keycloak-admin-client/lib/defs/resourceRepresentation';
 import { KeycloakClient } from './client';
+import { ResourceDto } from '../dto';
 
 @Injectable()
 export class KeycloakAuthResource {
@@ -17,29 +16,28 @@ export class KeycloakAuthResource {
         private config: ConfigService
     ) { }
 
-    public async createResource(user: TenantCredentialsDto, clientName: string, resourceDetails: ResourceRepresentation): Promise<any> {
-        try {
-            this.kcTenantAdminClient = new KcAdminClient({
-                baseUrl: this.config.get('keycloak.server'),
-                realmName: user.tenantName
-            });
+    public async createResource(body: ResourceDto, token: string): Promise<any> {
+        const { tenantName, clientName, resourceDetails } = body;
+        this.kcTenantAdminClient = new KcAdminClient({
+            baseUrl: this.config.get('keycloak.server'),
+            realmName: tenantName
+        });
 
-            await this.keycloak.init('adminuser', user.password, this.kcTenantAdminClient);
-            const myClient: ClientRepresentation = await this.keycloakClient.findClient(this.kcTenantAdminClient, clientName);
+        const parts = token.split(' ')
+        this.kcTenantAdminClient.setAccessToken(parts[1]);
 
-            await this.kcTenantAdminClient.clients.createResource(
-                {
-                    id: myClient.id
-                },
-                {
-                    ...resourceDetails,
-                    scopes: ['string' as ScopeRepresentation]  // remember to replace this
-                }
-            )
+        const myClient: ClientRepresentation = await this.keycloakClient.findClient(this.kcTenantAdminClient, clientName);
 
-            return 'Resource created successfully';
-        } catch (error) {
-            throw error;
-        }
+        await this.kcTenantAdminClient.clients.createResource(
+            {
+                id: myClient.id
+            },
+            {
+                ...resourceDetails,
+                scopes: ['string' as ScopeRepresentation]  // remember to replace this
+            }
+        )
+
+        return 'Resource created successfully';
     };
 };

@@ -1,6 +1,9 @@
-import { Controller } from '@nestjs/common';
-import { EventPattern, MessagePattern } from '@nestjs/microservices';
-import { throwError } from 'rxjs';
+import { Controller, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  EventPattern,
+  MessagePattern,
+  RpcException,
+} from '@nestjs/microservices';
 import { TenantConfigDto } from './dto/tenant.config.dto';
 import { TenantConfigService } from './tenant.config.service';
 
@@ -21,11 +24,14 @@ export class TenantConfigController {
     try {
       const isIntegerValue = Number.isInteger(tenantId);
       if (!isIntegerValue) {
-        throw new Error('Wrong Integer Entered');
+        throw new HttpException(
+          'Please enter an integer value',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
       }
       return await this.tenantConfigService.getConfig(tenantId);
     } catch (e) {
-      return throwError(() => e);
+      throw new RpcException(e);
     }
   }
 }

@@ -1,4 +1,5 @@
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
+import { ApiHideProperty } from "@nestjs/swagger";
 
 class UserDetails implements UserRepresentation {
   firstName?: string;
@@ -8,7 +9,9 @@ class UserDetails implements UserRepresentation {
 }
 
 export class UpdateUserDto {
+  @ApiHideProperty()
   tenantName: string;
+
   userName: string;
   action: UserDetails;
 }

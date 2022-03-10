@@ -21,7 +21,7 @@ export class KeycloakUser {
 
     public async createAdminUser(realmName: string, email: string, password: string): Promise<TenantAdminUser> {
         return await this.kcMasterAdminClient.users.create({
-            username: 'adminuser',
+            username: 'tenantadmin',
             email: email,
             enabled: true,
             credentials: [{
@@ -35,125 +35,108 @@ export class KeycloakUser {
 
     public async findUser(client: KcAdminClient): Promise<UserRepresentation> {
         const users = await client.users.find();
-        const admin = users.filter((user) => user.username === 'adminuser');
+        const admin = users.filter((user) => user.username === 'tenantadmin');
         return admin[0];
     };
 
     public async createUser(user: { tenantName: string }, userDetails: UserDetailsDto, token: string): Promise<string> {
-        try {
-            const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
-                baseUrl: this.keycloakServer,
-                realmName: user.tenantName
-            });
-            const parts = token.split(' ')
-            kcTenantAdminClient.setAccessToken(parts[1]);
+        const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
+            baseUrl: this.keycloakServer,
+            realmName: user.tenantName
+        });
+        const parts = token.split(' ')
+        kcTenantAdminClient.setAccessToken(parts[1]);
 
 
-            const createdUser = await kcTenantAdminClient.users.create({
-                username: userDetails.userName,
-                email: userDetails.email,
-                enabled: true,
-                credentials: [{
-                    temporary: false,
-                    type: 'password',
-                    value: userDetails.password,
-                }]
-            });
+        const createdUser = await kcTenantAdminClient.users.create({
+            username: userDetails.userName,
+            email: userDetails.email,
+            enabled: true,
+            credentials: [{
+                temporary: false,
+                type: 'password',
+                value: userDetails.password,
+            }]
+        });
 
-            const userRole: RoleRepresentation = await this.createUserRole(kcTenantAdminClient)
-            await this.UserRoleMapping(kcTenantAdminClient, createdUser, userRole)
+        const userRole: RoleRepresentation = await this.createUserRole(kcTenantAdminClient)
+        await this.UserRoleMapping(kcTenantAdminClient, createdUser, userRole)
 
-            return 'User created successfully';
-        } catch (error) {
-            throw error;
-        }
+        return 'User created successfully';
     };
 
     public async getUsers(data: { query: UsersQueryDto, token: string }): Promise<{ data: UserRepresentation[], count: number }> {
-        try {
-            let { tenantName, page = 1 } = data.query;
-            const { token } = data;
-            const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
-                baseUrl: this.keycloakServer,
-                realmName: tenantName,
-            });
-            const parts = token.split(' ')
-            kcTenantAdminClient.setAccessToken(parts[1]);
+        let { tenantName, page = 1 } = data.query;
+        const { token } = data;
+        const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
+            baseUrl: this.keycloakServer,
+            realmName: tenantName,
+        });
+        const parts = token.split(' ')
+        kcTenantAdminClient.setAccessToken(parts[1]);
 
-            const users = await kcTenantAdminClient.users.find({
-                briefRepresentation: true,
-                first: (page - 1) * 5,
-                max: 5
-            });
-            const count = await kcTenantAdminClient.users.count();
+        const users = await kcTenantAdminClient.users.find({
+            briefRepresentation: true,
+            first: (page - 1) * 5,
+            max: 5
+        });
+        const count = await kcTenantAdminClient.users.count();
 
-            return {
-                data: users,
-                count
-            };
-
-        } catch (error) {
-            throw error;
-        }
+        return {
+            data: users,
+            count
+        };
     };
 
     public async updateUser(tenantName: string, userName: string, userDetails: UserRepresentation, token: string): Promise<string> {
-        try {
-            const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
-                baseUrl: this.keycloakServer,
-                realmName: tenantName,
-            });
-            const parts = token.split(' ')
-            kcTenantAdminClient.setAccessToken(parts[1]);
+        const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
+            baseUrl: this.keycloakServer,
+            realmName: tenantName,
+        });
+        const parts = token.split(' ')
+        kcTenantAdminClient.setAccessToken(parts[1]);
 
-            const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
-                username: userName
-            });
-            if (!user[0]) {
-                throw new NotFoundException('User not found');
-            };
+        const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
+            username: userName
+        });
+        if (!user[0]) {
+            throw new NotFoundException('User not found');
+        };
 
-            await kcTenantAdminClient.users.update(
-                {
-                    id: user[0].id
-                },
-                {
-                    ...user[0],
-                    ...userDetails
-                }
-            );
+        await kcTenantAdminClient.users.update(
+            {
+                id: user[0].id
+            },
+            {
+                ...user[0],
+                ...userDetails
+            }
+        );
 
-            return 'User updated successfully';
-        } catch (error) {
-            throw error;
-        }
+        return 'User updated successfully';
     };
 
     public async deleteUser(tenantName: string, userName: string, token: string): Promise<string> {
-        try {
-            const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
-                baseUrl: this.keycloakServer,
-                realmName: tenantName,
-            });
-            const parts = token.split(' ')
-            kcTenantAdminClient.setAccessToken(parts[1]);
+        const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
+            baseUrl: this.keycloakServer,
+            realmName: tenantName,
+        });
+        const parts = token.split(' ')
+        kcTenantAdminClient.setAccessToken(parts[1]);
 
-            const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
-                username: userName
-            });
+        const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
+            username: userName
+        });
 
-            if (!user[0]) {
-                throw new NotFoundException('User not found');
-            };
+        if (!user[0]) {
+            throw new NotFoundException('User not found');
+        };
 
-            await kcTenantAdminClient.users.del({
-                id: user[0].id
-            });
+        await kcTenantAdminClient.users.del({
+            id: user[0].id
+        });
 
-            return 'User deleted Successfully';
-        } catch (error) {
-            throw error;
-        }
+        return 'User deleted Successfully';
     };
 
     private async createUserRole(client: KcAdminClient): Promise<RoleRepresentation> {

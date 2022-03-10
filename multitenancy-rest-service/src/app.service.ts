@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ConnectionUtils } from './utils';
 import {
-  ClientDto, DbDetailsDto, DeleteUserDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
+  ClientDto, CreateRealmDto, DbDetailsDto, DeleteUserDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
   RegisterTenantDto, ResourceDto, TenantUserDto, UpdateUserDto, UsersQueryDto
 } from './dto';
 import {
@@ -26,10 +26,34 @@ export class AppService {
     private readonly keycloakAuthPermission: KeycloakAuthPermission
   ) { }
   register(tenant: RegisterTenantDto) {
-    return this.client1.send({ cmd: 'register-tenant' }, tenant);
+    const { clientDetails, ...tenantDetails } = tenant;
+    return this.client1.send({ cmd: 'register-tenant' }, tenantDetails);
   }
   getTenantConfig(id: number) {
     return this.client2.send({ cmd: 'get_config' }, id);
+  }
+  async clientIdSecret(tenantName: string) {
+    let clientId: string;
+    let clientSecret: string;
+
+    const response = this.client1.send({ cmd: 'get-client-id-secret' }, tenantName);
+
+    await new Promise((resolve, reject) => {
+      response.subscribe({
+        next: next => {
+          {
+            clientId = next.clientId;
+            clientSecret = next.clientSecret;
+          }
+          resolve('done');
+        },
+        error: error => {
+          reject(error);
+        },
+      });
+    });
+
+    return { clientId, clientSecret }
   }
   listAllTenant(page: number) {
     return this.client1.send({ cmd: 'list-all-tenant' }, page);
@@ -46,9 +70,9 @@ export class AppService {
   createTable(tableDto: ProvisionTenantTableDto) {
     return this.client3.send({ cmd: 'create-table' }, tableDto);
   }
-  createRealm(tenantDetails: RegisterTenantDto) {
+  createRealm(tenantDetails: CreateRealmDto, token: string) {
     const { tenantName, email, password } = tenantDetails;
-    return this.keycloakRealm.createRealm(tenantName, email, password);
+    return this.keycloakRealm.createRealm(tenantName, email, password, token);
   }
   createUser(body: TenantUserDto, token: string) {
     const { userDetails, ...user } = body;
@@ -65,24 +89,19 @@ export class AppService {
     const { tenantName, userName } = body;
     return this.keycloakUser.deleteUser(tenantName, userName, token);
   }
-  createClient(body: ClientDto) {
-    const { clientDetails, ...user } = body;
-    return this.keycloakClient.createClient(user, clientDetails);
+  createClient(body: ClientDto, token: string) {
+    return this.keycloakClient.createClient(body, token);
   }
-  createPolicy(body: PolicyDto) {
-    const { clientName, policyType, policyDetails, ...user } = body;
-    return this.keycloakAuthPolicy.createPolicy(user, clientName, policyType, policyDetails);
+  createPolicy(body: PolicyDto, token: string) {
+    return this.keycloakAuthPolicy.createPolicy(body, token);
   }
-  createResource(body: ResourceDto) {
-    const { clientName, resourceDetails, ...user } = body;
-    return this.keycloakAuthResource.createResource(user, clientName, resourceDetails);
+  createResource(body: ResourceDto, token: string) {
+    return this.keycloakAuthResource.createResource(body, token);
   }
-  createScope(body: ScopeDto) {
-    const { clientName, scopeDetails, ...user } = body;
-    return this.keycloakAuthScope.createScope(user, clientName, scopeDetails);
+  createScope(body: ScopeDto, token: string) {
+    return this.keycloakAuthScope.createScope(body, token);
   }
-  createPermission(body: PermissionDto){
-    const { clientName, permissionType, permissionDetails, ...user } = body;
-    return this.keycloakAuthPermission.createPermission(user, clientName, permissionType, permissionDetails); 
+  createPermission(body: PermissionDto, token: string) {
+    return this.keycloakAuthPermission.createPermission(body, token);
   }
 }

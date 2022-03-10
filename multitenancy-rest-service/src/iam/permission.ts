@@ -2,17 +2,13 @@ import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { KeycloakClient } from "./client";
-import { KeycloakUser } from "./keycloakUser";
-import { Keycloak } from "./keycloak"
 import { PermissionDto } from '../dto';
 
 @Injectable()
 export class KeycloakAuthPermission {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private keycloak: Keycloak,
         private keycloakClient: KeycloakClient,
-        private keycloakUser: KeycloakUser,
         private config: ConfigService
     ) { }
 

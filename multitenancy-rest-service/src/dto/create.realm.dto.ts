@@ -11,7 +11,7 @@ class ClientDetails implements ClientRepresentation {
   directAccessGrantsEnabled?: boolean;
 }
 
-export class RegisterTenantDto {
+export class CreateRealmDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -29,20 +29,4 @@ export class RegisterTenantDto {
       'one special character'
   })
   password: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  description: string;
-
-  @ApiHideProperty()
-  createdDateTime?: string;
-
-  @IsNotEmpty()
-  clientDetails: ClientDetails
-
-  @ApiHideProperty()
-  clientId?: string
-
-  @ApiHideProperty()
-  clientSecret?: string
 }

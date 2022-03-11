@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -43,8 +43,23 @@ export class RegistertenantService {
     return { Message: 'Tenant Registered Successfully' };
   }
 
-  listAll(): Promise<Tenant[]> {
-    return this.tenantRepository.find();
+  async getIdSecret(tenantName: string): Promise<Tenant> {
+    try {
+      return await this.tenantRepository.findOneOrFail({
+        where: {
+          tenantName,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException('Tenant not found');
+    }
+  }
+
+  listAll(page = 1): Promise<[Tenant[], number]> {
+    return this.tenantRepository.findAndCount({
+      take: 5,
+      skip: 5 * (page - 1),
+    });
   }
 
   async updateDescription(tenantname: string, newdescription: string) {

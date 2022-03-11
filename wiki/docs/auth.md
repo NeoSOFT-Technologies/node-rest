@@ -35,6 +35,9 @@ The parameters required by this function are:
 
 We get the access token and refresh token which we can use further for authorisation.
 
+![Password Grant type flow](https://user-images.githubusercontent.com/87794374/156330776-51298fe8-efa4-41fa-9a16-8782563a2105.png)
+<p align = "center">Fig - Resource Owner Password Credentials Grant</p>
+
 ### **NestJS Guard for Authorization**
 
 After the token is received , the resources of the client can accessed. We are using Role based Access Control(RBAC) and to establish the access control layer we are implementing a custom guard namely *`KeycloakAuthGuard`*.

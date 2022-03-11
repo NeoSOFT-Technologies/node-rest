@@ -4,13 +4,13 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppService } from './app.service';
-import { ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
 import {
-  CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto,
-  ProvisionTenantTableDto, RegisterTenantDto, TenantUserDto, UpdateTenantDto
+  CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, ProvisionTenantTableDto, RegisterTenantDto,
+  TenantUserDto, UpdateTenantDto, UsersQueryDto, UpdateUserDto, DeleteUserDto, RefreshAccessTokenDto, ClientDto, ResourceDto, PolicyDto, ScopeDto, PermissionDto
 } from './dto';
 
 @Controller('api')
@@ -21,57 +21,126 @@ export class AppController {
   ) { }
 
   @Post('login')
+  @ApiTags('Authentication')
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: CredentialsDto })
   async login(@Body() body: CredentialsDto, @Res() res: Response) {
     try {
-      res.send((await this.authService.getAccessToken(body)).data);
+      const { tenantName } = body;
+      let response: { clientId: string, clientSecret: string };
+
+      if (tenantName) {
+        response = await this.appService.clientIdSecret(tenantName);
+      }
+      res.send((await this.authService.getAccessToken({ ...body, ...response })).data);
       // login successful
     } catch (e) {
-      return res.status(HttpStatus.UNAUTHORIZED).send(e);
+      if (e.status) {
+        res.status(e.status).send(e.message);
+      }
+      else if (e.response && e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+      else {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
+      }
     }
   }
 
   @Post('logout')
+  @ApiTags('Authentication')
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: LogoutDto })
   async logout(@Body() body: LogoutDto, @Res() res: Response) {
     try {
-      res.sendStatus(await this.authService.logout(body));
+      const { refreshToken } = body;
+      let response: { clientId: string, clientSecret: string };
+
+      if (!body.tenantName) {
+        body.tenantName = await this.authService.getTenantName(refreshToken)
+      }
+
+      if (body.tenantName !== 'master') {
+        response = await this.appService.clientIdSecret(body.tenantName);
+      }
+      res.sendStatus(await this.authService.logout({ ...body, ...response }));
       // logout successful
     } catch (e) {
-      return res.status(HttpStatus.UNAUTHORIZED).send(e);
+      if (e.status) {
+        res.status(e.status).send(e.message);
+      }
+      else if (e.response && e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+      else {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
+      }
+    }
+  }
+
+  @Post('refresh-access-token')
+  @ApiTags('Authentication')
+  @UsePipes(new ValidationPipe())
+  @ApiBody({ type: RefreshAccessTokenDto })
+  async refreshAccessToken(@Body() body: RefreshAccessTokenDto, @Res() res: Response) {
+    try {
+      const { refreshToken } = body;
+      let response: { clientId: string, clientSecret: string };
+
+      if (!body.tenantName) {
+        body.tenantName = await this.authService.getTenantName(refreshToken)
+      }
+
+      if (body.tenantName !== 'master') {
+        response = await this.appService.clientIdSecret(body.tenantName);
+      }
+      res.send((await this.authService.refreshAccessToken({ ...body, ...response })).data);
+    } catch (e) {
+      if (e.status) {
+        res.status(e.status).send(e.message);
+      }
+      else if (e.response && e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+      else {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
+      }
     }
   }
 
   @Post('tenants')
+  @ApiTags('Tenants')
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: RegisterTenantDto })
-  async registerTenant(@Body() body: RegisterTenantDto, @Res() res: Response) {
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async registerTenant(@Body() body: RegisterTenantDto, @Req() req: Request, @Res() res: Response) {
     try {
-      const tenant: RegisterTenantDto = body;
-      const response = this.appService.register(tenant);
-      await this.appService.createRealm(tenant);
-      response.subscribe((result) => res.send(result));
-    } catch (e) {
-      return res.status(HttpStatus.UNAUTHORIZED).send(e);
-    }
-  }
+      let { tenantName, email, password, clientDetails } = body;
+      const token = req.headers['authorization'];
 
-  @Post('user')
-  @UsePipes(new ValidationPipe())
-  @ApiBody({ type: TenantUserDto })
-  async tenantUser(@Body() body: TenantUserDto, @Res() res: Response) {
-    try {
-      const user: TenantUserDto = body;
-      res.send(await this.appService.createUser(user));
+      await this.appService.createRealm({ tenantName, email, password }, token);
+      const client = await this.appService.createClient({ tenantName, clientDetails }, token);
+
+      const response = this.appService.register({ ...body, ...client });
+      response.subscribe((result) => { res.send(result) });
     } catch (e) {
-      return e;
+      if (e.response && e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+      else {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
+      }
     }
   }
 
   @Get('tenants/:id')
+  @ApiTags('Tenants')
   @ApiParam({ name: 'id', required: true, type: Number })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
   getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantId: number = +req.params.id;
@@ -79,7 +148,9 @@ export class AppController {
       const response = this.appService.getTenantConfig(tenantId);
       const observer = {
         next: async (result: any) => res.send(result),
-        error: async (error: any) => res.send(error),
+        error: async (error: any) => {
+          res.status(error.status).send(error.message)
+        },
       }
       response.subscribe(observer);
     } catch (e) {
@@ -88,19 +159,30 @@ export class AppController {
   }
 
   @Get('tenants')
+  @ApiTags('Tenants')
+  @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
   listAllTenant(@Req() req: Request, @Res() res: Response) {
     try {
-      const response = this.appService.listAllTenant();
-      response.subscribe(async (result) => res.send(result));
+      const page: number = req.query.page as any || 1;
+      const response = this.appService.listAllTenant(page);
+      response.subscribe(async (result) => {
+        const [data, count] = result;
+        res.send({ data, count })
+      });
     } catch (e) {
       return e;
     }
   }
 
   @Patch('tenants')
+  @ApiTags('Tenants')
   @ApiBody({ type: UpdateTenantDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
   updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.body.action.tenantName;
@@ -113,7 +195,11 @@ export class AppController {
   }
 
   @Delete('tenants')
+  @ApiTags('Tenants')
   @ApiBody({ type: DeleteTenantDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
   deleteTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.body.tenantName;
@@ -124,7 +210,169 @@ export class AppController {
     }
   }
 
+  @Post('user')
+  @ApiTags('User')
+  @ApiBody({ type: TenantUserDto })
+  @UsePipes(new ValidationPipe())
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['tenantadmin'])
+  async tenantUser(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      if (!req.body.tenantName) {
+        req.body.tenantName = await this.authService.getTenantName(token);
+      }
+      res.send(await this.appService.createUser(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Get('user')
+  @ApiTags('User')
+  @ApiQuery({ type: UsersQueryDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['tenantadmin'])
+  async listAllUser(@Req() req: Request, @Res() res: Response) {
+    try {
+      const data = {
+        query: req.query as any,
+        token: req.headers['authorization']
+      }
+      if (!data.query.tenantName) {
+        data.query.tenantName = await this.authService.getTenantName(data.token);
+      }
+      res.send(await this.appService.listAllUser(data));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Patch('user')
+  @ApiTags('User')
+  @ApiBody({ type: UpdateUserDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['tenantadmin', 'user'])
+  async updateUser(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      if (!req.body.tenantName) {
+        req.body.tenantName = await this.authService.getTenantName(token);
+      }
+      res.send(await this.appService.updateUser(req.body, token));
+    } catch (e) {
+      if (e.response.statusCode) {
+        res.status(e.response.statusCode).send(e.response.message);
+      }
+      else if (e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+    }
+  }
+
+  @Delete('user')
+  @ApiTags('User')
+  @ApiBody({ type: DeleteUserDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['tenantadmin', 'user'])
+  async deleteUser(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      if (!req.body.tenantName) {
+        req.body.tenantName = await this.authService.getTenantName(token);
+      }
+      res.send(await this.appService.deleteUser(req.body, token));
+    } catch (e) {
+      if (e.response.statusCode) {
+        res.status(e.response.statusCode).send(e.response.message);
+      }
+      else if (e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+    }
+  }
+
+  @Post('client')
+  @ApiTags('Keycloak')
+  @ApiBody({ type: ClientDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async tenantClient(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.createClient(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Post('resource')
+  @ApiTags('Keycloak')
+  @ApiBody({ type: ResourceDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async resource(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.createResource(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Post('policy')
+  @ApiTags('Keycloak')
+  @ApiBody({ type: PolicyDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async policy(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.createPolicy(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Post('scope')
+  @ApiTags('Keycloak')
+  @ApiBody({ type: ScopeDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async scope(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.createScope(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Post('permission')
+  @ApiTags('Keycloak')
+  @ApiBody({ type: PermissionDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async permission(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.createPermission(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
   @Get('connect-database')
+  @ApiTags('Miscellaneous')
   @ApiQuery({ type: DbDetailsDto })
   async connectDatabase(@Req() req: Request, @Res() res: Response) {
     try {
@@ -140,6 +388,7 @@ export class AppController {
   }
 
   @Post('create-table')
+  @ApiTags('Miscellaneous')
   @ApiBody({ type: ProvisionTenantTableDto })
   async createTable(@Req() req: Request, @Res() res: Response) {
     try {

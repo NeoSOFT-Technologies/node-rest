@@ -1,7 +1,7 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { IsJWT, IsNotEmpty } from 'class-validator';
 
-export class LogoutDto {
+export class RefreshAccessTokenDto {
   @ApiHideProperty()
   tenantName: string;
 

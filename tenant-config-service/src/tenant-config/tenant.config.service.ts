@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TenantConfigDto } from './dto/tenant.config.dto';
@@ -16,10 +16,14 @@ export class TenantConfigService {
   }
 
   async getConfig(tenantId: number) {
-    return await this.configRepository.findOneOrFail({
-      where: {
-        tenantId: tenantId,
-      },
-    });
+    try {
+      return await this.configRepository.findOneOrFail({
+        where: {
+          tenantId: tenantId,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException('Incorrect ID');
+    }
   }
 }

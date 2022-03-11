@@ -1,24 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { Keycloak } from '@app/iam/keycloak';
-import { KeycloakRealm } from '@app/iam/keycloakRealm';
+import { Keycloak, KeycloakUser } from '@app/iam';
 import { ConfigService } from '@nestjs/config';
-import { KeycloakUser } from '@app/iam/keycloakUser';
+import { Test, TestingModule } from '@nestjs/testing';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                auth: jest.fn(),
                 users: {
                     create: jest.fn().mockResolvedValue({
                         id: 'id'
                     }),
+                    find: jest.fn().mockResolvedValue('sample-user'),
+                    count: jest.fn().mockResolvedValue('sample-count'),
                     addRealmRoleMappings: jest.fn(),
-                },
-                realms: {
-                    create: jest.fn().mockResolvedValue({
-                        realmName: 'string'
-                    })
+                    update: jest.fn(),
+                    del: jest.fn()
                 },
                 roles: {
                     create: jest.fn(),
@@ -26,21 +22,8 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         id: 'id',
                         name: 'name'
                     }),
-                    createComposite: jest.fn()
                 },
-                clients: {
-                    find: jest.fn().mockResolvedValue([
-                        {
-                            clientId: 'realm-management',
-                            id: 'id'
-                        }
-                    ]),
-                    listRoles: jest.fn().mockResolvedValue([
-                        {
-                            id:'id'
-                        }
-                    ])
-                }
+                setAccessToken: jest.fn()
             };
         })
     };
@@ -51,25 +34,61 @@ describe('Testing Keycloak User Service', () => {
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak, KeycloakRealm, ConfigService, KeycloakUser],
+            providers: [Keycloak, ConfigService, KeycloakUser],
         }).compile();
 
         keycloakUserService = module.get<KeycloakUser>(KeycloakUser);
     });
 
-    it('Tetsing "createUser" method', async () => {
-        const mockTenantuser = {
-            userName:'string',
-            email:'stirng',
-            password:'string',
-            tenantName:'string'
+    it('Testing "createUser" method', async () => {
+        const mockTenantCredentials = {
+            tenantName: 'string',
         };
-        const response = await keycloakUserService.createUser(mockTenantuser);
+        const mockUserDetails = {
+            userName: 'string',
+            email: 'stirng',
+            password: 'string',
+        };
+        const token: string = 'Bearer token'
+        const response = await keycloakUserService.createUser(mockTenantCredentials, mockUserDetails, token);
         expect(response).toEqual('User created successfully');
     });
 
+    it('Testing "getUsers" method', async () => {
+        const mockData = {
+            query: {
+                tenantName: 'string',
+                page: 1
+            },
+            token: 'Bearer token'
+        };
+        const response = await keycloakUserService.getUsers(mockData);
+        expect(response).toEqual({ data: 'sample-user', count: 'sample-count' });
+    });
+
+    it('Testing "updateUsers" method', async () => {
+        const tenantName = 'string';
+        const userName = 'string';
+        const mockuserDetails = {
+            firstName: 'string'
+        };
+        const token = 'Bearer token';
+
+        const response = await keycloakUserService.updateUser(tenantName, userName, mockuserDetails, token);
+        expect(response).toEqual('User updated successfully');
+    });
+
+    it('Testing "deleteUsers" method', async () => {
+        const tenantName = 'string';
+        const userName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakUserService.deleteUser(tenantName, userName, token);
+        expect(response).toEqual('User deleted Successfully');
+    });
+
     it('Testing "createAdminUser" method', async () => {
-        const response = await keycloakUserService.createAdminUser('string','string','string');
+        const response = await keycloakUserService.createAdminUser('string', 'string', 'string');
         expect(response.id).toEqual('id');
     });
 });

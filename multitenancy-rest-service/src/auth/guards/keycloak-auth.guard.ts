@@ -1,12 +1,14 @@
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import { AppService } from '@app/app.service';
 import { AuthService } from '../auth.service';
 
 @Injectable()
 export class KeycloakAuthGuard implements CanActivate {
   constructor(
     private readonly authenticationService: AuthService,
+    private readonly appService: AppService,
     private reflector: Reflector,
   ) { }
 
@@ -32,8 +34,21 @@ export class KeycloakAuthGuard implements CanActivate {
     }
 
     const token = parts[1];
-    const isTokenActive: boolean = await this.authenticationService.validateToken(token);
-    
+    const tenantName = await this.authenticationService.getTenantName(token);
+    let isTokenActive: boolean;
+    if (tenantName === 'master') {
+      isTokenActive = true;
+
+      const expTime = await this.authenticationService.getExpTime(token);
+      if (Date.now() >= expTime * 1000) {
+        isTokenActive = false;
+      }
+    }
+    else {
+      const response = await this.appService.clientIdSecret(tenantName);
+      isTokenActive = await this.authenticationService.validateToken(token, response.clientId, response.clientSecret);
+    }
+
     if (!isTokenActive) {
       throw new HttpException(
         'Authorization: Bearer <token> invalid',
@@ -51,7 +66,7 @@ export class KeycloakAuthGuard implements CanActivate {
   }
 
   async hasRole(userRoles: string[], roles: string[]): Promise<boolean> {
-    const containsAll: boolean = roles.every(role => {
+    const containsAll: boolean = roles.some(role => {
       return userRoles.includes(role);
     })
     return containsAll;

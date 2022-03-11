@@ -4,4 +4,6 @@ export class RegisterTenantDto {
   password: string;
   description: string;
   createdDateTime?: string;
+  clientId: string;
+  clientSecret: string;
 }

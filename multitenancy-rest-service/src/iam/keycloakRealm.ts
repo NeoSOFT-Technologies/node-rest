@@ -2,7 +2,6 @@ import { Realm } from "@app/dto/realm.dto";
 import { Injectable } from "@nestjs/common";
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Keycloak } from "./keycloak";
-import { ConfigService } from "@nestjs/config";
 import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import { KeycloakUser } from "./keycloakUser";
@@ -14,27 +13,20 @@ export class KeycloakRealm {
 
     constructor(
         private keycloak: Keycloak,
-        private keycloakUser: KeycloakUser,
-        private config: ConfigService) {
-        this.kcMasterAdminClient = keycloak.kcMasterAdminClient
+        private keycloakUser: KeycloakUser) {
+        this.kcMasterAdminClient = this.keycloak.kcMasterAdminClient
     }
 
-    public async createRealm(realmName: string, email: string, password: string): Promise<any> {
-        try {
-            const adminUsername = this.config.get('keycloak.user');
-            const adminUserpassword = this.config.get('keycloak.password');
+    public async createRealm(realmName: string, email: string, password: string, token: string): Promise<any> {
+        const parts = token.split(' ')
+        this.kcMasterAdminClient.setAccessToken(parts[1]);
 
-            await this.keycloak.init(adminUsername, adminUserpassword, this.kcMasterAdminClient);
-
-            const tenantRealm: Realm = await this.createTenantRealm(realmName);
-            const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, email, password);
-            const adminRole: RoleRepresentation = await this.createAdminRealmRole(tenantRealm);
-            await this.createCompositeRole(tenantRealm, adminRole);
-            await this.RealmRoleMapping(tenantRealm, adminUser, adminRole);
-            return 'Realm created successfully';
-        } catch (error) {
-            return error;
-        }
+        const tenantRealm: Realm = await this.createTenantRealm(realmName);
+        const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, email, password);
+        const adminRole: RoleRepresentation = await this.createAdminRealmRole(tenantRealm);
+        await this.createCompositeRole(tenantRealm, adminRole);
+        await this.RealmRoleMapping(tenantRealm, adminUser, adminRole);
+        return 'Realm created successfully';
     };
 
     private async createTenantRealm(realmName: string): Promise<Realm> {
@@ -47,11 +39,11 @@ export class KeycloakRealm {
 
     private async createAdminRealmRole(realm: Realm): Promise<RoleRepresentation> {
         await this.kcMasterAdminClient.roles.create({
-            name: 'admin',
+            name: 'tenantadmin',
             realm: realm.realmName
         });
         return await this.kcMasterAdminClient.roles.findOneByName({
-            name: 'admin',
+            name: 'tenantadmin',
             realm: realm.realmName
         });
     };

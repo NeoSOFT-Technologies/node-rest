@@ -1,17 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Keycloak, KeycloakAuthPolicy, KeycloakClient, KeycloakUser } from '@app/iam';
 import { ConfigService } from '@nestjs/config';
-import { KeycloakAuthPolicy, Keycloak, KeycloakClient, KeycloakUser } from '@app/iam';
+import { Test, TestingModule } from '@nestjs/testing';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                auth: jest.fn(),
                 users: {
                     find: jest.fn().mockResolvedValue([
                         {
                             id: 'id',
-                            username: 'adminuser'
+                            username: 'tenantadmin'
                         }
                     ]),
                 },
@@ -23,7 +22,8 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         }
                     ]),
                     createPolicy: jest.fn()
-                }
+                },
+                setAccessToken: jest.fn()
             };
         })
     };
@@ -41,18 +41,17 @@ describe('Testing Keycloak Auth Policy', () => {
     });
 
     it('Testing "createPolicy" method', async () => {
-        const mockTenantuser = {
+        const body = {
             tenantName: 'string',
-            password: 'string',
+            clientName: 'string',
+            policyType: 'user',
+            policyDetails: {
+                name: "test-policy",
+                description: "test policy description"
+            }
         };
-        const mockclientName = 'string';
-        const policyType = 'user';
-        const mockpolicyDetails = {
-            name: "test-policy",
-            description: "test policy description"
-        }
-
-        const response = await keycloakAuthPolicy.createPolicy(mockTenantuser, mockclientName, policyType, mockpolicyDetails);
+        const token = 'Bearer token';
+        const response = await keycloakAuthPolicy.createPolicy(body, token);
         expect(response).toEqual('Policy created successfully');
     });
 });

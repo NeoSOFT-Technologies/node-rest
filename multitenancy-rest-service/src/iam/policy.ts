@@ -1,11 +1,10 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
+import { Logic } from '@keycloak/keycloak-admin-client/lib/defs/policyRepresentation';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Keycloak } from "./keycloak";
-import { Logic } from '@keycloak/keycloak-admin-client/lib/defs/policyRepresentation';
-import { KeycloakUser } from "./keycloakUser";
-import { KeycloakClient } from './client';
 import { PolicyDto } from '../dto';
+import { KeycloakClient } from './client';
+import { KeycloakUser } from "./keycloakUser";
 
 
 
@@ -13,7 +12,6 @@ import { PolicyDto } from '../dto';
 export class KeycloakAuthPolicy {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private keycloak: Keycloak,
         private keycloakUser: KeycloakUser,
         private keycloakClient: KeycloakClient,
         private config: ConfigService

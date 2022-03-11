@@ -1,22 +1,23 @@
+import { KeycloakClient } from '@app/iam';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { Keycloak, KeycloakClient } from '@app/iam';
+import { Test, TestingModule } from '@nestjs/testing';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                auth: jest.fn(),
                 clients: {
                     create: jest.fn(),
                     find: jest.fn().mockResolvedValue([
                         {
                             id: 'id',
-                            clientId: 'testclient',
+                            clientId: 'test-client',
                         }
                     ]),
-                }
+                    generateNewClientSecret: jest.fn().mockResolvedValue({ value: 'clientSecret' })
+                },
+                setAccessToken: jest.fn()
             };
         })
     };
@@ -27,30 +28,29 @@ describe('Testing Keycloak Client', () => {
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak, ConfigService, KeycloakClient],
+            providers: [ConfigService, KeycloakClient],
         }).compile();
 
         keycloakClient = module.get<KeycloakClient>(KeycloakClient);
     });
 
     it('Testing "createClient" method', async () => {
-        const mockTenantuser = {
+        const body = {
             tenantName: 'string',
-            password: 'string',
+            clientDetails: {
+                clientId: "test-client",
+                rootUrl: "www.testUrl.com",
+            }
         };
-        const clientDetails = {
-            clientId: "test-client",
-            rootUrl: "www.testUrl.com",
-        }
-
-        const response = await keycloakClient.createClient(mockTenantuser, clientDetails);
-        expect(response).toEqual('Client created successfully');
+        const token = 'Bearer token';
+        const response = await keycloakClient.createClient(body, token);
+        expect(response).toEqual({ clientId: "test-client", clientSecret: "clientSecret" });
     });
 
     it('Testing "findClient" method', async () => {
-        const mockclientName = 'testclient';
+        const mockclientName = 'test-client';
         const kcAdminClient = new KcAdminClient();
         const response = await keycloakClient.findClient(kcAdminClient, mockclientName);
-        expect(response.clientId).toEqual('testclient');
+        expect(response.clientId).toEqual('test-client');
     });
 });

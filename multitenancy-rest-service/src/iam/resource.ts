@@ -1,17 +1,15 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Keycloak } from "./keycloak";
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
 import ScopeRepresentation from '@keycloak/keycloak-admin-client/lib/defs/scopeRepresentation';
-import { KeycloakClient } from './client';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ResourceDto } from '../dto';
+import { KeycloakClient } from './client';
 
 @Injectable()
 export class KeycloakAuthResource {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private keycloak: Keycloak,
         private keycloakClient: KeycloakClient,
         private config: ConfigService
     ) { }

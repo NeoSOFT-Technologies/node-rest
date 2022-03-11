@@ -1,13 +1,14 @@
+import { AuthService } from '@app/auth/auth.service';
+import config from '@app/config';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import axios from 'axios';
 import jwt_decode from "jwt-decode";
-import { AuthService } from '@app/auth/auth.service';
-import config from '@app/config';
 
 jest.mock('jwt-decode', () => ({
     default: jest.fn().mockReturnValue({
-        iss: 'string',
+        iss: '/tenantName',
+        exp: 'exp-time',
         realm_access: {
             roles: 'mockRole'
         }
@@ -38,6 +39,8 @@ describe('Testing Auth Service', () => {
             username: 'string',
             password: 'string',
             tenantName: 'string',
+            clientId: 'clientId',
+            clientSecret: 'clientSecret'
         }
 
         const mockAcessToken = jest.spyOn(axios, 'post').mockResolvedValue('access-token');
@@ -52,6 +55,8 @@ describe('Testing Auth Service', () => {
         const body = {
             tenantName: 'string',
             refreshToken: 'string',
+            clientId: 'clientId',
+            clientSecret: 'clientSecret'
         }
 
         const mockLogOut = jest.spyOn(axios, 'post').mockResolvedValue({ status: 204 });
@@ -62,13 +67,43 @@ describe('Testing Auth Service', () => {
         mockLogOut.mockRestore();
     });
 
-    it('Testing "validateToken"', async () => {
-        const mockLogOut = jest.spyOn(axios, 'post').mockResolvedValue({ data: { active: true } });
-        const response = await authService.validateToken('string');
+    it('Testing "refreshAccessToken"', async () => {
+        const body = {
+            tenantName: 'string',
+            refreshToken: 'string',
+            clientId: 'clientId',
+            clientSecret: 'clientSecret'
+        }
 
-        expect(mockLogOut).toHaveBeenCalled();
+        const mockrefreshAccessToken = jest.spyOn(axios, 'post').mockResolvedValue('access-token');
+        const response = await authService.refreshAccessToken(body);
+
+        expect(mockrefreshAccessToken).toHaveBeenCalled();
+        expect(response).toEqual('access-token');
+        mockrefreshAccessToken.mockRestore();
+    });
+
+    it('Testing "validateToken"', async () => {
+        const mockvalidateToken = jest.spyOn(axios, 'post').mockResolvedValue({ data: { active: true } });
+        const response = await authService.validateToken('string', 'string', 'string');
+
+        expect(mockvalidateToken).toHaveBeenCalled();
         expect(response).toEqual(true);
-        mockLogOut.mockRestore();
+        mockvalidateToken.mockRestore();
+    });
+
+    it('Testing "getTenantName"', async () => {
+        const response = await authService.getTenantName('string');
+
+        expect(jwt_decode).toHaveBeenCalled();
+        expect(response).toEqual('tenantName');
+    });
+
+    it('Testing "getExpTime"', async () => {
+        const response = await authService.getExpTime('string');
+
+        expect(jwt_decode).toHaveBeenCalled();
+        expect(response).toEqual('exp-time');
     });
 
     it('Testing "getUserRoles"', async () => {

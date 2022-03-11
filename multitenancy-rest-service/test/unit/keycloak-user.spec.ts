@@ -1,12 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Keycloak, KeycloakUser } from '@app/iam';
 import { ConfigService } from '@nestjs/config';
-import { Keycloak, KeycloakRealm, KeycloakUser } from '@app/iam';
+import { Test, TestingModule } from '@nestjs/testing';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                auth: jest.fn(),
                 users: {
                     create: jest.fn().mockResolvedValue({
                         id: 'id'

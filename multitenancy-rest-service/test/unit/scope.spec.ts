@@ -1,4 +1,4 @@
-import { Keycloak, KeycloakAuthScope, KeycloakClient, KeycloakUser } from "@app/iam";
+import { KeycloakAuthScope, KeycloakClient } from "@app/iam";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 
@@ -11,7 +11,7 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     find: jest.fn().mockResolvedValue([
                         {
                             id: 'id',
-                            username: 'adminuser'
+                            username: 'tenantadmin'
                         }
                     ]),
                 },
@@ -23,7 +23,8 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         }
                     ]),
                     createAuthorizationScope: jest.fn()
-                }
+                },
+                setAccessToken: jest.fn()
             };
         })
     };
@@ -32,24 +33,23 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
 describe('Testing Keycloak Authorization Scope', () => {
     let keycloakAuthScope: KeycloakAuthScope;
 
-    beforeAll(async() => {
+    beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak, KeycloakClient, KeycloakUser, KeycloakAuthScope, ConfigService]
+            providers: [KeycloakClient, ConfigService, KeycloakAuthScope]
         }).compile();
 
         keycloakAuthScope = module.get<KeycloakAuthScope>(KeycloakAuthScope);
     });
     it('Testing "createScope" method', async () => {
-        const mockTenantuser = {
+        const body = {
             tenantName: 'string',
-            password: 'string',
+            clientName: 'string',
+            scopeDetails: {
+                name: "test-scope",
+            }
         };
-        const mockclientName = 'string';
-        const mockscopeDetails = {
-            name: "test-scope",
-        }
-
-        const response = await keycloakAuthScope.createScope(mockTenantuser, mockclientName, mockscopeDetails);
+        const token = 'Bearer token';
+        const response = await keycloakAuthScope.createScope(body, token);
         expect(response).toEqual('Scope created successfully');
     });
 });

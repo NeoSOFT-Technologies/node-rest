@@ -1,12 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { KeycloakAuthResource, KeycloakClient } from '@app/iam';
 import { ConfigService } from '@nestjs/config';
-import { Keycloak, KeycloakClient, KeycloakAuthResource } from '@app/iam';
+import { Test, TestingModule } from '@nestjs/testing';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                auth: jest.fn(),
                 clients: {
                     find: jest.fn().mockResolvedValue([
                         {
@@ -16,6 +15,7 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     ]),
                     createResource: jest.fn()
                 },
+                setAccessToken: jest.fn()
             };
         })
     };
@@ -26,23 +26,23 @@ describe('Testing Keycloak Auth Resource', () => {
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak, KeycloakClient, ConfigService, KeycloakAuthResource],
+            providers: [KeycloakClient, ConfigService, KeycloakAuthResource],
         }).compile();
 
         keycloakAuthResource = module.get<KeycloakAuthResource>(KeycloakAuthResource);
     });
 
     it('Testing "createResource" method', async () => {
-        const mockTenantuser = {
+        const body = {
             tenantName: 'string',
-            password: 'string',
+            clientName: 'string',
+            resourceDetails: {
+                name: "test-resource",
+                uris: ["/*"]
+            }
         };
-        const mockclientName = 'string';
-        const resourceDetails = {
-            name: "test-resource",
-            uris: ["/*"]
-        };
-        const response = await keycloakAuthResource.createResource(mockTenantuser, mockclientName, resourceDetails);
+        const token = 'Bearer token';
+        const response = await keycloakAuthResource.createResource(body, token);
         expect(response).toEqual('Resource created successfully');
     });
 });

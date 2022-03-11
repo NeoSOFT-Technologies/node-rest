@@ -1,7 +1,6 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Keycloak } from "./keycloak";
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
 import { ClientDto } from '../dto';
 
@@ -9,7 +8,6 @@ import { ClientDto } from '../dto';
 export class KeycloakClient {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private keycloak: Keycloak,
         private config: ConfigService
     ) { }
 

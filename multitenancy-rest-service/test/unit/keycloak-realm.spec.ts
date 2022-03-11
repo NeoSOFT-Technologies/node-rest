@@ -1,12 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { Keycloak, KeycloakRealm, KeycloakUser } from '@app/iam';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                auth: jest.fn(),
                 users: {
                     create: jest.fn().mockResolvedValue({
                         id: 'id'
@@ -35,16 +34,17 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     ]),
                     listRoles: jest.fn().mockResolvedValue([
                         {
-                            id:'id'
+                            id: 'id'
                         }
                     ])
-                }
+                },
+                setAccessToken: jest.fn()
             };
         })
     };
 });
 
-describe('Testing Keycloak Realm Service', () =>{
+describe('Testing Keycloak Realm Service', () => {
     let keycloakRealmService: KeycloakRealm
     const mockService = {
         createAdminUser: jest.fn().mockResolvedValue({
@@ -53,14 +53,18 @@ describe('Testing Keycloak Realm Service', () =>{
     };
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak, KeycloakRealm, ConfigService, KeycloakUser],
-        }).overrideProvider(KeycloakUser).useValue(mockService).compile();
+            providers: [ConfigService, Keycloak, KeycloakUser, KeycloakRealm],
+        })
+            .overrideProvider(KeycloakUser)
+            .useValue(mockService)
+            .compile();
 
         keycloakRealmService = module.get<KeycloakRealm>(KeycloakRealm);
     });
 
     it('Testing "createRealm" method', async () => {
-        const response = await keycloakRealmService.createRealm('string', 'string', 'string');
+        const token = 'Bearer token';
+        const response = await keycloakRealmService.createRealm('string', 'string', 'string', token);
         expect(response).toEqual('Realm created successfully');
     });
 });

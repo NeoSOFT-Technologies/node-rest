@@ -1,4 +1,4 @@
-import { Keycloak, KeycloakAuthPermission, KeycloakClient, KeycloakUser } from "@app/iam";
+import { KeycloakAuthPermission, KeycloakClient } from "@app/iam";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 
@@ -6,12 +6,11 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                auth: jest.fn(),
                 users: {
                     find: jest.fn().mockResolvedValue([
                         {
                             id: 'id',
-                            username: 'adminuser'
+                            username: 'tenantadmin'
                         }
                     ]),
                 },
@@ -23,7 +22,8 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         }
                     ]),
                     createPermission: jest.fn()
-                }
+                },
+                setAccessToken: jest.fn()
             };
         })
     };
@@ -32,27 +32,26 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
 describe('Testing Keycloak Authorization Permission', () => {
     let keycloakAuthPermission: KeycloakAuthPermission;
 
-    beforeAll(async() => {
+    beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak, KeycloakClient, KeycloakUser, KeycloakAuthPermission, ConfigService]
+            providers: [KeycloakClient, ConfigService, KeycloakAuthPermission]
         }).compile()
 
         keycloakAuthPermission = module.get<KeycloakAuthPermission>(KeycloakAuthPermission);
     });
 
-    it('Testing "createPermission" method', async() => {
-        const mockTenantuser = {
+    it('Testing "createPermission" method', async () => {
+        const body = {
             tenantName: 'string',
-            password: 'string',
+            permissionType: 'user',
+            clientName: 'string',
+            permissionDetails: {
+                name: "test-permission",
+                description: "test permission description"
+            }
         };
-        const mockclientName = 'string';
-        const permissionType = 'user';
-        const mockPermisionDetails = {
-            name: "test-permission",
-            description: "test permission description"
-        }
-
-        const response = await keycloakAuthPermission.createPermission(mockTenantuser, mockclientName, permissionType, mockPermisionDetails);
+        const token = 'Bearer token';
+        const response = await keycloakAuthPermission.createPermission(body, token);
         expect(response).toEqual('Permission created successfully');
     });
 });

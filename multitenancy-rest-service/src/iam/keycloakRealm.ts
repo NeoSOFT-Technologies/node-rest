@@ -2,7 +2,6 @@ import { Realm } from "@app/dto/realm.dto";
 import { Injectable } from "@nestjs/common";
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Keycloak } from "./keycloak";
-import { ConfigService } from "@nestjs/config";
 import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import { KeycloakUser } from "./keycloakUser";
@@ -14,9 +13,8 @@ export class KeycloakRealm {
 
     constructor(
         private keycloak: Keycloak,
-        private keycloakUser: KeycloakUser,
-        private config: ConfigService) {
-        this.kcMasterAdminClient = keycloak.kcMasterAdminClient
+        private keycloakUser: KeycloakUser) {
+        this.kcMasterAdminClient = this.keycloak.kcMasterAdminClient
     }
 
     public async createRealm(realmName: string, email: string, password: string, token: string): Promise<any> {

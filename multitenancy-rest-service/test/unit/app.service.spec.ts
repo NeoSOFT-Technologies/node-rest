@@ -1,10 +1,10 @@
+import { AppService } from '@app/app.service';
+import { DbDetailsDto } from '@app/dto/db.details.dto';
+import { Keycloak, KeycloakAuthPermission, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakAuthScope, KeycloakClient, KeycloakRealm, KeycloakUser } from '@app/iam';
+import { ConnectionUtils } from '@app/utils';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
-import { AppService } from '@app/app.service';
-import { ConnectionUtils } from '@app/utils';
-import { DbDetailsDto } from '@app/dto/db.details.dto';
-import { Keycloak, KeycloakRealm, KeycloakUser, KeycloakClient, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakAuthScope, KeycloakAuthPermission } from '@app/iam';
-import { ConfigService } from '@nestjs/config';
 
 describe('Testing AppService', () => {
     let appService: AppService;
@@ -63,7 +63,7 @@ describe('Testing AppService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 Keycloak, ConfigService, KeycloakClient, AppService, KeycloakUser,
-                KeycloakRealm, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakAuthScope,KeycloakAuthPermission,
+                KeycloakRealm, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakAuthScope, KeycloakAuthPermission,
                 {
                     provide: 'REGISTER_TENANT',
                     useValue: mockClient1,
@@ -107,10 +107,13 @@ describe('Testing AppService', () => {
     it('Testing "register"', async () => {
         const mockMessage = { Message: 'Tenant Registered Successfully' };
         const tenantDetails = {
+            tenantName: 'string',
             email: 'string',
             password: 'string',
             description: 'string',
-            tenantName: 'string'
+            clientDetails: {
+                clientId: 'clientid'
+            }
         };
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
@@ -218,11 +221,11 @@ describe('Testing AppService', () => {
         const tenantDetails = {
             tenantName: 'string',
             email: 'string',
-            password: 'string',
-            description: 'string'
+            password: 'string'
         };
+        const token = 'Bearer token';
         const mockcreateRealm = jest.spyOn(keycloakRealm, 'createRealm');
-        appService.createRealm(tenantDetails);
+        appService.createRealm(tenantDetails, token);
 
         expect(mockcreateRealm).toHaveBeenCalled();
         mockcreateRealm.mockRestore();
@@ -292,14 +295,14 @@ describe('Testing AppService', () => {
     it('Testing "createClient"', async () => {
         const body = {
             tenantName: 'string',
-            password: 'string',
             clientDetails: {
                 clientId: "test-client",
                 rootUrl: "www.testUrl.com",
             },
         };
+        const token = 'Bearer token';
         const mockcreateClient = jest.spyOn(keycloakClient, 'createClient');
-        appService.createClient(body);
+        appService.createClient(body, token);
 
         expect(mockcreateClient).toHaveBeenCalled();
         mockcreateClient.mockRestore();
@@ -308,13 +311,13 @@ describe('Testing AppService', () => {
     it('Testing "createPolicy"', async () => {
         const body = {
             tenantName: 'string',
-            password: 'string',
             clientName: 'string',
             policyType: 'string',
             policyDetails: { name: 'string' },
         };
+        const token = 'Bearer token';
         const mockPolicy = jest.spyOn(keycloakAuthPolicy, 'createPolicy');
-        appService.createPolicy(body);
+        appService.createPolicy(body, token);
 
         expect(mockPolicy).toHaveBeenCalled();
         mockPolicy.mockRestore();
@@ -323,12 +326,12 @@ describe('Testing AppService', () => {
     it('Testing "createResource"', async () => {
         const body = {
             tenantName: 'string',
-            password: 'string',
             clientName: 'string',
             resourceDetails: { name: 'string' },
         };
+        const token = 'Bearer token';
         const mockResource = jest.spyOn(keycloakAuthResource, 'createResource');
-        appService.createResource(body);
+        appService.createResource(body, token);
 
         expect(mockResource).toHaveBeenCalled();
         mockResource.mockRestore();
@@ -337,31 +340,31 @@ describe('Testing AppService', () => {
     it('Testing "createScope"', async () => {
         const body = {
             tenantName: 'string',
-            password: 'string',
             clientName: 'string',
             scopeDetails: {
                 name: 'string'
             }
         };
+        const token = 'Bearer token';
         const mockScope = jest.spyOn(keycloakAuthScope, 'createScope');
-        appService.createScope(body);
+        appService.createScope(body, token);
 
         expect(mockScope).toHaveBeenCalled();
         mockScope.mockRestore();
     });
 
-    it('Testing "createPermission"', async() => {
+    it('Testing "createPermission"', async () => {
         const body = {
             tenantName: 'string',
-            password: 'string',
             clientName: 'string',
             permissionType: 'string',
             permissionDetails: {
                 name: 'string'
             }
         };
+        const token = 'Bearer token';
         const mockPermission = jest.spyOn(keycloakAuthPermission, 'createPermission');
-        appService.createPermission(body);
+        appService.createPermission(body, token);
 
         expect(mockPermission).toHaveBeenCalled();
         mockPermission.mockRestore();

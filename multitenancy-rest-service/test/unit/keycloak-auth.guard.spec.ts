@@ -1,17 +1,27 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { AppService } from '@app/app.service';
+import { AuthService } from '@app/auth/auth.service';
 import { KeycloakAuthGuard } from '@app/auth/guards/keycloak-auth.guard';
 import { Reflector } from '@nestjs/core';
-import { AuthService } from '@app/auth/auth.service';
+import { Test, TestingModule } from '@nestjs/testing';
 
 
 describe('Testing Auth Service', () => {
     let kcAuthGuard: KeycloakAuthGuard;
     let authService: AuthService;
+    let appService: AppService;
     let reflector: Reflector;
 
     const mockAuthService = {
         validateToken: jest.fn().mockResolvedValue(true),
-        getUserRoles: jest.fn().mockResolvedValue(['mockRole'])
+        getUserRoles: jest.fn().mockResolvedValue(['mockRole']),
+        getTenantName: jest.fn().mockResolvedValue('tenantName')
+    };
+
+    const mockAppService = {
+        clientIdSecret: jest.fn().mockResolvedValue({
+            clientId: 'clientId',
+            clientSecret: 'clientSecret'
+        }),
     };
 
     const mockReflector = {
@@ -29,6 +39,10 @@ describe('Testing Auth Service', () => {
                     useValue: mockAuthService,
                 },
                 {
+                    provide: AppService,
+                    useValue: mockAppService,
+                },
+                {
                     provide: Reflector,
                     useValue: mockReflector,
                 },
@@ -37,6 +51,7 @@ describe('Testing Auth Service', () => {
 
         kcAuthGuard = module.get<KeycloakAuthGuard>(KeycloakAuthGuard);
         authService = module.get<AuthService>(AuthService);
+        appService = module.get<AppService>(AppService);
         reflector = module.get<Reflector>(Reflector);
     });
 
@@ -52,7 +67,8 @@ describe('Testing Auth Service', () => {
         const response = await kcAuthGuard.canActivate(mockContext);
 
         expect(reflector.get).toHaveBeenCalled();
-        expect(authService.validateToken).toHaveBeenCalledWith('token');
+        expect(appService.clientIdSecret).toHaveBeenCalledWith('tenantName');
+        expect(authService.validateToken).toHaveBeenCalledWith('token', 'clientId', 'clientSecret');
         expect(authService.getUserRoles).toHaveBeenCalledWith('token');
         expect(response).toEqual(true);
     });
@@ -101,8 +117,6 @@ describe('Testing Auth Service', () => {
         expect(async () => await kcAuthGuard.canActivate(mockContext)).rejects.toThrow(
             'Authorization: Bearer <token> invalid'
         );
-
-        mockAuthService.validateToken.mockResolvedValue(true);
     });
 
     it('Testing "canActivate" - when required role not present', async () => {
@@ -114,6 +128,7 @@ describe('Testing Auth Service', () => {
                 }),
             })),
         } as any;
+        mockAuthService.validateToken.mockResolvedValue(true);
         mockReflector.get.mockReturnValue(['required-role']);
         const response = await kcAuthGuard.canActivate(mockContext);
         expect(response).toEqual(false);

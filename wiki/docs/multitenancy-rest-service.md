@@ -3,6 +3,7 @@
 This multitenancy-rest-service has been included to interact with the tenant microservices and test its working. It has the following endpoints namely
 - `Login` `/api/login/` - HTTP POST: It provides the access token after authenticating the user.
 - `Logout` `/api/logout/` - HTTP POST: It revokes the provided access token.
+- `Refresh Access Token` `/api/refresh-access-token/` - HTTP POST: It generates new access token using refresh token.
 - `Register tenant` `/api/tenants/` - HTTP POST: It registers a new tenant by consuming tenant-registration microservice.
 - `Get All Tenant` `api/tenants/`- HTTP GET: It retreives all the registered tenant information from database.The output has been paginated to reduce load time
 - `Update Tenant` `/api/tenants`- HTTP PATCH: Sample API to update tenant configuration.
@@ -115,7 +116,7 @@ API Endpoint:  `POST` `/api/login/`
     "token_type": "Bearer",
     "not-before-policy": 0,
     "session_state": "",
-    "scope": "profile email"
+    "scope": ""
 }
 ```
 ---
@@ -127,14 +128,39 @@ API Endpoint:  `POST` `/api/logout/`
 
 ```
 {
-  "tenantName": "String",
   "refreshToken": "String",
 }
 ```
 **Output:** The output has no content with status code `204`
 
 ---
-**3. Creating a Tenant**
+**3. Refresh Access Token**
+
+API Endpoint:  `POST` `/api/refresh-access-token/`
+
+**Input:** The input schema is shown below
+
+```
+{
+  "refreshToken": "String",
+}
+```
+**Output:** The scehma of the output is also in the `JSON` format
+
+```
+{
+    "access_token": "ACCESS TOKEN",
+    "expires_in": 300,
+    "refresh_expires_in": 1800,
+    "refresh_token": "REFRESH TOKEN",
+    "token_type": "Bearer",
+    "not-before-policy": 0,
+    "session_state": "",
+    "scope": ""
+}
+```
+---
+**4. Creating a Tenant**
 
 API Endpoint:  `POST` `/api/tenants/`
 
@@ -156,7 +182,7 @@ API Endpoint:  `POST` `/api/tenants/`
 }
 ```
 ---
-**4. Information Of Tenants**
+**5. Information Of Tenants**
 API Endpoint: `GET` `/api/tenants`
 
 **Input:** Query parameter page number
@@ -185,7 +211,7 @@ API Endpoint: `GET` `/api/tenants`
 The `"data"` key contains the tenants array limited to 5 tenants and `"count"` contains the total tenants available
 
 ---
-**5. Updating the Tenant's Configuration**
+**6. Updating the Tenant's Configuration**
 API Endpoint: `PATCH` `/api/tenants`
 
 **Input:** The schema of this input is in `NESTED JSON` format.
@@ -207,7 +233,7 @@ API Endpoint: `PATCH` `/api/tenants`
 The `affected` key value 1 means the updation is successfull otherwise it is 0
 ```
 ---
-**6. Deleting the Tenant's Configuration**
+**7. Deleting the Tenant's Configuration**
 API Endpoint: `DELETE` `/api/tenants`
 
 **Input:** The schema of this request is in the `JSON` format and `tenantName` is required.
@@ -226,7 +252,7 @@ API Endpoint: `DELETE` `/api/tenants`
 ```
 >The operation that we are performing here is called as `VIRTUAL DELETE` which states that the entity is not hard deleted from the database which can be used later in order to retrieve from archive etc.
 ---
-**7. Get Tenant's Configuration By Parameter**
+**8. Get Tenant's Configuration By Parameter**
 API Endpoint: `GET` `/api/tenants/{id}`
 
 **Input:** The input `id` is taken from the `request header` and the processed.
@@ -249,7 +275,7 @@ Request URL: `http://localhost:5000/api/tenants/1`
 }
 ```
 ---
-**8. Connect Database**
+**9. Connect Database**
 API Endpoint: `GET` `/api/connect-database`
 **Input:** The input for this endpoint is in the form of `request query` which is of the following format.
 ```
@@ -270,7 +296,7 @@ dbName: String
 ```
 ---
 
-**9. API Ceate Table**
+**10. API Ceate Table**
 API Endpoint: `POST` `/api/create-table`
 
 **Input:** The input for this endpoint is in the `JSON` format which consists the following parameters.
@@ -290,7 +316,7 @@ API Endpoint: `POST` `/api/create-table`
 }
 ```
 ---
-**10. Creating a user under a particular Tenant**
+**11. Creating a user under a particular Tenant**
 API Endpoint: `POST` `/api/create-user`
 **Input:** The input for this request is in `JSON` format with the following parameters.
 

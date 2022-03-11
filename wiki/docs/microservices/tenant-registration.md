@@ -66,6 +66,15 @@ export class Tenant {
 
   @Column()
   createdDateTime: string;
+  
+  @Column({ default: false })
+  isDelete: boolean;
+
+  @Column()
+  clientId: string;
+
+  @Column()
+  clientSecret: string;
 }
 ```
 ### Utility identifier for checking duplication of tenant

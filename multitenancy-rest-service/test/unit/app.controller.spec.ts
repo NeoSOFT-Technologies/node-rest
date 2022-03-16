@@ -57,7 +57,6 @@ describe('Testing AppController', () => {
         logout: jest.fn().mockResolvedValue('204'),
         refreshAccessToken: jest.fn().mockResolvedValue('token'),
         getUserName: jest.fn(),
-        getTenantName: jest.fn().mockResolvedValue('tenantName'),
         checkUserRole: jest.fn().mockResolvedValue(false),
     };
 
@@ -296,6 +295,9 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "getAvailableRoles"', async () => {
+        mockRequest.query = {
+            tenantName: 'tenantName',
+        };
         mockRequest.headers = {
             authorization: 'Bearer token'
         };

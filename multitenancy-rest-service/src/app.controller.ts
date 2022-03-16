@@ -307,8 +307,11 @@ export class AppController {
         req.body.userName = userName;
       }
       else if (isUser && req.body.userName !== userName) {
-        throw new HttpException('Not Allowed', HttpStatus.METHOD_NOT_ALLOWED);
+        throw new HttpException('Not Allowed', HttpStatus.FORBIDDEN);
       }
+      if (isUser && req.body.action.realmRoles) {
+        throw new HttpException('Roles Updation not allowed', HttpStatus.FORBIDDEN)
+      };
       res.send(await this.appService.updateUser(req.body, token));
     } catch (e) {
       if (e.response.statusCode) {
@@ -369,13 +372,17 @@ export class AppController {
 
   @Get('roles')
   @ApiTags('Keycloak')
+  @ApiQuery({ name: 'tenantName', type: 'string', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['tenantadmin'])
+  @Roles(['admin', 'tenantadmin'])
   async getAvailableRoles(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
-      const tenantName = await this.authService.getTenantName(token);
+      if (!req.query.tenantName) {
+        req.query.tenantName = await this.authService.getTenantName(token);
+      }
+      const tenantName = req.query.tenantName as string;
       res.send(await this.appService.getRoles(tenantName, token));
     } catch (e) {
       res.status(e.response.status).send(e.response.data);

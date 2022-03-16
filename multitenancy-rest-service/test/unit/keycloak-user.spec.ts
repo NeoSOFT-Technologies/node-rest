@@ -11,7 +11,7 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         id: 'id'
                     }),
                     find: jest.fn().mockResolvedValue([{ username: 'sample-user' }]),
-                    count: jest.fn().mockResolvedValue('sample-count'),
+                    count: jest.fn().mockResolvedValue(2),
                     addRealmRoleMappings: jest.fn(),
                     delRealmRoleMappings: jest.fn(),
                     listRealmRoleMappings: jest.fn().mockResolvedValue([{ name: 'sample-role' }]),
@@ -67,7 +67,7 @@ describe('Testing Keycloak User Service', () => {
             token: 'Bearer token'
         };
         const response = await keycloakUserService.getUsers(mockData);
-        expect(response).toEqual({ data: ['sample-user'], count: 'sample-count' });
+        expect(response).toEqual({ data: ['sample-user'], count: 1 });
     });
 
     it('Testing "getUserInfo" method', async () => {

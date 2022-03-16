@@ -79,7 +79,7 @@ export class KeycloakUser {
 
         const users = await kcClient.users.find({
             briefRepresentation: true,
-            first: (page - 1) * 5,
+            first: (page - 1) * 5 + 1,
             max: 5
         });
         const userNames = users.map(user => user.username)
@@ -87,7 +87,7 @@ export class KeycloakUser {
 
         return {
             data: userNames,
-            count
+            count: count - 1
         };
     };
 
@@ -144,9 +144,6 @@ export class KeycloakUser {
             const currentRoles = await this.getUserRoles(kcClient, { id: user[0].id });
 
             const addRoles = updatedRoles.filter(role => !currentRoles.includes(role));
-            if (userName !== 'tenantadmin' && addRoles.includes('tenantadmin')) {
-                throw new HttpException('Cannot add tenantadmin role', HttpStatus.FORBIDDEN)
-            };
             for (const role of addRoles) {
                 const userRole: RoleRepresentation = await kcClient.roles.findOneByName({
                     name: role

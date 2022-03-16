@@ -124,12 +124,17 @@ export class AuthService {
         return iss.split("/").pop();
     }
 
+    async getUserName(token: string) {
+        const { preferred_username }: any = jwt_decode(token);
+        return preferred_username;
+    }
+
     async getExpTime(token: string) {
         const { exp }: any = jwt_decode(token);
         return exp;
     }
 
-    async getUserRoles(token: string) {
+    async getRoles(token: string) {
         const parts = token.split(' ');
         if (parts.length === 2 && parts[0] === 'Bearer') {
             token = parts[1];
@@ -141,5 +146,19 @@ export class AuthService {
             roles = realm_access.roles;
         }
         return roles;
+    }
+
+    async checkUserRole(token: string) {
+        const parts = token.split(' ');
+        if (parts.length === 2 && parts[0] === 'Bearer') {
+            token = parts[1];
+        }
+        const { realm_access }: any = jwt_decode(token);
+
+        let roles: string[] = [];
+        if (realm_access.roles) {
+            roles = realm_access.roles;
+        }
+        return roles.includes('user');
     }
 }

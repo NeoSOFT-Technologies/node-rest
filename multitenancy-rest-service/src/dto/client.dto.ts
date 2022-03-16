@@ -17,5 +17,5 @@ export class ClientDto {
   @IsString()
   tenantName: string;
 
-  clientDetails: ClientDetails;
+  clientDetails?: ClientDetails;
 }

@@ -10,14 +10,17 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     create: jest.fn().mockResolvedValue({
                         id: 'id'
                     }),
-                    find: jest.fn().mockResolvedValue('sample-user'),
+                    find: jest.fn().mockResolvedValue([{ username: 'sample-user' }]),
                     count: jest.fn().mockResolvedValue('sample-count'),
                     addRealmRoleMappings: jest.fn(),
+                    delRealmRoleMappings: jest.fn(),
+                    listRealmRoleMappings: jest.fn().mockResolvedValue([{ name: 'sample-role' }]),
                     update: jest.fn(),
                     del: jest.fn()
                 },
                 roles: {
                     create: jest.fn(),
+                    find: jest.fn().mockResolvedValue([{ name: 'sample-role' }]),
                     findOneByName: jest.fn().mockResolvedValue({
                         id: 'id',
                         name: 'name'
@@ -48,6 +51,7 @@ describe('Testing Keycloak User Service', () => {
             userName: 'string',
             email: 'stirng',
             password: 'string',
+            roles: ['role']
         };
         const token: string = 'Bearer token'
         const response = await keycloakUserService.createUser(mockTenantCredentials, mockUserDetails, token);
@@ -63,7 +67,19 @@ describe('Testing Keycloak User Service', () => {
             token: 'Bearer token'
         };
         const response = await keycloakUserService.getUsers(mockData);
-        expect(response).toEqual({ data: 'sample-user', count: 'sample-count' });
+        expect(response).toEqual({ data: ['sample-user'], count: 'sample-count' });
+    });
+
+    it('Testing "getUserInfo" method', async () => {
+        const tenantName = 'string';
+        const userName = 'string';
+        const token: string = 'Bearer token';
+
+        const response = await keycloakUserService.getUserInfo(tenantName, userName, token);
+        expect(response).toEqual({
+            username: 'sample-user',
+            roles: ['sample-role']
+        });
     });
 
     it('Testing "updateUsers" method', async () => {
@@ -85,6 +101,14 @@ describe('Testing Keycloak User Service', () => {
 
         const response = await keycloakUserService.deleteUser(tenantName, userName, token);
         expect(response).toEqual('User deleted Successfully');
+    });
+
+    it('Testing "getRealmRoles" method', async () => {
+        const tenantName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakUserService.getRealmRoles(tenantName, token);
+        expect(response).toEqual(['sample-role']);
     });
 
     it('Testing "createAdminUser" method', async () => {

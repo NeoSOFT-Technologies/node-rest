@@ -57,7 +57,7 @@ export class KeycloakAuthGuard implements CanActivate {
     }
 
     try {
-      const userRoles: string[] = await this.authenticationService.getUserRoles(token);
+      const userRoles: string[] = await this.authenticationService.getRoles(token);
       const usrRole = await this.hasRole(userRoles, roles);
       return usrRole;
     } catch (e) {

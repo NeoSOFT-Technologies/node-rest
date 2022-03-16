@@ -49,4 +49,15 @@ export class KeycloakClient {
         );
         return newCredential.value;
     };
+
+    public defaultClientDetails() {
+        return {
+            clientId: this.config.get('client.id'),
+            rootUrl: this.config.get('client.rootUrl'),
+            redirectUris: [`${this.config.get('client.rootUrl')}/*`],
+            serviceAccountsEnabled: true,
+            authorizationServicesEnabled: true,
+            directAccessGrantsEnabled: true
+        }
+    };
 };

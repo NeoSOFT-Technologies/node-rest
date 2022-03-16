@@ -13,7 +13,7 @@ describe('Testing Auth Service', () => {
 
     const mockAuthService = {
         validateToken: jest.fn().mockResolvedValue(true),
-        getUserRoles: jest.fn().mockResolvedValue(['mockRole']),
+        getRoles: jest.fn().mockResolvedValue(['mockRole']),
         getTenantName: jest.fn().mockResolvedValue('tenantName')
     };
 
@@ -69,7 +69,7 @@ describe('Testing Auth Service', () => {
         expect(reflector.get).toHaveBeenCalled();
         expect(appService.clientIdSecret).toHaveBeenCalledWith('tenantName');
         expect(authService.validateToken).toHaveBeenCalledWith('token', 'clientId', 'clientSecret');
-        expect(authService.getUserRoles).toHaveBeenCalledWith('token');
+        expect(authService.getRoles).toHaveBeenCalledWith('token');
         expect(response).toEqual(true);
     });
 

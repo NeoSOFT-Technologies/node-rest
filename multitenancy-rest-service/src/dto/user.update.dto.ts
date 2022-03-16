@@ -6,6 +6,7 @@ class UserDetails implements UserRepresentation {
   lastName?: string;
   email?: string;
   enabled?: boolean;
+  realmRoles?: string[];
 }
 
 export class UpdateUserDto {

@@ -19,6 +19,7 @@ import { UpdateUserDto } from "./user.update.dto";
 import { PermissionDto } from "./permission.dto";
 import { CreateRealmDto } from "./create.realm.dto";
 import { RefreshAccessTokenDto } from "./refresh.access-token.dto";
+import { GetUsersInfoDto } from "./user.getInfo.dto";
 
 export {
     columnDto,
@@ -41,5 +42,6 @@ export {
     UpdateUserDto,
     PermissionDto,
     CreateRealmDto,
-    RefreshAccessTokenDto
+    RefreshAccessTokenDto,
+    GetUsersInfoDto
 }

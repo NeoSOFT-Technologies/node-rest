@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ConnectionUtils } from './utils';
 import {
-  ClientDto, CreateRealmDto, DbDetailsDto, DeleteUserDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
+  ClientDto, CreateRealmDto, DbDetailsDto, DeleteUserDto, GetUsersInfoDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
   RegisterTenantDto, ResourceDto, TenantUserDto, UpdateUserDto, UsersQueryDto
 } from './dto';
 import {
@@ -81,6 +81,10 @@ export class AppService {
   listAllUser(data: { query: UsersQueryDto, token: string }) {
     return this.keycloakUser.getUsers(data);
   }
+  userInfo(query: GetUsersInfoDto, token: string) {
+    const { tenantName, userName } = query;
+    return this.keycloakUser.getUserInfo(tenantName, userName, token);
+  }
   updateUser(body: UpdateUserDto, token: string) {
     const { tenantName, userName, action } = body;
     return this.keycloakUser.updateUser(tenantName, userName, action, token);
@@ -90,7 +94,13 @@ export class AppService {
     return this.keycloakUser.deleteUser(tenantName, userName, token);
   }
   createClient(body: ClientDto, token: string) {
+    if (!body.clientDetails) {
+      body.clientDetails = this.keycloakClient.defaultClientDetails()
+    }
     return this.keycloakClient.createClient(body, token);
+  }
+  getRoles(tenantName: string, token: string) {
+    return this.keycloakUser.getRealmRoles(tenantName, token);
   }
   createPolicy(body: PolicyDto, token: string) {
     return this.keycloakAuthPolicy.createPolicy(body, token);

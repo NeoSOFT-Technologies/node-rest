@@ -41,11 +41,13 @@ describe('Testing AppController', () => {
         createRealm: jest.fn(),
         createUser: jest.fn(),
         listAllUser: jest.fn(),
+        userInfo: jest.fn(),
         updateUser: jest.fn(),
         deleteUser: jest.fn(),
         createResource: jest.fn(),
         createPolicy: jest.fn(),
         createClient: jest.fn(),
+        getRoles: jest.fn(),
         createScope: jest.fn(),
         createPermission: jest.fn()
     };
@@ -54,6 +56,9 @@ describe('Testing AppController', () => {
         getAccessToken: jest.fn().mockResolvedValue('token'),
         logout: jest.fn().mockResolvedValue('204'),
         refreshAccessToken: jest.fn().mockResolvedValue('token'),
+        getUserName: jest.fn(),
+        getTenantName: jest.fn().mockResolvedValue('tenantName'),
+        checkUserRole: jest.fn().mockResolvedValue(false),
     };
 
     beforeAll(async () => {
@@ -118,9 +123,6 @@ describe('Testing AppController', () => {
             email: 'tenant@gmail.com',
             password: 'tenant123',
             description: 'This is tenant Database',
-            clientDetails: {
-                clientId: 'clientid'
-            }
         }
         mockRequest.headers = {
             authorization: 'Bearer token'
@@ -129,13 +131,13 @@ describe('Testing AppController', () => {
         const createRealm = jest.spyOn(appService, 'createRealm');
         const createClient = jest.spyOn(appService, 'createClient');
         await appController.registerTenant(mockBody, mockRequest, mockResponse);
-        const { tenantName, email, password, clientDetails } = mockBody;
+        const { tenantName, email, password } = mockBody;
         expect(mockSubscribe).toHaveBeenCalled();
         expect(createRealm).toHaveBeenCalledWith(
             { tenantName, email, password },
             mockRequest.headers['authorization']);
         expect(createClient).toHaveBeenCalledWith(
-            { tenantName, clientDetails },
+            { tenantName },
             mockRequest.headers['authorization']);
         mockSubscribe.mockRestore();
     });
@@ -217,6 +219,24 @@ describe('Testing AppController', () => {
         mockSend.mockRestore();
     });
 
+    it('Testing appcontroller "getUserInfo"', async () => {
+        mockRequest.query = {
+            tenantName: 'tenantName',
+            usertName: 'usertName',
+        };
+
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const userInfo = jest.spyOn(appService, 'userInfo');
+        await appController.getUserInfo(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(userInfo).toHaveBeenCalledWith(mockRequest.query,mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
     it('Testing appcontroller "updateUser"', async () => {
         mockRequest.body = {
             tenantName: 'tenantName',
@@ -272,6 +292,18 @@ describe('Testing AppController', () => {
         await appController.tenantClient(mockRequest, mockResponse);
         expect(mockSend).toHaveBeenCalled();
         expect(createClient).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "getAvailableRoles"', async () => {
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const getRoles = jest.spyOn(appService, 'getRoles');
+        await appController.getAvailableRoles(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(getRoles).toHaveBeenCalledWith('tenantName', mockRequest.headers['authorization']);
         mockSend.mockRestore();
     });
 

@@ -37,8 +37,8 @@ export class RegisterTenantDto {
   @ApiHideProperty()
   createdDateTime?: string;
 
-  @IsNotEmpty()
-  clientDetails: ClientDetails
+  @ApiHideProperty()
+  clientDetails?: ClientDetails
 
   @ApiHideProperty()
   clientId?: string

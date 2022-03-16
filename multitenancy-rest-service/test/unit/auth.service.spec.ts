@@ -9,6 +9,7 @@ jest.mock('jwt-decode', () => ({
     default: jest.fn().mockReturnValue({
         iss: '/tenantName',
         exp: 'exp-time',
+        preferred_username: 'username',
         realm_access: {
             roles: 'mockRole'
         }
@@ -99,6 +100,13 @@ describe('Testing Auth Service', () => {
         expect(response).toEqual('tenantName');
     });
 
+    it('Testing "getUserName"', async () => {
+        const response = await authService.getUserName('string');
+
+        expect(jwt_decode).toHaveBeenCalled();
+        expect(response).toEqual('username');
+    });
+
     it('Testing "getExpTime"', async () => {
         const response = await authService.getExpTime('string');
 
@@ -106,10 +114,17 @@ describe('Testing Auth Service', () => {
         expect(response).toEqual('exp-time');
     });
 
-    it('Testing "getUserRoles"', async () => {
-        const response = await authService.getUserRoles('string');
+    it('Testing "getRoles"', async () => {
+        const response = await authService.getRoles('string');
 
         expect(jwt_decode).toHaveBeenCalled();
         expect(response).toEqual('mockRole');
+    });
+
+    it('Testing "checkUserRole"', async () => {
+        const response = await authService.checkUserRole('string');
+
+        expect(jwt_decode).toHaveBeenCalled();
+        expect(response).toEqual(false);
     });
 });

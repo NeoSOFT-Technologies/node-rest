@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, HttpStatus,
+  Body, Controller, Delete, Get, HttpException, HttpStatus,
   Patch, Post, Req, Res, UseGuards, UsePipes, ValidationPipe
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -10,7 +10,8 @@ import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
 import {
   CredentialsDto, DbDetailsDto, DeleteTenantDto, LogoutDto, ProvisionTenantTableDto, RegisterTenantDto,
-  TenantUserDto, UpdateTenantDto, UsersQueryDto, UpdateUserDto, DeleteUserDto, RefreshAccessTokenDto, ClientDto, ResourceDto, PolicyDto, ScopeDto, PermissionDto
+  TenantUserDto, UpdateTenantDto, UsersQueryDto, UpdateUserDto, DeleteUserDto, RefreshAccessTokenDto,
+  ClientDto, ResourceDto, PolicyDto, ScopeDto, PermissionDto, GetUsersInfoDto
 } from './dto';
 
 @Controller('api')
@@ -117,11 +118,11 @@ export class AppController {
   @Roles(['admin'])
   async registerTenant(@Body() body: RegisterTenantDto, @Req() req: Request, @Res() res: Response) {
     try {
-      let { tenantName, email, password, clientDetails } = body;
+      let { tenantName, email, password } = body;
       const token = req.headers['authorization'];
 
       await this.appService.createRealm({ tenantName, email, password }, token);
-      const client = await this.appService.createClient({ tenantName, clientDetails }, token);
+      const client = await this.appService.createClient({ tenantName }, token);
 
       const response = this.appService.register({ ...body, ...client });
       response.subscribe((result) => { res.send(result) });
@@ -234,7 +235,7 @@ export class AppController {
   @ApiQuery({ type: UsersQueryDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['tenantadmin'])
+  @Roles(['admin', 'tenantadmin'])
   async listAllUser(@Req() req: Request, @Res() res: Response) {
     try {
       const data = {
@@ -250,6 +251,41 @@ export class AppController {
     }
   }
 
+  @Get('user-info')
+  @ApiTags('User')
+  @ApiQuery({ type: GetUsersInfoDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin', 'tenantadmin', 'user'])
+  async getUserInfo(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+
+      if (!req.query.tenantName) {
+        req.query.tenantName = await this.authService.getTenantName(token);
+      }
+      const userName = await this.authService.getUserName(token);
+      const isUser = await this.authService.checkUserRole(token);
+      if (!req.query.userName) {
+        req.query.userName = userName;
+      }
+      else if (isUser && req.query.userName !== userName) {
+        throw new HttpException(
+          'Not Allowed',
+          HttpStatus.METHOD_NOT_ALLOWED,
+        );
+      }
+      res.send(await this.appService.userInfo(req.query, token));
+    } catch (e) {
+      if (e.response.statusCode) {
+        res.status(e.response.statusCode).send(e.response.message);
+      }
+      else if (e.status) {
+        res.status(e.status).send(e.response);
+      }
+    }
+  }
+
   @Patch('user')
   @ApiTags('User')
   @ApiBody({ type: UpdateUserDto })
@@ -262,6 +298,17 @@ export class AppController {
       if (!req.body.tenantName) {
         req.body.tenantName = await this.authService.getTenantName(token);
       }
+      const userName = await this.authService.getUserName(token);
+      const isUser = await this.authService.checkUserRole(token);
+      if (!isUser && !req.body.userName) {
+        throw new HttpException('Please enter userName', HttpStatus.BAD_REQUEST);
+      }
+      if (isUser && !req.body.userName) {
+        req.body.userName = userName;
+      }
+      else if (isUser && req.body.userName !== userName) {
+        throw new HttpException('Not Allowed', HttpStatus.METHOD_NOT_ALLOWED);
+      }
       res.send(await this.appService.updateUser(req.body, token));
     } catch (e) {
       if (e.response.statusCode) {
@@ -269,6 +316,9 @@ export class AppController {
       }
       else if (e.response.status) {
         res.status(e.response.status).send(e.response.data);
+      }
+      else if (e.status) {
+        res.status(e.status).send(e.response);
       }
     }
   }
@@ -278,12 +328,15 @@ export class AppController {
   @ApiBody({ type: DeleteUserDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['tenantadmin', 'user'])
+  @Roles(['tenantadmin'])
   async deleteUser(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
       if (!req.body.tenantName) {
         req.body.tenantName = await this.authService.getTenantName(token);
+      }
+      if (!req.body.userName) {
+        throw new HttpException('Please enter userName', HttpStatus.BAD_REQUEST);
       }
       res.send(await this.appService.deleteUser(req.body, token));
     } catch (e) {
@@ -292,6 +345,9 @@ export class AppController {
       }
       else if (e.response.status) {
         res.status(e.response.status).send(e.response.data);
+      }
+      else if (e.status) {
+        res.status(e.status).send(e.response);
       }
     }
   }
@@ -306,6 +362,21 @@ export class AppController {
     try {
       const token = req.headers['authorization'];
       res.send(await this.appService.createClient(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
+
+  @Get('roles')
+  @ApiTags('Keycloak')
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['tenantadmin'])
+  async getAvailableRoles(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      const tenantName = await this.authService.getTenantName(token);
+      res.send(await this.appService.getRoles(tenantName, token));
     } catch (e) {
       res.status(e.response.status).send(e.response.data);
     }

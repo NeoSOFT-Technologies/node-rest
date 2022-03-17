@@ -9,9 +9,15 @@ This multitenancy-rest-service has been included to interact with the tenant mic
 - `Update Tenant` `/api/tenants`- HTTP PATCH: Sample API to update tenant configuration.
 - `Deleting Tenant` `api/tenants` - HTTP DELETE: Sample API to delete a tenant.
 - `Tenant Configuration` `/api/tenants/{id}` - HTTP GET: It retrieves configuration of the specified id.
-- `/api/user` - HTTP POST: It will create a user under the specified userName
+- `Create a Tenant User /api/user` - HTTP POST: It creates a user under the specified tenant.
+- `Get Tenant Users List /api/user` - HTTP GET: It returns user list under the specified tenant.
+- `Update a Tenant User /api/user` - HTTP PATCH: It updates a user.
+- `Delete a Tenant User /api/user` - HTTP DELETE: It deletes a user.
+- `Get a Tenant User's Info /api/user-info` - HTTP GET: It gives the user's details.
 - `/api/connect-database`- HTTP GET: It generates the connection string to a tenant database and connects to it.
 - `/api/create-table` - HTTP POST: It creates table in the database of the tenant.
+
+See full API documentation [here](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/api.md)
 
 ### Installation
 First run this command to install all dependency
@@ -313,27 +319,5 @@ API Endpoint: `POST` `/api/create-table`
 ```
 {
     "Message": "Table Created Successfully"
-}
-```
----
-**11. Creating a user under a particular Tenant**
-API Endpoint: `POST` `/api/create-user`
-**Input:** The input for this request is in `JSON` format with the following parameters.
-
-```
-{
-  "userName": "string",
-  "email": "string",
-  "password": "string",
-  "tenantName": "string"
-}
-```
-> Note: `password` is the password of the tenant under which the user is being created.
-
-
-**Output:** The response of this request is present in the `JSON` format
-```
-{
-   "Message": "User created Successfully."
 }
 ```

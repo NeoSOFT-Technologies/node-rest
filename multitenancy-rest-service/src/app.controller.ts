@@ -109,6 +109,20 @@ export class AppController {
     }
   }
 
+  @Get('forgotPassword')
+  @ApiTags('Authentication')
+  @ApiQuery({ name: 'tenant', type: 'string', required: false })
+  forgotPassword(@Req() req: Request, @Res() res: Response) {
+    try{
+      const tenantName = req.query.tenant as string;
+      const redirectUrl = this.appService.createRedirectUrl(tenantName);
+      res.send(redirectUrl);
+      res.redirect(redirectUrl);
+    } catch(e){
+      return e;
+    }
+  }
+
   @Post('tenants')
   @ApiTags('Tenants')
   @UsePipes(new ValidationPipe())

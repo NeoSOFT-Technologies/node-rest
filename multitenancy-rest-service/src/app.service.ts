@@ -10,6 +10,7 @@ import {
   KeycloakRealm, KeycloakUser, KeycloakAuthScope, KeycloakAuthPermission
 } from './iam';
 import { ScopeDto } from './dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
@@ -23,11 +24,22 @@ export class AppService {
     private readonly keycloakAuthPolicy: KeycloakAuthPolicy,
     private readonly keycloakAuthResource: KeycloakAuthResource,
     private readonly keycloakAuthScope: KeycloakAuthScope,
-    private readonly keycloakAuthPermission: KeycloakAuthPermission
-  ) { }
+    private readonly keycloakAuthPermission: KeycloakAuthPermission,
+    private config: ConfigService
+  ) { 
+    this.keycloakRedirectUrl = this.config.get('keycloak.redirectUrl');
+  }
+
+  keycloakRedirectUrl: string;
+  redirectUrl: string;
+
   register(tenant: RegisterTenantDto) {
     const { clientDetails, ...tenantDetails } = tenant;
     return this.client1.send({ cmd: 'register-tenant' }, tenantDetails);
+  }
+  createRedirectUrl(tenantName: string) {
+    this.redirectUrl = `${this.keycloakRedirectUrl}/admin/${tenantName}/console/`;
+    return this.redirectUrl;
   }
   getTenantConfig(id: number) {
     return this.client2.send({ cmd: 'get_config' }, id);

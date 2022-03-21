@@ -19,7 +19,7 @@ import { UpdateUserDto } from "./user.update.dto";
 import { PermissionDto } from "./permission.dto";
 import { CreateRealmDto } from "./create.realm.dto";
 import { RefreshAccessTokenDto } from "./refresh.access-token.dto";
-import { GetUsersInfoDto } from "./user.getInfo.dto";
+import { GetUsersInfoDto } from "./user.getinfo.dto";
 
 export {
     columnDto,

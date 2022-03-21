@@ -5,6 +5,7 @@ import { Keycloak } from "./keycloak";
 import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import { KeycloakUser } from "./keycloakUser";
+import { ConfigService } from "@nestjs/config";
 
 
 @Injectable()
@@ -13,7 +14,8 @@ export class KeycloakRealm {
 
     constructor(
         private keycloak: Keycloak,
-        private keycloakUser: KeycloakUser) {
+        private keycloakUser: KeycloakUser,
+        private config: ConfigService) {
         this.kcMasterAdminClient = this.keycloak.kcMasterAdminClient
     }
 
@@ -21,7 +23,7 @@ export class KeycloakRealm {
         const parts = token.split(' ')
         this.kcMasterAdminClient.setAccessToken(parts[1]);
 
-        const tenantRealm: Realm = await this.createTenantRealm(realmName);
+        const tenantRealm: Realm = await this.createTenantRealm(realmName,email);
         const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, email, password);
         const adminRole: RoleRepresentation = await this.createAdminRealmRole(tenantRealm);
         await this.createCompositeRole(tenantRealm, adminRole);
@@ -29,11 +31,17 @@ export class KeycloakRealm {
         return 'Realm created successfully';
     };
 
-    private async createTenantRealm(realmName: string): Promise<Realm> {
+    private async createTenantRealm(realmName: string, email: string): Promise<Realm> {
         return await this.kcMasterAdminClient.realms.create({
             id: realmName,
             realm: realmName,
-            enabled: true
+            enabled: true,
+            resetPasswordAllowed: true,
+            smtpServer: {
+                "host": this.config.get('mailServer.host'),
+                "port": this.config.get('mailServer.port'),
+                "from": email,
+            }
         });
     };
 

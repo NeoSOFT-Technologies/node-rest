@@ -2,7 +2,6 @@ import { columnDto } from "./column.dto";
 import { CredentialsDto } from "./credentials.dto";
 import { LogoutDto } from "./logout.body.dto";
 import { DbDetailsDto } from "./db.details.dto";
-import { DeleteTenantDto } from "./delete.tenant.dto";
 import { ProvisionTenantTableDto } from "./provision.tenant.table.dto";
 import { RegisterTenantDto } from "./register.tenant.dto";
 import { TenantUserDto } from "./tenant.user.dto";
@@ -19,14 +18,20 @@ import { UpdateUserDto } from "./user.update.dto";
 import { PermissionDto } from "./permission.dto";
 import { CreateRealmDto } from "./create.realm.dto";
 import { RefreshAccessTokenDto } from "./refresh.access-token.dto";
-import { GetUsersInfoDto } from "./user.getinfo.dto";
+import { GetUsersInfoDto } from "./user.getInfo.dto";
+import { CreateRoleDto } from "./create.role.dto";
+import { UpdateRoleDto } from "./update.role.dto";
+import { DeleteRoleDto } from "./delete.role.dto";
+import { GetRoleInfoDto } from "./role.getinfo.dto";
+import { GetPermissionsDto } from "./getpermissions.dto";
+import { UpdatePermissionDto } from "./update.permission.dto";
+import { DeletePermissionDto } from "./delete.permission.dto";
 
 export {
     columnDto,
     CredentialsDto,
     LogoutDto,
     DbDetailsDto,
-    DeleteTenantDto,
     ProvisionTenantTableDto,
     RegisterTenantDto,
     TenantUserDto,
@@ -43,5 +48,12 @@ export {
     PermissionDto,
     CreateRealmDto,
     RefreshAccessTokenDto,
-    GetUsersInfoDto
+    GetUsersInfoDto,
+    CreateRoleDto,
+    UpdateRoleDto,
+    DeleteRoleDto,
+    GetRoleInfoDto,
+    GetPermissionsDto,
+    UpdatePermissionDto,
+    DeletePermissionDto
 }

@@ -1,5 +1,5 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
 import { ClientDto } from '../dto';
@@ -36,6 +36,9 @@ export class KeycloakClient {
     public async findClient(kcclient: KcAdminClient, clientName: string): Promise<ClientRepresentation> {
         const clients = await kcclient.clients.find();
         const client = clients.filter((client) => client.clientId === clientName);
+        if (!client[0]) {
+            throw new NotFoundException('Client not found');
+        }
         return client[0];
     };
 

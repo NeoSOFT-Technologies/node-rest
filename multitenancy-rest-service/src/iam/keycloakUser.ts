@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Keycloak } from "./keycloak";
@@ -67,8 +67,8 @@ export class KeycloakUser {
         return 'User created successfully';
     };
 
-    public async getUsers(data: { query: UsersQueryDto, token: string }): Promise<{ data: string[], count: number }> {
-        let { tenantName, page = 1 } = data.query;
+    public async getUsers(data: { query: UsersQueryDto, token: string }): Promise<{ data: any, count: number }> {
+        let { tenantName, userName = undefined, page = 1 } = data.query;
         const { token } = data;
         const kcClient: KcAdminClient = new KcAdminClient({
             baseUrl: this.keycloakServer,
@@ -79,15 +79,26 @@ export class KeycloakUser {
 
         const users = await kcClient.users.find({
             briefRepresentation: true,
-            first: (page - 1) * 5 + 1,
-            max: 5
+            username: userName,
+            first: (page - 1) * 10,
+            max: 10
         });
-        const userNames = users.map(user => user.username)
-        const count = await kcClient.users.count();
+
+        const userNames = users.map(user => {
+            const createdTimestamp = this.formatTimeStamp(user);
+            return {
+                userName: user.username,
+                email: user.email,
+                createdTimestamp
+            }
+        });
+        const count = await kcClient.users.count({
+            username: userName
+        });
 
         return {
             data: userNames,
-            count: count - 1
+            count: count
         };
     };
 
@@ -106,9 +117,12 @@ export class KeycloakUser {
         if (!userInfo[0]) {
             throw new NotFoundException('User not found');
         };
+        const createdTimestamp = this.formatTimeStamp(userInfo[0]);
         const roles = await this.getUserRoles(kcClient, { id: userInfo[0].id });
         return {
             ...userInfo[0],
+            createdTimestamp,
+            tenantName,
             roles
         };
     };
@@ -189,19 +203,6 @@ export class KeycloakUser {
         return 'User deleted Successfully';
     };
 
-    public async getRealmRoles(tenantName: string, token: string): Promise<string[]> {
-        const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
-            baseUrl: this.keycloakServer,
-            realmName: tenantName,
-        });
-        const parts = token.split(' ')
-        kcTenantAdminClient.setAccessToken(parts[1]);
-
-        const roles = await kcTenantAdminClient.roles.find();
-        const rolesName = roles.map(role => role.name)
-        return rolesName;
-    };
-
     private async createUserRole(client: KcAdminClient, role: string): Promise<RoleRepresentation> {
         let userRole = await client.roles.findOneByName({
             name: role
@@ -248,5 +249,16 @@ export class KeycloakUser {
         });
         const rolesName = roles.map(role => role.name)
         return rolesName;
+    };
+
+    private formatTimeStamp(user: UserRepresentation): string {
+        const d = new Date(user.createdTimestamp);
+        const createdTimestamp = new Date(d.getTime() - (d.getTimezoneOffset() * 60000))
+            .toISOString()
+            .slice(0, 19)
+            .replace(/-/g, '/')
+            .replace('T', ' ');
+
+        return createdTimestamp;
     };
 }

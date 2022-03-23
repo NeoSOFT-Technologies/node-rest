@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
@@ -22,8 +22,10 @@ export class RegistertenantService {
         '-' +
         Math.random().toString(16).slice(-4);
     }
-
-    tenant.createdDateTime = new Date()
+    const date = new Date();
+    tenant.createdDateTime = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000,
+    )
       .toISOString()
       .slice(0, 19)
       .replace(/-/g, '/')
@@ -55,10 +57,13 @@ export class RegistertenantService {
     }
   }
 
-  listAll(page = 1): Promise<[Tenant[], number]> {
+  listAll(tenantName = '', page = 1): Promise<[Tenant[], number]> {
     return this.tenantRepository.findAndCount({
-      take: 5,
-      skip: 5 * (page - 1),
+      where: {
+        tenantName: Like(`%${tenantName}%`),
+      },
+      take: 10,
+      skip: 10 * (page - 1),
     });
   }
 

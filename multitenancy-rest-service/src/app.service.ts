@@ -2,8 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ConnectionUtils } from './utils';
 import {
-  ClientDto, CreateRealmDto, DbDetailsDto, DeleteUserDto, GetUsersInfoDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
-  RegisterTenantDto, ResourceDto, TenantUserDto, UpdateUserDto, UsersQueryDto
+  ClientDto, CreateRealmDto, CreateRoleDto, DbDetailsDto, DeletePermissionDto, DeleteRoleDto, DeleteUserDto,
+  GetPermissionsDto, GetRoleInfoDto, GetUsersInfoDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
+  RegisterTenantDto, ResourceDto, TenantUserDto, UpdatePermissionDto, UpdateRoleDto, UpdateUserDto, UsersQueryDto
 } from './dto';
 import {
   KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient,
@@ -26,7 +27,7 @@ export class AppService {
     private readonly keycloakAuthScope: KeycloakAuthScope,
     private readonly keycloakAuthPermission: KeycloakAuthPermission,
     private config: ConfigService
-  ) { 
+  ) {
     this.keycloakRedirectUrl = this.config.get('keycloak.redirectUrl');
   }
 
@@ -67,8 +68,8 @@ export class AppService {
 
     return { clientId, clientSecret }
   }
-  listAllTenant(page: number) {
-    return this.client1.send({ cmd: 'list-all-tenant' }, page);
+  listAllTenant(tenantName: string, page: number) {
+    return this.client1.send({ cmd: 'list-all-tenant' }, { tenantName, page });
   }
   updateDescription(tenantname: string, newdescription: string) {
     return this.client1.send({ cmd: 'update-description' }, { tenantname, newdescription });
@@ -111,8 +112,24 @@ export class AppService {
     }
     return this.keycloakClient.createClient(body, token);
   }
+  createRole(body: CreateRoleDto, token: string) {
+    const { tenantName, roleDetails } = body
+    return this.keycloakRealm.createRealmRoles(tenantName, roleDetails, token);
+  }
   getRoles(tenantName: string, token: string) {
-    return this.keycloakUser.getRealmRoles(tenantName, token);
+    return this.keycloakRealm.getRealmRoles(tenantName, token);
+  }
+  roleInfo(query: GetRoleInfoDto, token: string) {
+    const { tenantName, roleName } = query;
+    return this.keycloakRealm.getRealmRoleInfo(tenantName, roleName, token);
+  }
+  updateRole(body: UpdateRoleDto, token: string) {
+    const { tenantName, roleName, action } = body
+    return this.keycloakRealm.updateRealmRoles(tenantName, roleName, action, token);
+  }
+  deleteRole(body: DeleteRoleDto, token: string) {
+    const { tenantName, roleName } = body
+    return this.keycloakRealm.deleteRealmRoles(tenantName, roleName, token);
   }
   createPolicy(body: PolicyDto, token: string) {
     return this.keycloakAuthPolicy.createPolicy(body, token);
@@ -125,5 +142,15 @@ export class AppService {
   }
   createPermission(body: PermissionDto, token: string) {
     return this.keycloakAuthPermission.createPermission(body, token);
+  }
+  getPermissions(query: GetPermissionsDto, token: string) {
+    const { tenantName, clientName } = query;
+    return this.keycloakAuthPermission.getPermissions(tenantName, clientName, token);
+  }
+  updatePermission(body: UpdatePermissionDto, token: string) {
+    return this.keycloakAuthPermission.updatePermission(body, token);
+  }
+  deletePermission(body: DeletePermissionDto, token: string) {
+    return this.keycloakAuthPermission.deletePermission(body, token);
   }
 }

@@ -4,7 +4,7 @@ import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { Keycloak } from "./keycloak";
 import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
-import { UserDetailsDto, UsersQueryDto } from "../dto";
+import { GetUsersInfoDto, UserDetailsDto, UsersQueryDto } from "../dto";
 import RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/roleRepresentation";
 
 @Injectable()
@@ -102,7 +102,8 @@ export class KeycloakUser {
         };
     };
 
-    public async getUserInfo(tenantName: string, userName: string, token: string) {
+    public async getUserInfo(query: GetUsersInfoDto, token: string) {
+        const { tenantName, userName, clientName } = query;
         const kcClient: KcAdminClient = new KcAdminClient({
             baseUrl: this.keycloakServer,
             realmName: tenantName,
@@ -119,11 +120,13 @@ export class KeycloakUser {
         };
         const createdTimestamp = this.formatTimeStamp(userInfo[0]);
         const roles = await this.getUserRoles(kcClient, { id: userInfo[0].id });
+        const permissions = await this.getUserPermission(kcClient, { id: userInfo[0].id }, clientName);
         return {
             ...userInfo[0],
             createdTimestamp,
             tenantName,
-            roles
+            roles,
+            permissions
         };
     };
 
@@ -249,6 +252,37 @@ export class KeycloakUser {
         });
         const rolesName = roles.map(role => role.name)
         return rolesName;
+    };
+
+    private async getUserPermission(Kcclient: KcAdminClient, user: { id: string }, clientName: string) {
+        const client = await Kcclient.clients.find({
+            clientId: clientName
+        });
+
+        let evaluation: any = await Kcclient.clients.evaluateResource(
+            {
+                id: client[0].id,
+            },
+            {
+                userId: user.id,
+                entitlements: false,
+                context: {
+                    attributes: {}
+                }
+            }
+
+        );
+
+        evaluation = evaluation.results;
+        let permissions: string[] = [];
+        for (let elements of evaluation) {
+            if (elements.status === 'PERMIT') {
+                elements = elements.policies;
+                let c = elements.map((element: any) => element.policy.name)
+                permissions.push(...c);
+            }
+        }
+        return permissions;
     };
 
     private formatTimeStamp(user: UserRepresentation): string {

@@ -117,7 +117,6 @@ export class AppController {
     try {
       const tenantName = req.query.tenant as string;
       const redirectUrl = this.appService.createRedirectUrl(tenantName);
-      res.send(redirectUrl);
       res.redirect(redirectUrl);
     } catch (e) {
       return e;
@@ -133,11 +132,11 @@ export class AppController {
   @Roles(['admin'])
   async registerTenant(@Body() body: RegisterTenantDto, @Req() req: Request, @Res() res: Response) {
     try {
-      let { tenantName, email, password } = body;
+      let { tenantName, email, password, clientDetails } = body;
       const token = req.headers['authorization'];
 
       await this.appService.createRealm({ tenantName, email, password }, token);
-      const client = await this.appService.createClient({ tenantName }, token);
+      const client = await this.appService.createClient({ tenantName, clientDetails }, token);
 
       const response = this.appService.register({ ...body, ...client });
       response.subscribe((result) => { res.send(result) });
@@ -177,14 +176,15 @@ export class AppController {
   @Get('tenants')
   @ApiTags('Tenants')
   @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiQuery({ name: 'isDeleted', type: 'boolean', required: false })
   @ApiQuery({ name: 'tenantName', type: 'string', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
   listAllTenant(@Req() req: Request, @Res() res: Response) {
     try {
-      const { tenantName, page } = req.query as any;
-      const response = this.appService.listAllTenant(tenantName, page);
+      const { tenantName, isDeleted, page } = req.query as any;
+      const response = this.appService.listAllTenant(tenantName, isDeleted, page);
       response.subscribe(async (result) => {
         const [data, count] = result;
         res.send({ data, count })
@@ -368,21 +368,6 @@ export class AppController {
       else if (e.status) {
         res.status(e.status).send(e.response);
       }
-    }
-  }
-
-  @Post('client')
-  @ApiTags('Keycloak')
-  @ApiBody({ type: ClientDto })
-  @ApiBearerAuth()
-  @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  async tenantClient(@Req() req: Request, @Res() res: Response) {
-    try {
-      const token = req.headers['authorization'];
-      res.send(await this.appService.createClient(req.body, token));
-    } catch (e) {
-      res.status(e.response.status).send(e.response.data);
     }
   }
 
@@ -584,6 +569,20 @@ export class AppController {
     }
   }
 
+  @Post('client')
+  @ApiTags('Keycloak')
+  @ApiBody({ type: ClientDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async tenantClient(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      res.send(await this.appService.createClient(req.body, token));
+    } catch (e) {
+      res.status(e.response.status).send(e.response.data);
+    }
+  }
 
   @Post('resource')
   @ApiTags('Keycloak')

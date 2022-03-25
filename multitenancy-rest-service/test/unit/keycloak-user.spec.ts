@@ -29,6 +29,24 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         name: 'name'
                     }),
                 },
+                clients: {
+                    find: jest.fn().mockResolvedValue([
+                        {
+                            id: 'id',
+                            clientId: 'test-client',
+                        }
+                    ]),
+                    evaluateResource: jest.fn().mockResolvedValue({
+                        results: [{
+                            status: 'PERMIT',
+                            policies: [{
+                                policy: {
+                                    name: 'sample-permission'
+                                }
+                            }]
+                        }]
+                    })
+                },
                 setAccessToken: jest.fn()
             };
         })
@@ -85,15 +103,17 @@ describe('Testing Keycloak User Service', () => {
     it('Testing "getUserInfo" method', async () => {
         const tenantName = 'string';
         const userName = 'string';
+        const clientName = 'string';
         const token: string = 'Bearer token';
 
-        const response = await keycloakUserService.getUserInfo(tenantName, userName, token);
+        const response = await keycloakUserService.getUserInfo({ tenantName, userName, clientName }, token);
         expect(response).toEqual({
             username: 'sample-user',
             email: 'sample-email',
             createdTimestamp: '2022/03/21 17:59:39',
             tenantName: 'string',
-            roles: ['sample-role']
+            roles: ['sample-role'],
+            permissions: ['sample-permission']
         });
     });
 

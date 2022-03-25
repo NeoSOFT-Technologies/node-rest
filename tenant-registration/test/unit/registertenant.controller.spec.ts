@@ -59,9 +59,14 @@ describe('Testing RegisTration MicroService Controller', () => {
   });
 
   it('Testing listAllTenant', async () => {
+    const query = {
+      tenantName: 'tenantName',
+      isDeleted: true,
+      page: 1,
+    };
     const mockMessage = { Message: 'All Tenant received Successfully' };
     mockRegistertenantService.listAll.mockResolvedValue(mockMessage);
-    expect(await registertenantController.listAllTenant(1)).toEqual(
+    expect(await registertenantController.listAllTenant(query)).toEqual(
       mockMessage,
     );
   });

@@ -129,6 +129,7 @@ describe('Testing AppController', () => {
             email: 'tenant@gmail.com',
             password: 'tenant123',
             description: 'This is tenant Database',
+            clientDetails: { clientId: 'clientId' }
         }
         mockRequest.headers = {
             authorization: 'Bearer token'
@@ -137,13 +138,13 @@ describe('Testing AppController', () => {
         const createRealm = jest.spyOn(appService, 'createRealm');
         const createClient = jest.spyOn(appService, 'createClient');
         await appController.registerTenant(mockBody, mockRequest, mockResponse);
-        const { tenantName, email, password } = mockBody;
+        const { tenantName, email, password, clientDetails } = mockBody;
         expect(mockSubscribe).toHaveBeenCalled();
         expect(createRealm).toHaveBeenCalledWith(
             { tenantName, email, password },
             mockRequest.headers['authorization']);
         expect(createClient).toHaveBeenCalledWith(
-            { tenantName },
+            { tenantName, clientDetails },
             mockRequest.headers['authorization']);
         mockSubscribe.mockRestore();
     });

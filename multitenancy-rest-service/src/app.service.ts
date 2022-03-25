@@ -68,8 +68,8 @@ export class AppService {
 
     return { clientId, clientSecret }
   }
-  listAllTenant(tenantName: string, page: number) {
-    return this.client1.send({ cmd: 'list-all-tenant' }, { tenantName, page });
+  listAllTenant(tenantName: string, isDeleted: boolean, page: number) {
+    return this.client1.send({ cmd: 'list-all-tenant' }, { tenantName, isDeleted, page });
   }
   updateDescription(tenantname: string, newdescription: string) {
     return this.client1.send({ cmd: 'update-description' }, { tenantname, newdescription });
@@ -95,8 +95,10 @@ export class AppService {
     return this.keycloakUser.getUsers(data);
   }
   userInfo(query: GetUsersInfoDto, token: string) {
-    const { tenantName, userName } = query;
-    return this.keycloakUser.getUserInfo(tenantName, userName, token);
+    if (!query.clientName) {
+      query.clientName = this.keycloakClient.defaultClientDetails().clientId;
+    }
+    return this.keycloakUser.getUserInfo(query, token);
   }
   updateUser(body: UpdateUserDto, token: string) {
     const { tenantName, userName, action } = body;
@@ -144,7 +146,10 @@ export class AppService {
     return this.keycloakAuthPermission.createPermission(body, token);
   }
   getPermissions(query: GetPermissionsDto, token: string) {
-    const { tenantName, clientName } = query;
+    let { tenantName, clientName } = query;
+    if (!clientName) {
+      clientName = this.keycloakClient.defaultClientDetails().clientId;
+    }
     return this.keycloakAuthPermission.getPermissions(tenantName, clientName, token);
   }
   updatePermission(body: UpdatePermissionDto, token: string) {

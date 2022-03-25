@@ -57,14 +57,29 @@ export class RegistertenantService {
     }
   }
 
-  listAll(tenantName = '', page = 1): Promise<[Tenant[], number]> {
-    return this.tenantRepository.findAndCount({
-      where: {
-        tenantName: Like(`%${tenantName}%`),
-      },
-      take: 10,
-      skip: 10 * (page - 1),
-    });
+  listAll(
+    tenantName = '',
+    isDeleted = '',
+    page = 1,
+  ): Promise<[Tenant[], number]> {
+    if ((isDeleted = '')) {
+      return this.tenantRepository.findAndCount({
+        where: {
+          tenantName: Like(`%${tenantName}%`),
+        },
+        take: 10,
+        skip: 10 * (page - 1),
+      });
+    } else {
+      return this.tenantRepository.findAndCount({
+        where: {
+          tenantName: Like(`%${tenantName}%`),
+          isDelete: isDeleted === 'true',
+        },
+        take: 10,
+        skip: 10 * (page - 1),
+      });
+    }
   }
 
   async updateDescription(tenantname: string, newdescription: string) {

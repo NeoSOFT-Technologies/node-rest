@@ -35,9 +35,9 @@ export class RegistertenantController {
   }
 
   @MessagePattern({ cmd: 'list-all-tenant' })
-  async listAllTenant({ tenantName, page }) {
+  async listAllTenant({ tenantName, isDeleted, page }) {
     try {
-      return await this.tenantService.listAll(tenantName, page);
+      return await this.tenantService.listAll(tenantName, isDeleted, page);
     } catch (e) {
       return e;
     }

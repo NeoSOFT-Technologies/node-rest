@@ -165,10 +165,11 @@ API Endpoint:  `/api/tenant`
     | Authorization | Bearer [ACCESS_TOKEN] |
 
 2. Request Query
-    | Name                   | Description                | Type   |
-    |------------------------|----------------------------|--------|
-    | tenantName<br>optional | name of the tenant(search) | string |
-    | page<br>optional       | page number                | number |
+    | Name                   | Description                | Type    |
+    |------------------------|----------------------------|---------|
+    | tenantName<br>optional | name of the tenant(search) | string  |
+    | isDeleted<br>optional  | tenant is deleted          | boolean |
+    | page<br>optional       | page number                | number  |
 
 
 **Output:** Produces `application/json` which contains the array of the following schema
@@ -412,7 +413,8 @@ API Endpoint:  `/api/user-info`
 | createdTimestamp| time of creation of user                     |
 | userName        | name of user                                 |
 | email           | email of user                                |
-| roles           | roles assigned to new user                   |
+| roles           | roles assigned to user                       |
+| permission      | permission granted to user                   |
 ---
 **16. Updating a User**
 

@@ -152,10 +152,11 @@ describe('Testing AppService', () => {
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
         });
+        const tenantName = 'tenantName';
+        const isDeleted = true;
         const page = 1;
-        const searchQuery = 'tenantName';
         const mocklistAllTenant = jest.spyOn(mockClient1, 'send');
-        const response = appService.listAllTenant(searchQuery, page );
+        const response = appService.listAllTenant(tenantName, isDeleted, page);
 
         expect(mocklistAllTenant).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));
@@ -277,7 +278,8 @@ describe('Testing AppService', () => {
     it('Testing "userInfo"', async () => {
         const query = {
             tenantName: 'tenantName',
-            usertName: 'usertName',
+            userName: 'userName',
+            clientName: 'clientName',
         };
         const token = 'Bearer token';
         const mockgetUserInfo = jest.spyOn(keycloakUser, 'getUserInfo');

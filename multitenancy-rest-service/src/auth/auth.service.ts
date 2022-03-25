@@ -24,10 +24,6 @@ export class AuthService {
             clientId = 'admin-cli'
         }
 
-        if (!username && clientId && clientSecret) {
-            username = 'tenantadmin'
-        }
-
         this.tokenURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/token`;
         const params: string = stringify({
             username,

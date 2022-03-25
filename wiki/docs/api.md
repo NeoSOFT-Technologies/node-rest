@@ -22,6 +22,7 @@ API Endpoint:  `/api/login`
     | Name                     | Description             | Type   |
     |--------------------------|-------------------------|--------|
     | tenantName<br>required   | Username of the tenant  | string |
+    | username<br>required     | Username of the tenant  | string |
     | password<br>required     | Password of that tenant | string |
 
 
@@ -149,9 +150,36 @@ API Endpoint:  `/api/forgot-password`
 **Output:** After hitting this API , the user will be redirected to keycloak UI.
 
 ---
+## /api/admin
+
+**7. Admin Info**
+
+Request Method:  `GET`  
+API Endpoint:  `/api/admin`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+**Output:** Produces `application/json` of the following schema
+| Name            | Description                                  |
+|-----------------|----------------------------------------------|
+| id              | id of table row                              |
+| createdTimestamp| time of creation of user                     |
+| userName        | name of user                                 |
+| email           | email of user                                |
+| roles           | roles assigned to user                       |
+| tenants         | all the tenants details (array)              |
+| count           | total number of tenants                      |
+
+---
 ## /api/tenant
 
-**7. Tenant List**
+**8. Tenant List**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/tenant`
@@ -187,7 +215,7 @@ API Endpoint:  `/api/tenant`
 
 ---
 
-**8. Tenant Details**
+**9. Tenant Details**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/tenant/:id`
@@ -219,7 +247,7 @@ API Endpoint:  `/api/tenant/:id`
 | policy          | policies of tenant            |
 
 ---
-**9. Create new Tenant**
+**10. Create new Tenant**
 
 Request Method:  `POST`  
 API Endpoint:  `/api/tenant`
@@ -248,7 +276,7 @@ API Endpoint:  `/api/tenant`
 |----------|-----------------------------|
 | message  | success                     |
 ---
-**10. Updating a Tenant**
+**11. Updating a Tenant**
 
 Request Method:  `PATCH`  
 API Endpoint: `/api/tenant`
@@ -275,7 +303,7 @@ API Endpoint: `/api/tenant`
 The `affected` key value 1 means the updation is successfull otherwise it is 0  
 
 ---
-**11. Deleting a Tenant**
+**12. Deleting a Tenant**
 
 Request Method: `DELETE`  
 API Endpoint:  `/api/tenant/{tenantName}`
@@ -304,7 +332,7 @@ The `affected` key value 1 means the updation is successfull otherwise it is 0
 ---
 ## /api/tenant/config
 
-**12. Tenant Configurations**
+**13. Tenant Configurations**
 
 Request Method:  `GET`  
 API Endpoint: `/api/tenant/config/:id`
@@ -334,7 +362,7 @@ API Endpoint: `/api/tenant/config/:id`
 ---
 ## /api/user
 
-**13. Create New User**
+**14. Create New User**
 
 Request Method:  `POST`  
 API Endpoint: `/api/user`
@@ -362,7 +390,7 @@ API Endpoint: `/api/user`
 | message    | success        |
 
 ---
-**14. User List**
+**15. User List**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/user`
@@ -389,7 +417,7 @@ API Endpoint:  `/api/user`
 | count     | total number of users of that tenant         |
 
 ---
-**15. User Info**
+**16. User Info**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/user-info`
@@ -413,10 +441,11 @@ API Endpoint:  `/api/user-info`
 | createdTimestamp| time of creation of user                     |
 | userName        | name of user                                 |
 | email           | email of user                                |
+| tenanTName      | tenant of that user                          |
 | roles           | roles assigned to user                       |
 | permission      | permission granted to user                   |
 ---
-**16. Updating a User**
+**17. Updating a User**
 
 Request Method:  `PATCH`  
 API Endpoint: `/api/user`
@@ -445,7 +474,7 @@ API Endpoint: `/api/user`
 
 ---
 
-**17. Deleting a User**
+**18. Deleting a User**
 
 Request Method: `DELETE`  
 API Endpoint:  `/api/user/{userName}`
@@ -473,7 +502,7 @@ API Endpoint:  `/api/user/{userName}`
 ---
 ## /api/roles
 
-**18. Create New Role**
+**19. Create New Role**
 
 Request Method:  `POST`  
 API Endpoint: `/api/roles`
@@ -499,7 +528,7 @@ API Endpoint: `/api/roles`
 | message    | success        |
 
 ---
-**19. Available Realm Role**
+**20. Available Realm Role**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/roles`
@@ -523,7 +552,7 @@ API Endpoint:  `/api/roles`
 | roles     | array of available roles                     |
 
 ---
-**20. Role Info**
+**21. Role Info**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/role-info`
@@ -550,7 +579,7 @@ API Endpoint:  `/api/role-info`
 | description     | description of role                          |
 
 ---
-**21. Update Realm Role**
+**22. Update Realm Role**
 
 Request Method:  `PATCH`  
 API Endpoint: `/api/roles`
@@ -578,7 +607,7 @@ API Endpoint: `/api/roles`
 |------------|--------------|
 | message    | success      |
 ---
-**22. Delete Realm Role**
+**23. Delete Realm Role**
 
 Request Method: `DELETE`  
 API Endpoint:  `/api/roles/{tenantName}/{roleName}`
@@ -608,7 +637,7 @@ API Endpoint:  `/api/roles/{tenantName}/{roleName}`
 ---
 ## /api/permission
 
-**23. Create New Permission**
+**24. Create New Permission**
 
 Request Method:  `POST`  
 API Endpoint: `/api/permission`
@@ -636,7 +665,7 @@ API Endpoint: `/api/permission`
 | message    | success        |
 
 ---
-**24. Get Client Permissions**
+**25. Get Client Permissions**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/permission`
@@ -661,7 +690,7 @@ API Endpoint:  `/api/permission`
 | permission| array of client permission with details      |
 
 ---
-**25. Update Client Permission**
+**26. Update Client Permission**
 
 Request Method:  `PATCH`  
 API Endpoint: `/api/permission`
@@ -691,7 +720,7 @@ API Endpoint: `/api/permission`
 |------------|--------------|
 | message    | success      |
 ---
-**26. Delete Client Permission**
+**27. Delete Client Permission**
 
 Request Method: `DELETE`  
 API Endpoint:  `/api/roles/{tenantName}/{clientName}/{permissionName}-{permissionType}`
@@ -723,7 +752,7 @@ API Endpoint:  `/api/roles/{tenantName}/{clientName}/{permissionName}-{permissio
 ---
 ## Testing API's
 
-**27. Test Tenant's connectivity with database**
+**28. Test Tenant's connectivity with database**
 
 Request Method: `GET`  
 API Endpoint:  `/api/connect-database`
@@ -750,7 +779,7 @@ API Endpoint:  `/api/connect-database`
 
 ---
 
-**28. Test Creation of Table in Tenant's Database**
+**29. Test Creation of Table in Tenant's Database**
 
 Request Method: `POST`  
 API Endpoint:  `/api/create-table`

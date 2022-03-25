@@ -64,6 +64,11 @@ describe('Testing Keycloak User Service', () => {
         keycloakUserService = module.get<KeycloakUser>(KeycloakUser);
     });
 
+    it('Testing "createAdminUser" method', async () => {
+        const response = await keycloakUserService.createAdminUser('string', 'string', 'string');
+        expect(response.id).toEqual('id');
+    });
+
     it('Testing "createUser" method', async () => {
         const mockTenantCredentials = {
             tenantName: 'string',
@@ -138,8 +143,16 @@ describe('Testing Keycloak User Service', () => {
         expect(response).toEqual('User deleted Successfully');
     });
 
-    it('Testing "createAdminUser" method', async () => {
-        const response = await keycloakUserService.createAdminUser('string', 'string', 'string');
-        expect(response.id).toEqual('id');
+    it('Testing "getAdminDetails" method', async () => {
+        const userName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakUserService.getAdminDetails(userName, token);
+        expect(response).toEqual({
+            username: 'sample-user',
+            email: 'sample-email',
+            createdTimestamp: '2022/03/21 17:59:39',
+            roles: ['sample-role'],
+        });
     });
 });

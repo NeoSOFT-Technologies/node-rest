@@ -39,6 +39,7 @@ describe('Testing AppController', () => {
         deleteTenant: jest.fn(() => of(mockMessage)),
         createTable: jest.fn(() => of(mockMessage)),
         createRealm: jest.fn(),
+        getAdminDetails: jest.fn(),
         createUser: jest.fn(),
         listAllUser: jest.fn(),
         userInfo: jest.fn(),
@@ -63,7 +64,8 @@ describe('Testing AppController', () => {
         getAccessToken: jest.fn().mockResolvedValue('token'),
         logout: jest.fn().mockResolvedValue('204'),
         refreshAccessToken: jest.fn().mockResolvedValue('token'),
-        getUserName: jest.fn(),
+        getTenantName: jest.fn().mockResolvedValue('tenantName'),
+        getUserName: jest.fn().mockResolvedValue('userName'),
         checkUserRole: jest.fn().mockResolvedValue(false),
     };
 
@@ -121,6 +123,20 @@ describe('Testing AppController', () => {
         await appController.refreshAccessToken(mockBody, mockResponse);
         expect(mockrefreshAccessToken).toHaveBeenCalled();
         mockrefreshAccessToken.mockRestore();
+    });
+
+    it('Testing appcontroller "adminDetails"', async () => {
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+
+        const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const getAdminDetails = jest.spyOn(appService, 'getAdminDetails');
+        await appController.adminDetails(mockRequest, mockResponse);
+        expect(getAdminDetails).toHaveBeenCalled();
+        expect(mockSubscribe).toHaveBeenCalled();
+        getAdminDetails.mockRestore();
+        mockSubscribe.mockRestore();
     });
 
     it('Testing appcontroller "registerTenant"', async () => {
@@ -268,7 +284,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "deleteUser"', async () => {
         mockRequest.params = {
             tenantName: 'tenantName',
-            userName: 'userName',
+            userName: 'username',
         };
 
         mockRequest.headers = {

@@ -28,10 +28,13 @@ export class AppController {
   @ApiBody({ type: CredentialsDto })
   async login(@Body() body: CredentialsDto, @Res() res: Response) {
     try {
-      const { tenantName } = body;
+      const { tenantName, username } = body;
       let response: { clientId: string, clientSecret: string };
 
-      if (tenantName) {
+      if (tenantName && !username) {
+        throw new HttpException('Please enter userName', HttpStatus.BAD_REQUEST);
+      }
+      else if (tenantName) {
         response = await this.appService.clientIdSecret(tenantName);
       }
       res.send((await this.authService.getAccessToken({ ...body, ...response })).data);
@@ -118,6 +121,31 @@ export class AppController {
       const tenantName = req.query.tenant as string;
       const redirectUrl = this.appService.createRedirectUrl(tenantName);
       res.redirect(redirectUrl);
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @Get('admin')
+  @ApiTags('Admin')
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles(['admin'])
+  async adminDetails(@Req() req: Request, @Res() res: Response) {
+    try {
+      const token = req.headers['authorization'];
+      const userName = await this.authService.getUserName(token);
+
+      let adminDetails = await this.appService.getAdminDetails(userName, token);
+      const response = this.appService.listAllTenant(undefined, undefined, undefined);
+      response.subscribe(async (result) => {
+        const [tenants, count] = result;
+        res.send({
+          ...adminDetails,
+          tenants,
+          count
+        });
+      });
     } catch (e) {
       return e;
     }
@@ -296,6 +324,9 @@ export class AppController {
       if (e.response.statusCode) {
         res.status(e.response.statusCode).send(e.response.message);
       }
+      else if (e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
       else if (e.status) {
         res.status(e.status).send(e.response);
       }
@@ -351,11 +382,10 @@ export class AppController {
   async deleteUser(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
-      if (!req.params.tenantName) {
-        req.params.tenantName = await this.authService.getTenantName(token);
-      }
-      if (!req.params.userName) {
-        throw new HttpException('Please enter userName', HttpStatus.BAD_REQUEST);
+      req.params.tenantName = await this.authService.getTenantName(token);
+      const userName = await this.authService.getUserName(token);
+      if (userName === req.params.userName) {
+        throw new HttpException('Not Allowed', HttpStatus.FORBIDDEN);
       }
       res.send(await this.appService.deleteUser(req.params as any, token));
     } catch (e) {
@@ -480,12 +510,6 @@ export class AppController {
   @Roles(['admin'])
   async deleteRole(@Req() req: Request, @Res() res: Response) {
     try {
-      if (!req.params.tenantName) {
-        throw new HttpException('Please enter tenantName', HttpStatus.BAD_REQUEST);
-      }
-      if (!req.params.roleName) {
-        throw new HttpException('Please enter roleName', HttpStatus.BAD_REQUEST);
-      }
       const token = req.headers['authorization'];
       res.send(await this.appService.deleteRole(req.params as any, token));
     } catch (e) {

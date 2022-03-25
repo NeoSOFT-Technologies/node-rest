@@ -87,6 +87,9 @@ export class AppService {
     const { tenantName, email, password } = tenantDetails;
     return this.keycloakRealm.createRealm(tenantName, email, password, token);
   }
+  getAdminDetails(userName: string, token: string) {
+    return this.keycloakUser.getAdminDetails(userName, token);
+  }
   createUser(body: TenantUserDto, token: string) {
     const { userDetails, ...user } = body;
     return this.keycloakUser.createUser(user, userDetails, token);

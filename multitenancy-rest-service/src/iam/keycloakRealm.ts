@@ -26,7 +26,7 @@ export class KeycloakRealm {
         const parts = token.split(' ')
         this.kcMasterAdminClient.setAccessToken(parts[1]);
 
-        const tenantRealm: Realm = await this.createTenantRealm(realmName,email);
+        const tenantRealm: Realm = await this.createTenantRealm(realmName, email);
         const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, email, password);
         const adminRole: RoleRepresentation = await this.createAdminRealmRole(tenantRealm);
         await this.createCompositeRole(tenantRealm, adminRole);

@@ -35,6 +35,7 @@ describe('Testing AppService', () => {
         getUserInfo: jest.fn(),
         updateUser: jest.fn(),
         deleteUser: jest.fn(),
+        getAdminDetails: jest.fn(),
     };
 
     const mockKeycloakRealm = {
@@ -240,6 +241,16 @@ describe('Testing AppService', () => {
 
         expect(mockcreateRealm).toHaveBeenCalled();
         mockcreateRealm.mockRestore();
+    });
+
+    it('Testing "getAdminDetails"', async () => {
+        const userName = 'userName';
+        const token = 'Bearer token';
+        const getAdminDetails = jest.spyOn(keycloakUser, 'getAdminDetails');
+        appService.getAdminDetails(userName, token);
+
+        expect(getAdminDetails).toHaveBeenCalled();
+        getAdminDetails.mockRestore();
     });
 
     it('Testing "createUser"', async () => {

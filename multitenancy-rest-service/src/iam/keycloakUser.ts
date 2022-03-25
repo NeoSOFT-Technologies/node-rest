@@ -113,7 +113,8 @@ export class KeycloakUser {
 
         const userInfo: UserRepresentation[] = await kcClient.users.find({
             username: userName,
-            briefRepresentation: true
+            briefRepresentation: true,
+            exact: true
         });
         if (!userInfo[0]) {
             throw new NotFoundException('User not found');
@@ -139,7 +140,8 @@ export class KeycloakUser {
         kcClient.setAccessToken(parts[1]);
 
         const user: UserRepresentation[] = await kcClient.users.find({
-            username: userName
+            username: userName,
+            exact: true
         });
         if (!user[0]) {
             throw new NotFoundException('User not found');
@@ -192,7 +194,8 @@ export class KeycloakUser {
         kcTenantAdminClient.setAccessToken(parts[1]);
 
         const user: UserRepresentation[] = await kcTenantAdminClient.users.find({
-            username: userName
+            username: userName,
+            exact: true
         });
 
         if (!user[0]) {
@@ -204,6 +207,28 @@ export class KeycloakUser {
         });
 
         return 'User deleted Successfully';
+    };
+
+    public async getAdminDetails(userName: string, token: string) {
+        const kcAdminClient: KcAdminClient = new KcAdminClient({
+            baseUrl: this.keycloakServer,
+            realmName: 'master',
+        });
+        const parts = token.split(' ')
+        kcAdminClient.setAccessToken(parts[1]);
+
+        const adminInfo = await kcAdminClient.users.find({
+            username: userName,
+            briefRepresentation: true,
+            exact: true
+        })
+        const createdTimestamp = this.formatTimeStamp(adminInfo[0]);
+        const roles = await this.getUserRoles(kcAdminClient, { id: adminInfo[0].id });
+        return {
+            ...adminInfo[0],
+            createdTimestamp,
+            roles,
+        };
     };
 
     private async createUserRole(client: KcAdminClient, role: string): Promise<RoleRepresentation> {

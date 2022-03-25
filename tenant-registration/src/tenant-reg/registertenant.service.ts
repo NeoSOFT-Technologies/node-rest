@@ -99,12 +99,14 @@ export class RegistertenantService {
     const tenant: Tenant = await this.tenantRepository.findOneOrFail({
       where: {
         tenantName: tenantname,
+        isDelete: false,
       },
     });
 
-    return this.tenantRepository.update(tenant.id, {
+    await this.tenantRepository.update(tenant.id, {
       ...tenant,
       isDelete: true,
     });
+    return 'Tenant Deleted Successfully';
   }
 }

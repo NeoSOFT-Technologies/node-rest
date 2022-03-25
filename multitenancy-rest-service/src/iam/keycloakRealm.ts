@@ -134,6 +134,14 @@ export class KeycloakRealm {
     };
 
 
+    public async deleteRealm(tenantname: string, token:string): Promise<any> {
+        const parts = token.split(' ');
+        this.kcMasterAdminClient.setAccessToken(parts[1]);
+        await this.kcMasterAdminClient.realms.del({
+            realm: tenantname
+        });        
+    }
+    
     private async createTenantRealm(realmName: string, email: string): Promise<Realm> {
         return await this.kcMasterAdminClient.realms.create({
             id: realmName,

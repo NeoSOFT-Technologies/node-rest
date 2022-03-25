@@ -74,7 +74,8 @@ export class AppService {
   updateDescription(tenantname: string, newdescription: string) {
     return this.client1.send({ cmd: 'update-description' }, { tenantname, newdescription });
   }
-  deleteTenant(tenantname: string) {
+  async deleteTenant(tenantname: string, token: string) {
+    await this.keycloakRealm.deleteRealm(tenantname, token);
     return this.client1.send({ cmd: 'soft-delete' }, tenantname);
   }
   connect(dbdetails: DbDetailsDto) {

@@ -244,11 +244,12 @@ export class AppController {
   @ApiParam({ name: 'tenantName', type: 'string', required: true })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  deleteTenant(@Req() req: Request, @Res() res: Response) {
+  @Roles(['admin', 'tenantadmin'])
+  async deleteTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.params.tenantName;
-      const response = this.appService.deleteTenant(tenantname);
+      const token = req.headers['authorization'];
+      const response = await this.appService.deleteTenant(tenantname, token);
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
       return e;

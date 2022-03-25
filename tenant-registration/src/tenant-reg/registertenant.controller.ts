@@ -16,7 +16,7 @@ export class RegistertenantController {
     try {
       if (await this.identifierService.identify(tenant)) {
         return {
-          status: 'this tenant already exists',
+          status: 'This tenant already exists',
         };
       }
       return await this.tenantService.register(tenant);

@@ -145,6 +145,8 @@ describe('Testing AppController', () => {
             email: 'tenant@gmail.com',
             password: 'tenant123',
             description: 'This is tenant Database',
+            databaseName: 'tenant_db',
+            databaseDescription: 'This is database description',
             clientDetails: { clientId: 'clientId' }
         }
         mockRequest.headers = {

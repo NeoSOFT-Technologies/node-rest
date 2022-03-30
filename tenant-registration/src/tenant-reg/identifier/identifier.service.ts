@@ -16,7 +16,7 @@ export class IdentifierService {
       where: {
         tenantName: tenant.tenantName,
         email: tenant.email,
-        isDelete: false,
+        isDeleted: false,
       },
     });
   }

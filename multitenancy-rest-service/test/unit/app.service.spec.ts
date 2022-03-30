@@ -45,6 +45,7 @@ describe('Testing AppService', () => {
         getRealmRoleInfo: jest.fn(),
         updateRealmRoles: jest.fn(),
         deleteRealmRoles: jest.fn(),
+        deleteRealm: jest.fn()
     };
 
     const mockKeycloakAuthResource = {
@@ -121,6 +122,8 @@ describe('Testing AppService', () => {
             email: 'string',
             password: 'string',
             description: 'string',
+            databaseName: 'string',
+            databaseDescription: 'string',
             clientDetails: {
                 clientId: 'clientid'
             }
@@ -201,8 +204,9 @@ describe('Testing AppService', () => {
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
         });
+        const token = 'Bearer Token'
         const mocklistAllTenant = jest.spyOn(mockClient1, 'send');
-        const response = appService.deleteTenant(tenantName);
+        const response = await appService.deleteTenant(tenantName, token);
 
         expect(mocklistAllTenant).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));

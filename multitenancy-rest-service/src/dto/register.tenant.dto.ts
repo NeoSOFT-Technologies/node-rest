@@ -34,6 +34,14 @@ export class RegisterTenantDto {
   @IsNotEmpty()
   description: string;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  databaseName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  databaseDescription: string;
+  
   @ApiHideProperty()
   createdDateTime?: string;
 

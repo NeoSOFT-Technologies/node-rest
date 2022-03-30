@@ -18,7 +18,7 @@ import { UpdateUserDto } from "./user.update.dto";
 import { PermissionDto } from "./permission.dto";
 import { CreateRealmDto } from "./create.realm.dto";
 import { RefreshAccessTokenDto } from "./refresh.access-token.dto";
-import { GetUsersInfoDto } from "./user.getInfo.dto";
+import { GetUsersInfoDto } from "./user.getinfo.dto";
 import { CreateRoleDto } from "./create.role.dto";
 import { UpdateRoleDto } from "./update.role.dto";
 import { DeleteRoleDto } from "./delete.role.dto";

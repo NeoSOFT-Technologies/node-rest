@@ -74,7 +74,7 @@ export class RegistertenantService {
       return this.tenantRepository.findAndCount({
         where: {
           tenantName: Like(`%${tenantName}%`),
-          isDelete: isDeleted === 'true',
+          isDeleted: isDeleted === 'true',
         },
         take: 10,
         skip: 10 * (page - 1),
@@ -99,13 +99,13 @@ export class RegistertenantService {
     const tenant: Tenant = await this.tenantRepository.findOneOrFail({
       where: {
         tenantName: tenantname,
-        isDelete: false,
+        isDeleted: false,
       },
     });
 
     await this.tenantRepository.update(tenant.id, {
       ...tenant,
-      isDelete: true,
+      isDeleted: true,
     });
     return 'Tenant Deleted Successfully';
   }

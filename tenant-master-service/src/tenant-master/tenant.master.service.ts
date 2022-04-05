@@ -12,8 +12,8 @@ export class TenantMasterService {
     const tenant = {
       tenantName: tenantDetails.tenantName,
       password: tenantDetails.password,
+      databaseName: tenantDetails.databaseName,
     };
-
     const message = this.client1.send({ cmd: 'create-database' }, tenant);
     const databaseName: string = await new Promise((res) => {
       message.subscribe((next) => {
@@ -23,7 +23,7 @@ export class TenantMasterService {
 
     const Tenantconfig: TenantDetailsDto = {
       ...tenantDetails,
-      tenantDbName: databaseName,
+      databaseName,
       host: '127.0.0.1',
       port: 3306,
     };

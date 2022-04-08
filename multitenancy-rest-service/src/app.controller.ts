@@ -170,17 +170,17 @@ export class AppController {
     }
   }
 
-  @Get('tenants/:id')
+  @Get('tenants/:tenantName')
   @ApiTags('Tenants')
-  @ApiParam({ name: 'id', required: true, type: Number })
+  @ApiParam({ name: 'tenantName', required: true, type: String })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
   getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
-      const tenantId: number = +req.params.id;
+      const tenantName: String = req.params.tenantName;
 
-      const response = this.appService.getTenantConfig(tenantId);
+      const response = this.appService.getTenantConfig(tenantName);
       const observer = {
         next: async (result: any) => res.send(result),
         error: async (error: any) => {

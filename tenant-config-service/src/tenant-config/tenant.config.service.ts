@@ -15,15 +15,15 @@ export class TenantConfigService {
     return await this.configRepository.save(tenantconfig);
   }
 
-  async getConfig(tenantId: number) {
+  async getConfig(tenantName: string) {
     try {
       return await this.configRepository.findOneOrFail({
         where: {
-          tenantId: tenantId,
+          tenantName: tenantName,
         },
       });
     } catch (error) {
-      throw new NotFoundException('Incorrect ID');
+      throw new NotFoundException('Incorrect Tenant name entered');
     }
   }
 }

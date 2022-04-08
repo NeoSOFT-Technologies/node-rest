@@ -42,8 +42,8 @@ export class AppService {
     this.redirectUrl = `${this.keycloakRedirectUrl}/admin/${tenantName}/console/`;
     return this.redirectUrl;
   }
-  getTenantConfig(id: number) {
-    return this.client2.send({ cmd: 'get_config' }, id);
+  getTenantConfig(tenantName: String) {
+    return this.client2.send({ cmd: 'get_config' }, tenantName);
   }
   async clientIdSecret(tenantName: string) {
     let clientId: string;

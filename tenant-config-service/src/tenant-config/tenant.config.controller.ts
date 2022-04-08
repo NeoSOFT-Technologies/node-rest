@@ -20,16 +20,9 @@ export class TenantConfigController {
   }
 
   @MessagePattern({ cmd: 'get_config' })
-  async getConfig(tenantId: number) {
+  async getConfig(tenantName: string) {
     try {
-      const isIntegerValue = Number.isInteger(tenantId);
-      if (!isIntegerValue) {
-        throw new HttpException(
-          'Please enter an integer value',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
-      }
-      return await this.tenantConfigService.getConfig(tenantId);
+      return await this.tenantConfigService.getConfig(tenantName);
     } catch (e) {
       throw new RpcException(e);
     }

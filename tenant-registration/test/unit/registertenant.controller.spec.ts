@@ -11,6 +11,8 @@ describe('Testing RegisTration MicroService Controller', () => {
     email: 'string',
     password: 'string',
     description: 'string',
+    databaseName: 'string',
+    databaseDescription: 'string',
     clientId: 'string',
     clientSecret: 'string',
   };

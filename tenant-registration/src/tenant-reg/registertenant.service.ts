@@ -62,8 +62,17 @@ export class RegistertenantService {
     isDeleted = '',
     page = 1,
   ): Promise<[Tenant[], number]> {
-    if ((isDeleted = '')) {
+    if (isDeleted === '') {
       return this.tenantRepository.findAndCount({
+        select: [
+          'id',
+          'tenantName',
+          'email',
+          'description',
+          'databaseName',
+          'databaseDescription',
+          'createdDateTime',
+        ],
         where: {
           tenantName: Like(`%${tenantName}%`),
         },
@@ -72,6 +81,15 @@ export class RegistertenantService {
       });
     } else {
       return this.tenantRepository.findAndCount({
+        select: [
+          'id',
+          'tenantName',
+          'email',
+          'description',
+          'databaseName',
+          'databaseDescription',
+          'createdDateTime',
+        ],
         where: {
           tenantName: Like(`%${tenantName}%`),
           isDeleted: isDeleted === 'true',

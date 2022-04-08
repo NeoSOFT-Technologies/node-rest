@@ -11,6 +11,8 @@ describe('Testing RegisTration MicroService Service', () => {
     email: 'string',
     password: 'string',
     description: 'string',
+    databaseName: 'string',
+    databaseDescription: 'string',
     createdDateTime: 'string',
     clientId: 'string',
     clientSecret: 'string',
@@ -72,7 +74,7 @@ describe('Testing RegisTration MicroService Service', () => {
 
   it('Testing softDelete', async () => {
     expect(await registertenantService.softDelete(tenant.tenantName)).toEqual(
-      tenant,
+      'Tenant Deleted Successfully',
     );
   });
 });

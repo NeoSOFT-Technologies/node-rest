@@ -136,16 +136,8 @@ export class AppController {
       const token = req.headers['authorization'];
       const userName = await this.authService.getUserName(token);
 
-      let adminDetails = await this.appService.getAdminDetails(userName, token);
-      const response = this.appService.listAllTenant(undefined, undefined, undefined);
-      response.subscribe(async (result) => {
-        const [tenants, count] = result;
-        res.send({
-          ...adminDetails,
-          tenants,
-          count
-        });
-      });
+      const adminDetails = await this.appService.getAdminDetails(userName, token);
+      res.send(adminDetails);
     } catch (e) {
       return e;
     }

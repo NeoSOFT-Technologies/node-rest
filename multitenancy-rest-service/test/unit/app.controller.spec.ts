@@ -130,13 +130,10 @@ describe('Testing AppController', () => {
             authorization: 'Bearer token'
         };
 
-        const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         const getAdminDetails = jest.spyOn(appService, 'getAdminDetails');
         await appController.adminDetails(mockRequest, mockResponse);
         expect(getAdminDetails).toHaveBeenCalled();
-        expect(mockSubscribe).toHaveBeenCalled();
         getAdminDetails.mockRestore();
-        mockSubscribe.mockRestore();
     });
 
     it('Testing appcontroller "registerTenant"', async () => {

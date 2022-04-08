@@ -31,6 +31,18 @@ export class KeycloakRealm {
         const adminRole: RoleRepresentation = await this.createAdminRealmRole(tenantRealm);
         await this.createCompositeRole(tenantRealm, adminRole);
         await this.RealmRoleMapping(tenantRealm, adminUser, adminRole);
+
+        const userRoleDetails = {
+            name: 'user',
+            composite: true,
+            composites: {
+                client: {
+                    'realm-management': ['view-users', 'view-realm', 'view-clients', 'view-authorization', 'manage-users']
+                }
+            }
+        }
+        await this.createRealmRoles(realmName, userRoleDetails, token)
+        
         return 'Realm created successfully';
     };
 
@@ -134,14 +146,14 @@ export class KeycloakRealm {
     };
 
 
-    public async deleteRealm(tenantname: string, token:string): Promise<any> {
+    public async deleteRealm(tenantname: string, token: string): Promise<any> {
         const parts = token.split(' ');
         this.kcMasterAdminClient.setAccessToken(parts[1]);
         await this.kcMasterAdminClient.realms.del({
             realm: tenantname
-        });        
+        });
     }
-    
+
     private async createTenantRealm(realmName: string, email: string): Promise<Realm> {
         return await this.kcMasterAdminClient.realms.create({
             id: realmName,

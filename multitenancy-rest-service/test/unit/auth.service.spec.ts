@@ -3,10 +3,11 @@ import config from '@app/config';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import axios from 'axios';
-import jwt_decode from "jwt-decode";
+import * as jwt from "jsonwebtoken";
 
-jest.mock('jwt-decode', () => ({
-    default: jest.fn().mockReturnValue({
+jest.mock('jsonwebtoken', () => ({
+    verify: jest.fn().mockReturnValue('token'),
+    decode: jest.fn().mockReturnValue({
         iss: '/tenantName',
         exp: 'exp-time',
         preferred_username: 'username',
@@ -93,38 +94,44 @@ describe('Testing Auth Service', () => {
         mockvalidateToken.mockRestore();
     });
 
+    it('Testing "validateTokenwithKey"', async () => {
+        const response = await authService.validateTokenwithKey('string', 'string');
+
+        expect(jwt.verify).toHaveBeenCalled();
+    });
+
     it('Testing "getTenantName"', async () => {
         const response = await authService.getTenantName('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
+        expect(jwt.decode).toHaveBeenCalled();
         expect(response).toEqual('tenantName');
     });
 
     it('Testing "getUserName"', async () => {
         const response = await authService.getUserName('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
+        expect(jwt.decode).toHaveBeenCalled();
         expect(response).toEqual('username');
     });
 
     it('Testing "getExpTime"', async () => {
         const response = await authService.getExpTime('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
+        expect(jwt.decode).toHaveBeenCalled();
         expect(response).toEqual('exp-time');
     });
 
     it('Testing "getRoles"', async () => {
         const response = await authService.getRoles('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
+        expect(jwt.decode).toHaveBeenCalled();
         expect(response).toEqual('mockRole');
     });
 
     it('Testing "checkUserRole"', async () => {
         const response = await authService.checkUserRole('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
+        expect(jwt.decode).toHaveBeenCalled();
         expect(response).toEqual(false);
     });
 });

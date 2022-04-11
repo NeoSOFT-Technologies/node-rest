@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { stringify } from "querystring";
-import jwt_decode from "jwt-decode";
+import * as jwt from "jsonwebtoken";
 import { ConfigService } from "@nestjs/config";
 import { CredentialsDto, LogoutDto, RefreshAccessTokenDto } from "@app/dto";
 import { httpClient } from "@app/utils";
@@ -95,7 +95,7 @@ export class AuthService {
     }
 
     async validateToken(token: string, clientId: string, clientSecret: string) {
-        const { iss }: any = jwt_decode(token);
+        const { iss }: any = jwt.decode(token) as jwt.JwtPayload;
 
         this.validateURL = `${iss}/protocol/openid-connect/token/introspect`;
         const params = stringify({
@@ -115,18 +115,23 @@ export class AuthService {
         return response.data.active;
     }
 
+    async validateTokenwithKey(token: string, publicKey: string) {
+        const key =`-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
+        jwt.verify(token, key);
+    }
+
     async getTenantName(token: string) {
-        const { iss }: any = jwt_decode(token);
+        const { iss }: any = jwt.decode(token) as jwt.JwtPayload;
         return iss.split("/").pop();
     }
 
     async getUserName(token: string) {
-        const { preferred_username }: any = jwt_decode(token);
+        const { preferred_username }: any = jwt.decode(token) as jwt.JwtPayload;;
         return preferred_username;
     }
 
     async getExpTime(token: string) {
-        const { exp }: any = jwt_decode(token);
+        const { exp }: any = jwt.decode(token) as jwt.JwtPayload;;
         return exp;
     }
 
@@ -135,7 +140,7 @@ export class AuthService {
         if (parts.length === 2 && parts[0] === 'Bearer') {
             token = parts[1];
         }
-        const { realm_access }: any = jwt_decode(token);
+        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
 
         let roles: string[] = [];
         if (realm_access.roles) {
@@ -149,7 +154,7 @@ export class AuthService {
         if (parts.length === 2 && parts[0] === 'Bearer') {
             token = parts[1];
         }
-        const { realm_access }: any = jwt_decode(token);
+        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
 
         let roles: string[] = [];
         if (realm_access.roles) {

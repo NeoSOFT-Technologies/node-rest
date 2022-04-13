@@ -142,9 +142,9 @@ describe('Testing AppService', () => {
 
     it('Testing "getTenantConfig"', async () => {
         const mockMessage = { Message: 'Tenant Config recieved Successfully' };
-        const tenantId = 1;
+        const tenantName = 'string';
         const mockgetTenantConfig = jest.spyOn(mockClient2, 'send');
-        const response = appService.getTenantConfig(tenantId);
+        const response = appService.getTenantConfig(tenantName);
 
         expect(mockgetTenantConfig).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));

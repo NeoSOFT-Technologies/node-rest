@@ -14,6 +14,7 @@ export class RegistertenantController {
   @MessagePattern({ cmd: 'register-tenant' })
   async registerTenant(tenant: RegisterTenantDto) {
     try {
+      console.log('Inside registerTenant Controller');
       if (await this.identifierService.identify(tenant)) {
         return {
           status: 'This tenant already exists',

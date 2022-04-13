@@ -27,4 +27,22 @@ export class TenantConfigController {
       throw new RpcException(e);
     }
   }
+
+  @EventPattern({ cmd: 'update-config' })
+  async updateConfig({ tenantname, newdescription }) {
+    try {
+      await this.tenantConfigService.updateConfig(tenantname, newdescription);
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @EventPattern({ cmd: 'delete-config' })
+  async deleteConfig(tenantname: string) {
+    try {
+      await this.tenantConfigService.deleteConfig(tenantname);
+    } catch (e) {
+      return e;
+    }
+  }
 }

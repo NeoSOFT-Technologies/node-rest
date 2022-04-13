@@ -26,4 +26,33 @@ export class TenantConfigService {
       throw new NotFoundException('Incorrect Tenant name entered');
     }
   }
+
+  async updateConfig(tenantname: string, newdescription: string) {
+    try {
+      const tenant: TenantConfig = await this.configRepository.findOneOrFail({
+        where: {
+          tenantName: tenantname,
+        },
+      });
+      await this.configRepository.update(tenant.id, {
+        ...tenant,
+        description: newdescription,
+      });
+    } catch (e) {
+      return e;
+    }
+  }
+
+  async deleteConfig(tenantname: string) {
+    try {
+      const tenantEntity = await this.configRepository.findOneOrFail({
+        where: {
+          tenantName: tenantname,
+        },
+      });
+      await this.configRepository.remove(tenantEntity);
+    } catch (e) {
+      return e;
+    }
+  }
 }

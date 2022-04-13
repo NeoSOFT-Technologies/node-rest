@@ -1,11 +1,11 @@
 SET @db = ?;
 SET @user = ?;
 SET @password = ?;
-SET @createdb = CONCAT('CREATE DATABASE `', @db, '`;');
+SET @createdb = CONCAT('CREATE DATABASE IF NOT EXISTS `', @db, '`;');
 PREPARE stmt FROM @createdb;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
-SET @createuser = CONCAT('CREATE USER "',@user,'"@"%" IDENTIFIED BY "',@password,'";'); 
+SET @createuser = CONCAT('CREATE USER IF NOT EXISTS "',@user,'"@"%" IDENTIFIED BY "',@password,'";'); 
 PREPARE stmt FROM @createuser;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;

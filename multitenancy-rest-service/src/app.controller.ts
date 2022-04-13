@@ -175,21 +175,47 @@ export class AppController {
   @ApiParam({ name: 'tenantName', required: true, type: String })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  getTenantConfig(@Req() req: Request, @Res() res: Response) {
+  @Roles(['admin','tenantadmin'])
+  async getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
+      const token = req.headers['authorization'];
       const tenantName: String = req.params.tenantName;
-
-      const response = this.appService.getTenantConfig(tenantName);
-      const observer = {
-        next: async (result: any) => res.send(result),
-        error: async (error: any) => {
-          res.status(error.status).send(error.message)
-        },
+      const tenantNameFromToken: String = await this.authService.getTenantName(token);
+      if(tenantNameFromToken === 'master'){
+        const response = this.appService.getTenantConfig(tenantName);
+        const observer = {
+          next: async (result: any) => res.send(result),
+          error: async (error: any) => {
+            res.status(error.status).send(error.message)
+          },
+        }
+        response.subscribe(observer);
       }
-      response.subscribe(observer);
+      else{
+        if(tenantName !== tenantNameFromToken){
+          throw new HttpException('Details cannot be displayed', HttpStatus.FORBIDDEN);
+        }
+        else{
+          const response = this.appService.getTenantConfig(tenantName);
+          const observer = {
+            next: async (result: any) => res.send(result),
+            error: async (error: any) => {
+              res.status(error.status).send(error.message)
+            },
+          }
+          response.subscribe(observer);
+        }
+      }
     } catch (e) {
-      return e;
+      if (e.response.statusCode) {
+        res.status(e.response.statusCode).send(e.response.message);
+      }
+      else if (e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+      else if (e.status) {
+        res.status(e.status).send(e.response);
+      }
     }
   }
 
@@ -219,15 +245,37 @@ export class AppController {
   @ApiBody({ type: UpdateTenantDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  updateDescription(@Req() req: Request, @Res() res: Response) {
+  @Roles(['admin','tenantadmin'])
+  async updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
+      const token = req.headers['authorization'];
+      const tenantNameFromToken: string = await this.authService.getTenantName(token);
       const tenantname: string = req.body.action.tenantName;
       const newDescription: string = req.body.action.description;
-      const response = this.appService.updateDescription(tenantname, newDescription);
-      response.subscribe(async (result) => res.send(result));
+
+      if(tenantNameFromToken === 'master'){
+        const response = this.appService.updateDescription(tenantname, newDescription);
+        response.subscribe(async (result) => res.send(result));
+      }
+      else{
+        if(tenantname !== tenantNameFromToken){
+          throw new HttpException('Updation Not Allowed', HttpStatus.FORBIDDEN);
+        }
+        else{
+          const response = this.appService.updateDescription(tenantname, newDescription);
+          response.subscribe(async (result) => res.send(result));
+        }
+      }
     } catch (e) {
-      return e;
+      if (e.response.statusCode) {
+        res.status(e.response.statusCode).send(e.response.message);
+      }
+      else if (e.response.status) {
+        res.status(e.response.status).send(e.response.data);
+      }
+      else if (e.status) {
+        res.status(e.status).send(e.response);
+      }
     }
   }
 
@@ -244,7 +292,7 @@ export class AppController {
       const response = await this.appService.deleteTenant(tenantname, token);
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
-      return e;
+      res.status(e.response.status).send(e.response.data);
     }
   }
 

@@ -116,30 +116,28 @@ export class AuthService {
     }
 
     async validateTokenwithKey(token: string, publicKey: string) {
-        const key =`-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
-        jwt.verify(token, key);
+        jwt.verify(token, publicKey);
     }
 
     async getTenantName(token: string) {
+        token = this.parseToken(token);
         const { iss }: any = jwt.decode(token) as jwt.JwtPayload;
         return iss.split("/").pop();
     }
 
     async getUserName(token: string) {
+        token = this.parseToken(token);
         const { preferred_username }: any = jwt.decode(token) as jwt.JwtPayload;;
         return preferred_username;
     }
 
     async getExpTime(token: string) {
+        token = this.parseToken(token);
         const { exp }: any = jwt.decode(token) as jwt.JwtPayload;;
         return exp;
     }
 
     async getRoles(token: string) {
-        const parts = token.split(' ');
-        if (parts.length === 2 && parts[0] === 'Bearer') {
-            token = parts[1];
-        }
         const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
 
         let roles: string[] = [];
@@ -150,10 +148,7 @@ export class AuthService {
     }
 
     async checkUserRole(token: string) {
-        const parts = token.split(' ');
-        if (parts.length === 2 && parts[0] === 'Bearer') {
-            token = parts[1];
-        }
+        token = this.parseToken(token);
         const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
 
         let roles: string[] = [];
@@ -161,5 +156,12 @@ export class AuthService {
             roles = realm_access.roles;
         }
         return roles.includes('user');
+    }
+    private parseToken(token: string){
+        const parts = token.split(' ');
+        if (parts.length === 2 && parts[0] === 'Bearer') {
+            token = parts[1];
+        }
+        return token;
     }
 }

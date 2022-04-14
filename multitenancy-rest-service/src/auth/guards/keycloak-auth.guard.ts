@@ -1,14 +1,14 @@
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { AuthService } from '../auth.service';
+import { PublicKeyCache } from '../cache.publicKey';
 
 @Injectable()
 export class KeycloakAuthGuard implements CanActivate {
   constructor(
     private readonly authenticationService: AuthService,
-    private config: ConfigService,
+    private publicKeyCache: PublicKeyCache,
     private reflector: Reflector,
   ) { }
 
@@ -35,7 +35,7 @@ export class KeycloakAuthGuard implements CanActivate {
 
     const token = parts[1];
     try {
-      const publicKey = this.config.get('keycloak.key');
+      const publicKey = await this.publicKeyCache.getPublicKey(token);
       await this.authenticationService.validateTokenwithKey(token, publicKey);
       const userRoles: string[] = await this.authenticationService.getRoles(token);
       const usrRole = await this.hasRole(userRoles, roles);

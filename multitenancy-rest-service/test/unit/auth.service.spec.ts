@@ -95,8 +95,7 @@ describe('Testing Auth Service', () => {
     });
 
     it('Testing "validateTokenwithKey"', async () => {
-        const response = await authService.validateTokenwithKey('string', 'string');
-
+        await authService.validateTokenwithKey('string', 'string');
         expect(jwt.verify).toHaveBeenCalled();
     });
 

@@ -2,12 +2,11 @@ import { AppController } from '@app/app.controller';
 import { AppService } from '@app/app.service';
 import { AuthService } from '@app/auth/auth.service';
 import { RegisterTenantDto } from '@app/dto/register.tenant.dto';
-import { ConfigModule } from '@nestjs/config';
+import { PublicKeyCache } from '@app/auth/cache.publicKey';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request, Response } from 'express';
 import * as httpMocks from 'node-mocks-http';
 import { Observable, of } from 'rxjs';
-import config from '@app/config';
 
 describe('Testing AppController', () => {
     let appController: AppController;
@@ -73,15 +72,8 @@ describe('Testing AppController', () => {
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [
-                ConfigModule.forRoot({
-                    envFilePath: [`${process.cwd()}/config/.env`],
-                    isGlobal: true,
-                    expandVariables: true,
-                    load: config,
-                })],
             controllers: [AppController],
-            providers: [AppService, AuthService],
+            providers: [AppService, AuthService, PublicKeyCache],
         })
             .overrideProvider(AppService)
             .useValue(mockAppService)

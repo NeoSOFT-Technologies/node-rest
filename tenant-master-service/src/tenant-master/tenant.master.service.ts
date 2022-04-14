@@ -20,7 +20,6 @@ export class TenantMasterService {
         res(next.database_name);
       });
     });
-
     const Tenantconfig: TenantDetailsDto = {
       ...tenantDetails,
       databaseName,

@@ -40,7 +40,6 @@ export class RegistertenantService {
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };
-
     this.client.emit({ cmd: 'tenant-master' }, tenantDetails);
     return { Message: 'Tenant Registered Successfully' };
   }
@@ -50,6 +49,7 @@ export class RegistertenantService {
       return await this.tenantRepository.findOneOrFail({
         where: {
           tenantName,
+          isDeleted: false,
         },
       });
     } catch (error) {
@@ -104,6 +104,7 @@ export class RegistertenantService {
     const tenant: Tenant = await this.tenantRepository.findOneOrFail({
       where: {
         tenantName: tenantname,
+        isDeleted: false,
       },
     });
 

@@ -27,20 +27,17 @@ export class AppService {
     private readonly keycloakAuthScope: KeycloakAuthScope,
     private readonly keycloakAuthPermission: KeycloakAuthPermission,
     private config: ConfigService
-  ) {
-    this.keycloakRedirectUrl = this.config.get('keycloak.redirectUrl');
-  }
+  ) {  }
 
-  keycloakRedirectUrl: string;
-  redirectUrl: string;
 
   register(tenant: RegisterTenantDto) {
     const { clientDetails, ...tenantDetails } = tenant;
     return this.client1.send({ cmd: 'register-tenant' }, tenantDetails);
   }
   createRedirectUrl(tenantName: string) {
-    this.redirectUrl = `${this.keycloakRedirectUrl}/admin/${tenantName}/console/`;
-    return this.redirectUrl;
+    const keycloakRedirectUrl = this.config.get('keycloak.redirectUrl');
+    const redirectUrl = `${keycloakRedirectUrl}/admin/${tenantName}/console/`;
+    return redirectUrl;
   }
   getTenantConfig(tenantName: String) {
     return this.client2.send({ cmd: 'get_config' }, tenantName);
@@ -72,10 +69,12 @@ export class AppService {
     return this.client1.send({ cmd: 'list-all-tenant' }, { tenantName, isDeleted, page });
   }
   updateDescription(tenantname: string, newdescription: string) {
+    this.client2.emit({ cmd: 'update-config' },  { tenantname, newdescription });
     return this.client1.send({ cmd: 'update-description' }, { tenantname, newdescription });
   }
   async deleteTenant(tenantname: string, token: string) {
     await this.keycloakRealm.deleteRealm(tenantname, token);
+    this.client2.emit({ cmd: 'delete-config' }, tenantname);
     return this.client1.send({ cmd: 'soft-delete' }, tenantname);
   }
   connect(dbdetails: DbDetailsDto) {

@@ -23,7 +23,7 @@ export class RegistertenantService {
         '-' +
         Math.random().toString(16).slice(-4);
     }
-
+    const password = tenant.password;
     tenant.password = encodePassword(tenant.password);
     const date = new Date();
     tenant.createdDateTime = new Date(
@@ -39,7 +39,7 @@ export class RegistertenantService {
       tenantId: registered_tenant.id,
       tenantName: registered_tenant.tenantName,
       databaseName: registered_tenant.databaseName,
-      password: registered_tenant.password,
+      password: password,
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };

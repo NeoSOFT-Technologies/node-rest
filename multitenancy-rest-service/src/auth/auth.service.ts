@@ -147,6 +147,15 @@ export class AuthService {
         return roles;
     }
 
+    async getPermissions(token: string) {
+        token = this.parseToken(token);
+        let { permission }: any = jwt.decode(token) as jwt.JwtPayload;
+        if (typeof permission === 'string') {
+            permission = permission.split(',');
+        }
+        return permission;
+    }
+
     async checkUserRole(token: string) {
         token = this.parseToken(token);
         const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
@@ -157,7 +166,7 @@ export class AuthService {
         }
         return roles.includes('user');
     }
-    private parseToken(token: string){
+    private parseToken(token: string) {
         const parts = token.split(' ');
         if (parts.length === 2 && parts[0] === 'Bearer') {
             token = parts[1];

@@ -121,13 +121,11 @@ export class KeycloakUser {
         };
         const createdTimestamp = this.formatTimeStamp(userInfo[0]);
         const roles = await this.getUserRoles(kcClient, { id: userInfo[0].id });
-        const permissions = await this.getUserPermission(kcClient, { id: userInfo[0].id }, clientName);
         return {
             ...userInfo[0],
             createdTimestamp,
             tenantName,
-            roles,
-            permissions
+            roles
         };
     };
 

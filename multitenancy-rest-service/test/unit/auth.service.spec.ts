@@ -12,8 +12,9 @@ jest.mock('jsonwebtoken', () => ({
         exp: 'exp-time',
         preferred_username: 'username',
         realm_access: {
-            roles: 'mockRole'
-        }
+            roles: ['mockRole']
+        },
+        permission: 'mockPermission'
     })
 }));
 
@@ -124,7 +125,14 @@ describe('Testing Auth Service', () => {
         const response = await authService.getRoles('string');
 
         expect(jwt.decode).toHaveBeenCalled();
-        expect(response).toEqual('mockRole');
+        expect(response).toEqual(['mockRole']);
+    });
+
+    it('Testing "getPermissions"', async () => {
+        const response = await authService.getPermissions('string');
+
+        expect(jwt.decode).toHaveBeenCalled();
+        expect(response).toEqual(['mockPermission']);
     });
 
     it('Testing "checkUserRole"', async () => {

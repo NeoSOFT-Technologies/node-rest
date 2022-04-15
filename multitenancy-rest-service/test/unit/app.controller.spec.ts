@@ -68,6 +68,7 @@ describe('Testing AppController', () => {
         getTenantName: jest.fn().mockResolvedValue('tenantName'),
         getUserName: jest.fn().mockResolvedValue('userName'),
         checkUserRole: jest.fn().mockResolvedValue(false),
+        getPermissions: jest.fn().mockResolvedValue(['permission']),
     };
 
     beforeAll(async () => {

@@ -14,6 +14,7 @@ import {
   ClientDto, ResourceDto, PolicyDto, ScopeDto, PermissionDto, GetUsersInfoDto, CreateRoleDto,
   UpdateRoleDto, GetRoleInfoDto, GetPermissionsDto, UpdatePermissionDto
 } from './dto';
+import { Permission } from './auth/permission.decorator';
 
 @Controller('api')
 export class AppController {
@@ -131,6 +132,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['view'])
   async adminDetails(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -150,6 +152,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['create'])
   async registerTenant(@Body() body: RegisterTenantDto, @Req() req: Request, @Res() res: Response) {
     try {
       let { tenantName, email, password, clientDetails } = body;
@@ -176,6 +179,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin','tenantadmin'])
+  @Permission(['view'])
   async getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -227,6 +231,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['view'])
   listAllTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const { tenantName, isDeleted, page } = req.query as any;
@@ -246,6 +251,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin','tenantadmin'])
+  @Permission(['edit'])
   async updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -285,6 +291,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin', 'tenantadmin'])
+  @Permission(['delete'])
   async deleteTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.params.tenantName;
@@ -303,6 +310,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['tenantadmin'])
+  @Permission(['create'])
   async tenantUser(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -321,6 +329,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin', 'tenantadmin'])
+  @Permission(['view'])
   async listAllUser(@Req() req: Request, @Res() res: Response) {
     try {
       const data = {
@@ -342,6 +351,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin', 'tenantadmin', 'user'])
+  @Permission(['view'])
   async getUserInfo(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -360,7 +370,9 @@ export class AppController {
           HttpStatus.METHOD_NOT_ALLOWED,
         );
       }
-      res.send(await this.appService.userInfo(req.query, token));
+      const userInfo = await this.appService.userInfo(req.query, token);
+      const permissions = await this.authService.getPermissions(token);
+      res.send({ ...userInfo, permissions });
     } catch (e) {
       if (e.response.statusCode) {
         res.status(e.response.statusCode).send(e.response.message);
@@ -380,6 +392,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['tenantadmin', 'user'])
+  @Permission(['edit'])
   async updateUser(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -420,6 +433,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['tenantadmin'])
+  @Permission(['delete'])
   async deleteUser(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -448,6 +462,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['create'])
   async createRole(@Req() req: Request, @Res() res: Response) {
     try {
       if (!req.body.tenantName) {
@@ -471,6 +486,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin', 'tenantadmin'])
+  @Permission(['view'])
   async getAvailableRoles(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -490,6 +506,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['view'])
   async getRoleInfo(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -519,6 +536,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['edit'])
   async updateRole(@Req() req: Request, @Res() res: Response) {
     try {
       if (!req.body.tenantName) {
@@ -549,6 +567,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['delete'])
   async deleteRole(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -569,6 +588,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['create'])
   async permission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -584,6 +604,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin', 'tenantadmin'])
+  @Permission(['read'])
   async listPermission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -607,6 +628,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['edit'])
   async updatePermission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -625,6 +647,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['delete'])
   async deletePermission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -640,6 +663,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['create'])
   async tenantClient(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -655,6 +679,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['create'])
   async resource(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -670,6 +695,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['create'])
   async policy(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -685,6 +711,7 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin'])
+  @Permission(['create'])
   async scope(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];

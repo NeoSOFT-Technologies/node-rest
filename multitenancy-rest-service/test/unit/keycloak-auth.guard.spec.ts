@@ -14,7 +14,8 @@ describe('Testing Auth Service', () => {
     const mockAuthService = {
         validateToken: jest.fn().mockResolvedValue(true),
         validateTokenwithKey: jest.fn().mockResolvedValue('token'),
-        getRoles: jest.fn().mockResolvedValue(['mockRole']),
+        getRoles: jest.fn().mockResolvedValue(['roles']),
+        getPermissions: jest.fn().mockResolvedValue(['permissions']),
         getTenantName: jest.fn().mockResolvedValue('tenantName')
     };
 
@@ -30,7 +31,7 @@ describe('Testing Auth Service', () => {
     };
 
     const mockReflector = {
-        get: jest.fn().mockReturnValue(['mockRole']),
+        get: jest.fn().mockImplementation(arg => [arg]),
     };
 
 
@@ -75,10 +76,11 @@ describe('Testing Auth Service', () => {
         } as any;
         const response = await kcAuthGuard.canActivate(mockContext);
 
-        expect(reflector.get).toHaveBeenCalled();
+        expect(reflector.get).toHaveBeenCalledTimes(2);
         expect(publicKeyCache.getPublicKey).toHaveBeenCalled();
         expect(authService.validateTokenwithKey).toHaveBeenCalled();
         expect(authService.getRoles).toHaveBeenCalledWith('token');
+        expect(authService.getPermissions).toHaveBeenCalledWith('token');
         expect(response).toEqual(true);
     });
 
@@ -121,7 +123,7 @@ describe('Testing Auth Service', () => {
                 }),
             })),
         } as any;
-        mockAuthService.validateTokenwithKey.mockRejectedValue(new Error('Authorization: Bearer <token> invalid'));
+        mockAuthService.validateTokenwithKey.mockRejectedValueOnce(new Error('Authorization: Bearer <token> invalid'));
 
         expect(async () => await kcAuthGuard.canActivate(mockContext)).rejects.toThrow(
             'Authorization: Bearer <token> invalid'
@@ -137,8 +139,23 @@ describe('Testing Auth Service', () => {
                 }),
             })),
         } as any;
-        mockAuthService.validateTokenwithKey.mockResolvedValue('token');
-        mockReflector.get.mockReturnValue(['required-role']);
+        mockReflector.get.mockReturnValueOnce(['required-role']);
+        const response = await kcAuthGuard.canActivate(mockContext);
+        expect(response).toEqual(false);
+    });
+
+    it('Testing "canActivate" - when required permission not present', async () => {
+        const mockContext = {
+            getHandler: jest.fn(),
+            switchToHttp: jest.fn(() => ({
+                getRequest: jest.fn().mockReturnValue({
+                    header: jest.fn().mockReturnValue('Bearer token')
+                }),
+            })),
+        } as any;
+        mockReflector.get
+        .mockReturnValueOnce(['roles'])
+        .mockReturnValueOnce(['required-permission']);
         const response = await kcAuthGuard.canActivate(mockContext);
         expect(response).toEqual(false);
     });

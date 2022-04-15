@@ -117,8 +117,7 @@ describe('Testing Keycloak User Service', () => {
             email: 'sample-email',
             createdTimestamp: '2022/03/21 17:59:39',
             tenantName: 'string',
-            roles: ['sample-role'],
-            permissions: ['sample-permission']
+            roles: ['sample-role']
         });
     });
 

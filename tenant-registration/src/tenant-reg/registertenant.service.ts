@@ -5,6 +5,7 @@ import { Like, Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
+import { encodePassword } from './utils/bcrypt';
 
 @Injectable()
 export class RegistertenantService {
@@ -22,6 +23,8 @@ export class RegistertenantService {
         '-' +
         Math.random().toString(16).slice(-4);
     }
+    const password = tenant.password;
+    tenant.password = encodePassword(tenant.password);
     const date = new Date();
     tenant.createdDateTime = new Date(
       date.getTime() - date.getTimezoneOffset() * 60000,
@@ -36,7 +39,7 @@ export class RegistertenantService {
       tenantId: registered_tenant.id,
       tenantName: registered_tenant.tenantName,
       databaseName: registered_tenant.databaseName,
-      password: registered_tenant.password,
+      password: password,
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };

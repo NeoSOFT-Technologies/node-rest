@@ -1,11 +1,12 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
-import { encodePassword } from './utils/bcrypt';
+import { encodePassword } from './utils/crypto';
+
 
 @Injectable()
 export class RegistertenantService {
@@ -24,90 +25,38 @@ export class RegistertenantService {
         Math.random().toString(16).slice(-4);
     }
 
-    tenant.password = encodePassword(tenant.password);
-    const date = new Date();
-    tenant.createdDateTime = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000,
-    )
+    const password = encodePassword(tenant.password);
+    tenant.password = password;
+
+    tenant.createdDateTime = new Date()
       .toISOString()
       .slice(0, 19)
       .replace(/-/g, '/')
       .replace('T', ' ');
 
     const registered_tenant = await this.tenantRepository.save(tenant);
+
     const tenantDetails: TenantDetailsDto = {
       tenantId: registered_tenant.id,
       tenantName: registered_tenant.tenantName,
-      databaseName: registered_tenant.databaseName,
       password: registered_tenant.password,
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };
+    console.log(`password:${tenant.password}`);
+
     this.client.emit({ cmd: 'tenant-master' }, tenantDetails);
     return { Message: 'Tenant Registered Successfully' };
   }
 
-  async getIdSecret(tenantName: string): Promise<Tenant> {
-    try {
-      return await this.tenantRepository.findOneOrFail({
-        where: {
-          tenantName,
-          isDeleted: false,
-        },
-      });
-    } catch (error) {
-      throw new NotFoundException('Tenant not found');
-    }
-  }
-
-  listAll(
-    tenantName = '',
-    isDeleted = '',
-    page = 1,
-  ): Promise<[Tenant[], number]> {
-    if (isDeleted === '') {
-      return this.tenantRepository.findAndCount({
-        select: [
-          'id',
-          'tenantName',
-          'email',
-          'description',
-          'databaseName',
-          'databaseDescription',
-          'createdDateTime',
-        ],
-        where: {
-          tenantName: Like(`%${tenantName}%`),
-        },
-        take: 10,
-        skip: 10 * (page - 1),
-      });
-    } else {
-      return this.tenantRepository.findAndCount({
-        select: [
-          'id',
-          'tenantName',
-          'email',
-          'description',
-          'databaseName',
-          'databaseDescription',
-          'createdDateTime',
-        ],
-        where: {
-          tenantName: Like(`%${tenantName}%`),
-          isDeleted: isDeleted === 'true',
-        },
-        take: 10,
-        skip: 10 * (page - 1),
-      });
-    }
+  listAll(): Promise<Tenant[]> {
+    return this.tenantRepository.find();
   }
 
   async updateDescription(tenantname: string, newdescription: string) {
     const tenant: Tenant = await this.tenantRepository.findOneOrFail({
       where: {
         tenantName: tenantname,
-        isDeleted: false,
       },
     });
 
@@ -121,14 +70,12 @@ export class RegistertenantService {
     const tenant: Tenant = await this.tenantRepository.findOneOrFail({
       where: {
         tenantName: tenantname,
-        isDeleted: false,
       },
     });
 
-    await this.tenantRepository.update(tenant.id, {
+    return this.tenantRepository.update(tenant.id, {
       ...tenant,
-      isDeleted: true,
+      isDelete: true,
     });
-    return 'Tenant Deleted Successfully';
   }
 }

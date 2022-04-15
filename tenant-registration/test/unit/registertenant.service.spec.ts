@@ -3,6 +3,10 @@ import { RegistertenantService } from '@app/tenant-reg/registertenant.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
+jest.mock('bcryptjs', () => ({
+  hashSync: jest.fn().mockReturnValue('string'),
+}));
+
 describe('Testing RegisTration MicroService Service', () => {
   let registertenantService: RegistertenantService;
 

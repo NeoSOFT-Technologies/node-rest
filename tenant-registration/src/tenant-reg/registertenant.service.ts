@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
+import { encodePassword } from './utils/bcrypt';
+
 
 @Injectable()
 export class RegistertenantService {
@@ -23,6 +25,9 @@ export class RegistertenantService {
         Math.random().toString(16).slice(-4);
     }
 
+    const password = encodePassword(tenant.password);
+    tenant.password = password;
+
     tenant.createdDateTime = new Date()
       .toISOString()
       .slice(0, 19)
@@ -38,16 +43,14 @@ export class RegistertenantService {
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };
+    console.log(`password:${tenant.password}`);
 
     this.client.emit({ cmd: 'tenant-master' }, tenantDetails);
     return { Message: 'Tenant Registered Successfully' };
   }
 
-  listAll(page = 1): Promise<[Tenant[], number]> {
-    return this.tenantRepository.findAndCount({
-      take: 5,
-      skip: 5 * (page - 1),
-    });
+  listAll(): Promise<Tenant[]> {
+    return this.tenantRepository.find();
   }
 
   async updateDescription(tenantname: string, newdescription: string) {

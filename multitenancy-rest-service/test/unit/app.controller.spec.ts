@@ -165,9 +165,17 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "getTenantConfig"', async () => {
+        mockRequest.params = {
+            tenantName: 'tenantName',
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const getTenantConfig = jest.spyOn(appService, 'getTenantConfig');
         await appController.getTenantConfig(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
+        expect(getTenantConfig).toHaveBeenCalledWith('tenantName');
         mockSubscribe.mockRestore();
     });
 
@@ -184,9 +192,11 @@ describe('Testing AppController', () => {
                 tenantName: 'string',
                 description: 'string'
             }
-        }
+        };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const updateDescription = jest.spyOn(appService, 'updateDescription');
         await appController.updateDescription(mockRequest, mockResponse);
+        expect(updateDescription).toHaveBeenCalledWith('tenantname','newDescription');
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });

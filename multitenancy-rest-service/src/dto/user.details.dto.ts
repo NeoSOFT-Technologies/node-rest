@@ -21,4 +21,6 @@ export class UserDetailsDto {
   password: string;
 
   roles: string[];
+
+  attributes: string[];
 }

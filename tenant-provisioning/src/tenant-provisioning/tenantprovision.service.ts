@@ -5,6 +5,7 @@ import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
 import { SeedingDataeDto } from './dto/seeding-data.dto';
 import { ConfigService } from '@nestjs/config';
 import { ConnectionUtils } from './connection.utils';
+import { decodePassword } from './utils/decrypt';
 
 @Injectable()
 export class TenantprovisionService {
@@ -14,8 +15,7 @@ export class TenantprovisionService {
     tenant: ProvisionTenantDto,
   ): Promise<Record<string, any>> {
     const tenantName = tenant.tenantName;
-    const password = tenant.password;
-    const databaseName = tenant.databaseName;
+    const password = decodePassword(tenant.password).toString();
     const query = readFileSync(
       `${__dirname}/scripts/create-database.sql`,
     ).toString();
@@ -25,7 +25,7 @@ export class TenantprovisionService {
       if (query) {
         db_connection.query(
           query,
-          [databaseName, tenantName, password],
+          ['db-' + tenantName, tenantName, password],
           (err) => {
             if (err) {
               rej(err);
@@ -33,7 +33,7 @@ export class TenantprovisionService {
               ConnectionUtils.endConnection(db_connection);
               res({
                 status: 'Database created successfully',
-                database_name: databaseName,
+                database_name: 'db-' + tenantName,
               });
             }
           },

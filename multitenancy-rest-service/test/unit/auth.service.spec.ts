@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import axios from 'axios';
 import * as jwt from "jsonwebtoken";
+import * as jwksClient from "jwks-rsa";
 
 jest.mock('jsonwebtoken', () => ({
     verify: jest.fn().mockReturnValue('token'),
@@ -98,6 +99,17 @@ describe('Testing Auth Service', () => {
     it('Testing "validateTokenwithKey"', async () => {
         await authService.validateTokenwithKey('string', 'string');
         expect(jwt.verify).toHaveBeenCalled();
+    });
+
+    it('Testing "getpublicKey"', async () => {
+        const mockKey = jest.spyOn(jwksClient.JwksClient.prototype, 'getSigningKey').mockImplementation(() => {
+            return Promise.resolve({
+                getPublicKey: jest.fn().mockReturnValue('key')
+            })
+        });
+        const response = await authService.getpublicKey('string');
+        expect(response).toEqual({public_key: "key"});
+        mockKey.mockRestore();
     });
 
     it('Testing "getTenantName"', async () => {

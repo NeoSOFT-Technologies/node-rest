@@ -69,6 +69,7 @@ describe('Testing AppController', () => {
         getUserName: jest.fn().mockResolvedValue('userName'),
         checkUserRole: jest.fn().mockResolvedValue(false),
         getPermissions: jest.fn().mockResolvedValue(['permission']),
+        getpublicKey: jest.fn().mockResolvedValue('public-key'),
     };
 
     beforeAll(async () => {
@@ -127,6 +128,16 @@ describe('Testing AppController', () => {
         mockrefreshAccessToken.mockRestore();
     });
 
+    it('Testing appcontroller "publicKey"', async () => {
+        mockRequest.params = {
+            tenantName: 'tenantName'
+        };
+        const getpublicKey = jest.spyOn(authService, 'getpublicKey');
+        await appController.publicKey(mockRequest, mockResponse);
+        expect(getpublicKey).toHaveBeenCalled();
+        getpublicKey.mockRestore();
+    });
+
     it('Testing appcontroller "adminDetails"', async () => {
         mockRequest.headers = {
             authorization: 'Bearer token'
@@ -167,9 +178,17 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "getTenantConfig"', async () => {
+        mockRequest.params = {
+            tenantName: 'tenantName',
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const getTenantConfig = jest.spyOn(appService, 'getTenantConfig');
         await appController.getTenantConfig(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
+        expect(getTenantConfig).toHaveBeenCalledWith('tenantName');
         mockSubscribe.mockRestore();
     });
 
@@ -183,12 +202,14 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "updateDescription"', async () => {
         mockRequest.body = {
             action: {
-                tenantName: 'string',
-                description: 'string'
+                tenantName: 'tenantName',
+                description: 'newDescription'
             }
-        }
+        };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const updateDescription = jest.spyOn(appService, 'updateDescription');
         await appController.updateDescription(mockRequest, mockResponse);
+        expect(updateDescription).toHaveBeenCalledWith('tenantName','newDescription');
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });

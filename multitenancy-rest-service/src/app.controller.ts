@@ -127,6 +127,19 @@ export class AppController {
     }
   }
 
+  @Get('publicKey/:tenantName')
+  @ApiTags('Authentication')
+  @ApiParam({ name: 'tenantName', type: 'string', required: true })
+  async publicKey(@Req() req: Request, @Res() res: Response) {
+    try {
+      const tenantname: string = req.params.tenantName;
+      const key = await this.authService.getpublicKey(tenantname);
+      res.send(key);
+    } catch (e) {
+      res.status(HttpStatus.NOT_FOUND).send(e);
+    }
+  }
+
   @Get('admin')
   @ApiTags('Admin')
   @ApiBearerAuth()
@@ -178,38 +191,24 @@ export class AppController {
   @ApiParam({ name: 'tenantName', required: true, type: String })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin','tenantadmin'])
+  @Roles(['admin', 'tenantadmin'])
   // @Permission(['view'])
   async getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
-      const tenantName: String = req.params.tenantName;
-      const tenantNameFromToken: String = await this.authService.getTenantName(token);
-      if(tenantNameFromToken === 'master'){
-        const response = this.appService.getTenantConfig(tenantName);
-        const observer = {
-          next: async (result: any) => res.send(result),
-          error: async (error: any) => {
-            res.status(error.status).send(error.message)
-          },
-        }
-        response.subscribe(observer);
+      const tenantName: string = req.params.tenantName;
+      const tenantNameFromToken: string = await this.authService.getTenantName(token);
+      if (tenantName !== tenantNameFromToken) {
+        throw new HttpException('Details cannot be displayed', HttpStatus.FORBIDDEN);
       }
-      else{
-        if(tenantName !== tenantNameFromToken){
-          throw new HttpException('Details cannot be displayed', HttpStatus.FORBIDDEN);
-        }
-        else{
-          const response = this.appService.getTenantConfig(tenantName);
-          const observer = {
-            next: async (result: any) => res.send(result),
-            error: async (error: any) => {
-              res.status(error.status).send(error.message)
-            },
-          }
-          response.subscribe(observer);
-        }
+      const response = this.appService.getTenantConfig(tenantName);
+      const observer = {
+        next: async (result: any) => res.send(result),
+        error: async (error: any) => {
+          res.status(error.status).send(error.message)
+        },
       }
+      response.subscribe(observer);
     } catch (e) {
       if (e.response.statusCode) {
         res.status(e.response.statusCode).send(e.response.message);
@@ -250,38 +249,30 @@ export class AppController {
   @ApiBody({ type: UpdateTenantDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin','tenantadmin'])
+  @Roles(['admin', 'tenantadmin'])
   // @Permission(['edit'])
   async updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
       const tenantNameFromToken: string = await this.authService.getTenantName(token);
-      const tenantname: string = req.body.action.tenantName;
+      let tenantName: string = req.body.action.tenantName;
       const newDescription: string = req.body.action.description;
 
-      if(tenantNameFromToken === 'master'){
-        const response = this.appService.updateDescription(tenantname, newDescription);
-        response.subscribe(async (result) => res.send(result));
+      if (tenantNameFromToken === 'master' && !tenantName) {
+        throw new HttpException('Please enter TenantName', HttpStatus.BAD_REQUEST);
       }
-      else{
-        if(tenantname !== tenantNameFromToken){
+      else if (tenantNameFromToken !== 'master') {
+        if (!tenantName) {
+          tenantName = tenantNameFromToken;
+        }
+        else if (tenantName !== tenantNameFromToken) {
           throw new HttpException('Updation Not Allowed', HttpStatus.FORBIDDEN);
         }
-        else{
-          const response = this.appService.updateDescription(tenantname, newDescription);
-          response.subscribe(async (result) => res.send(result));
-        }
       }
+      const response = this.appService.updateDescription(tenantName, newDescription);
+      response.subscribe(async (result) => res.send(result));
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      res.status(e.status).send(e.response);
     }
   }
 
@@ -290,7 +281,7 @@ export class AppController {
   @ApiParam({ name: 'tenantName', type: 'string', required: true })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin', 'tenantadmin'])
+  @Roles(['admin'])
   // @Permission(['delete'])
   async deleteTenant(@Req() req: Request, @Res() res: Response) {
     try {

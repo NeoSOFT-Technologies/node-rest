@@ -44,12 +44,12 @@ After the token is received , the resources of the client can accessed. We are u
 
 It performs two important tasks for us before granting access to any resource:
 
-1. Token Validation: It validates the token received from Authorization header using *`Introspection endpoint`*
-    > /realms/{realm-name}/protocol/openid-connect/token/introspect
+1. Token Validation: It validates the token received from Authorization header using public key *`jwks_uri endpoint`*
+    > /realms/{realm-name}/protocol/openid-connect/certs
 
-    We have *`validateToken`* method in out `AuthService` class which abstracts the use of this endpoint. This method takes in token as the input and returns `true` if the token is active.
+    We have *`validateTokenwithKey`* method in out `AuthService` class.  This method takes in token and public key (which we get using the above endpoint) as the input and returns error if the token is invalid.The implementation stores public key in cache so as not to hit authorization server repeatedly.
 
-2. Extract `available roles` from access token to grant access to the resources after checking if the `required role` is present in the available roles.
+2. Extract `available roles & permissions` from access token to grant access to the resources after checking if the `required role & permissions` are present in the available roles & permissions.
 
 ### **Logout endpoint**
 The logout endpoint logs out the authenticated user. To invoke this endpoint directly the refresh token needs to be included as well as the credentials required to authenticate the client.

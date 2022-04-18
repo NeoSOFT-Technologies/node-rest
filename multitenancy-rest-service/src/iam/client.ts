@@ -60,7 +60,18 @@ export class KeycloakClient {
             redirectUris: [`${this.config.get('client.rootUrl')}/*`],
             serviceAccountsEnabled: true,
             authorizationServicesEnabled: true,
-            directAccessGrantsEnabled: true
+            directAccessGrantsEnabled: true,
+            protocolMappers: [{
+                name: "permissionMapper",
+                protocol: "openid-connect",
+                protocolMapper: "oidc-usermodel-attribute-mapper",
+                config: {
+                    "multivalued": "true",
+                    "access.token.claim": "true",
+                    "claim.name": "permission",
+                    "user.attribute": "permission"
+                }
+            }]
         }
     };
 };

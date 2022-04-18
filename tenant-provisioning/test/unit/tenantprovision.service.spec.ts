@@ -28,8 +28,8 @@ describe('Testing Provisioning MicroService Service', () => {
     const TenantName = {
       tenantName: 'string',
       password: 'string',
+      databaseName: 'string',
     };
-
     expect(
       (await tenantprovisionService.createDatabase(TenantName)).status,
     ).toEqual('Database created successfully');
@@ -68,6 +68,7 @@ describe('Testing Provisioning MicroService Service', () => {
     const TenantName = {
       tenantName: 'string',
       password: 'string',
+      databaseName: 'string',
     };
 
     expect(await tenantprovisionService.ping(TenantName)).toBeDefined();

@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { stringify } from "querystring";
 import * as jwt from "jsonwebtoken";
+import * as jwksClient from "jwks-rsa";
 import { ConfigService } from "@nestjs/config";
 import { CredentialsDto, LogoutDto, RefreshAccessTokenDto } from "@app/dto";
 import { httpClient } from "@app/utils";
@@ -117,6 +118,17 @@ export class AuthService {
 
     async validateTokenwithKey(token: string, publicKey: string) {
         jwt.verify(token, publicKey);
+    }
+
+    async getpublicKey(tenantName: string) {
+        const publicKeyURI = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/certs`;
+        const client = jwksClient({
+            jwksUri: publicKeyURI
+        });
+        const key = await client.getSigningKey();
+        const signingKey = key.getPublicKey();
+        
+        return { public_key: signingKey };
     }
 
     async getTenantName(token: string) {

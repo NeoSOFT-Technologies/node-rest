@@ -73,7 +73,7 @@ describe('Testing RegisTration MicroService Service', () => {
         tenant.tenantName,
         tenant.description,
       ),
-    ).toEqual(tenant);
+    ).toEqual('Tenant Updated Successfully');
   });
 
   it('Testing softDelete', async () => {

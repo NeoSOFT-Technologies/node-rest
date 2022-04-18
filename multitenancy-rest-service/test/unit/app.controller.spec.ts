@@ -189,14 +189,14 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "updateDescription"', async () => {
         mockRequest.body = {
             action: {
-                tenantName: 'string',
-                description: 'string'
+                tenantName: 'tenantName',
+                description: 'newDescription'
             }
         };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         const updateDescription = jest.spyOn(appService, 'updateDescription');
         await appController.updateDescription(mockRequest, mockResponse);
-        expect(updateDescription).toHaveBeenCalledWith('tenantname','newDescription');
+        expect(updateDescription).toHaveBeenCalledWith('tenantName','newDescription');
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });

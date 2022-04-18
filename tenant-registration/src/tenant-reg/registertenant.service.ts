@@ -108,10 +108,11 @@ export class RegistertenantService {
       },
     });
 
-    return this.tenantRepository.update(tenant.id, {
+    await this.tenantRepository.update(tenant.id, {
       ...tenant,
       description: newdescription,
     });
+    return 'Tenant Updated Successfully';
   }
 
   async softDelete(tenantname: string) {

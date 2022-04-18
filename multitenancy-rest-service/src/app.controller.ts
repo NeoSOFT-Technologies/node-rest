@@ -236,17 +236,14 @@ export class AppController {
     try {
       const token = req.headers['authorization'];
       const tenantNameFromToken: string = await this.authService.getTenantName(token);
-      let tenantName: string;
+      let tenantName: string = req.body.action.tenantName;
       const newDescription: string = req.body.action.description;
 
-      if (tenantNameFromToken === 'master') {
-        if (!req.body.action.tenantName) {
-          throw new HttpException('Please enter TenantName', HttpStatus.BAD_REQUEST);
-        }
-        tenantName = req.body.action.tenantName;
+      if (tenantNameFromToken === 'master' && !tenantName) {
+        throw new HttpException('Please enter TenantName', HttpStatus.BAD_REQUEST);
       }
-      else {
-        if (!req.body.action.tenantName) {
+      else if (tenantNameFromToken !== 'master') {
+        if (!tenantName) {
           tenantName = tenantNameFromToken;
         }
         else if (tenantName !== tenantNameFromToken) {
@@ -256,15 +253,7 @@ export class AppController {
       const response = this.appService.updateDescription(tenantName, newDescription);
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      res.status(e.status).send(e.response);
     }
   }
 

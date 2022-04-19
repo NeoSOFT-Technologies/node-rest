@@ -15,6 +15,7 @@ export class TenantprovisionService {
   ): Promise<Record<string, any>> {
     const tenantName = tenant.tenantName;
     const password = tenant.password;
+    const databaseName = tenant.databaseName;
     const query = readFileSync(
       `${__dirname}/scripts/create-database.sql`,
     ).toString();
@@ -24,7 +25,7 @@ export class TenantprovisionService {
       if (query) {
         db_connection.query(
           query,
-          ['db-' + tenantName, tenantName, password],
+          [databaseName, tenantName, password],
           (err) => {
             if (err) {
               rej(err);
@@ -32,7 +33,7 @@ export class TenantprovisionService {
               ConnectionUtils.endConnection(db_connection);
               res({
                 status: 'Database created successfully',
-                database_name: 'db-' + tenantName,
+                database_name: databaseName,
               });
             }
           },

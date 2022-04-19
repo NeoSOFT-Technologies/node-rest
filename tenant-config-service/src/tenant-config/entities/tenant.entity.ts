@@ -23,7 +23,7 @@ export class TenantConfig {
   createdDateTime: string;
 
   @Column()
-  tenantDbName: string;
+  databaseName: string;
 
   @Column()
   host: string;

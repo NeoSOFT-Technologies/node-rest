@@ -3,15 +3,19 @@ import config from '@app/config';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import axios from 'axios';
-import jwt_decode from "jwt-decode";
+import * as jwt from "jsonwebtoken";
+import * as jwksClient from "jwks-rsa";
 
-jest.mock('jwt-decode', () => ({
-    default: jest.fn().mockReturnValue({
+jest.mock('jsonwebtoken', () => ({
+    verify: jest.fn().mockReturnValue('token'),
+    decode: jest.fn().mockReturnValue({
         iss: '/tenantName',
         exp: 'exp-time',
+        preferred_username: 'username',
         realm_access: {
-            roles: 'mockRole'
-        }
+            roles: ['mockRole']
+        },
+        permission: 'mockPermission'
     })
 }));
 
@@ -92,24 +96,61 @@ describe('Testing Auth Service', () => {
         mockvalidateToken.mockRestore();
     });
 
+    it('Testing "validateTokenwithKey"', async () => {
+        await authService.validateTokenwithKey('string', 'string');
+        expect(jwt.verify).toHaveBeenCalled();
+    });
+
+    it('Testing "getpublicKey"', async () => {
+        const mockKey = jest.spyOn(jwksClient.JwksClient.prototype, 'getSigningKey').mockImplementation(() => {
+            return Promise.resolve({
+                getPublicKey: jest.fn().mockReturnValue('key')
+            })
+        });
+        const response = await authService.getpublicKey('string');
+        expect(response).toEqual({public_key: "key"});
+        mockKey.mockRestore();
+    });
+
     it('Testing "getTenantName"', async () => {
         const response = await authService.getTenantName('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
+        expect(jwt.decode).toHaveBeenCalled();
         expect(response).toEqual('tenantName');
+    });
+
+    it('Testing "getUserName"', async () => {
+        const response = await authService.getUserName('string');
+
+        expect(jwt.decode).toHaveBeenCalled();
+        expect(response).toEqual('username');
     });
 
     it('Testing "getExpTime"', async () => {
         const response = await authService.getExpTime('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
+        expect(jwt.decode).toHaveBeenCalled();
         expect(response).toEqual('exp-time');
     });
 
-    it('Testing "getUserRoles"', async () => {
-        const response = await authService.getUserRoles('string');
+    it('Testing "getRoles"', async () => {
+        const response = await authService.getRoles('string');
 
-        expect(jwt_decode).toHaveBeenCalled();
-        expect(response).toEqual('mockRole');
+        expect(jwt.decode).toHaveBeenCalled();
+        expect(response).toEqual(['mockRole']);
+    });
+
+    it('Testing "getPermissions"', async () => {
+        const response = await authService.getPermissions('string');
+
+        expect(jwt.decode).toHaveBeenCalled();
+        expect(response).toEqual(['mockPermission']);
+    });
+
+    it('Testing "checkUserRole"', async () => {
+        const response = await authService.checkUserRole('string');
+
+        expect(jwt.decode).toHaveBeenCalled();
+        expect(response).toEqual(false);
     });
 });

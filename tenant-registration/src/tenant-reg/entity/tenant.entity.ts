@@ -18,10 +18,16 @@ export class Tenant {
   description: string;
 
   @Column()
+  databaseName: string;
+
+  @Column()
+  databaseDescription: string;
+
+  @Column()
   createdDateTime: string;
 
   @Column({ default: false })
-  isDelete: boolean;
+  isDeleted: boolean;
 
   @Column()
   clientId: string;

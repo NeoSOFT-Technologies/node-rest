@@ -2,6 +2,7 @@ import { ApiHideProperty } from '@nestjs/swagger';
 import { IsNotEmpty, Matches } from 'class-validator';
 
 export class CredentialsDto {
+  tenantName: string;
   username: string;
 
   @IsNotEmpty()
@@ -10,8 +11,6 @@ export class CredentialsDto {
       'one special character'
   })
   password: string;
-
-  tenantName: string;
 
   @ApiHideProperty()
   clientId: string;

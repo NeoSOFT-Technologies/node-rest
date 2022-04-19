@@ -16,6 +16,15 @@ export class IdentifierService {
       where: {
         tenantName: tenant.tenantName,
         email: tenant.email,
+        isDeleted: false,
+      },
+    });
+  }
+
+  async checkDb(dbName: string): Promise<number> {
+    return this.tenantRepository.count({
+      where: {
+        databaseName: dbName,
       },
     });
   }

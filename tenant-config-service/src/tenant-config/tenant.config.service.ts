@@ -15,15 +15,44 @@ export class TenantConfigService {
     return await this.configRepository.save(tenantconfig);
   }
 
-  async getConfig(tenantId: number) {
+  async getConfig(tenantName: string) {
     try {
       return await this.configRepository.findOneOrFail({
         where: {
-          tenantId: tenantId,
+          tenantName: tenantName,
         },
       });
     } catch (error) {
-      throw new NotFoundException('Incorrect ID');
+      throw new NotFoundException('Incorrect Tenant name entered');
+    }
+  }
+
+  async updateConfig(tenantname: string, newdescription: string) {
+    try {
+      const tenant: TenantConfig = await this.configRepository.findOneOrFail({
+        where: {
+          tenantName: tenantname,
+        },
+      });
+      await this.configRepository.update(tenant.id, {
+        ...tenant,
+        description: newdescription,
+      });
+    } catch (e) {
+      return e;
+    }
+  }
+
+  async deleteConfig(tenantname: string) {
+    try {
+      const tenantEntity = await this.configRepository.findOneOrFail({
+        where: {
+          tenantName: tenantname,
+        },
+      });
+      await this.configRepository.remove(tenantEntity);
+    } catch (e) {
+      return e;
     }
   }
 }

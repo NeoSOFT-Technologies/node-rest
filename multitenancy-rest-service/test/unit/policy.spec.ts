@@ -1,4 +1,4 @@
-import { Keycloak, KeycloakAuthPolicy, KeycloakClient, KeycloakUser } from '@app/iam';
+import { KeycloakAuthPolicy, KeycloakClient } from '@app/iam';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -6,14 +6,6 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
             return {
-                users: {
-                    find: jest.fn().mockResolvedValue([
-                        {
-                            id: 'id',
-                            username: 'tenantadmin'
-                        }
-                    ]),
-                },
                 clients: {
                     find: jest.fn().mockResolvedValue([
                         {
@@ -34,7 +26,7 @@ describe('Testing Keycloak Auth Policy', () => {
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [Keycloak, KeycloakClient, KeycloakUser, ConfigService, KeycloakAuthPolicy],
+            providers: [KeycloakClient, ConfigService, KeycloakAuthPolicy],
         }).compile();
 
         keycloakAuthPolicy = module.get<KeycloakAuthPolicy>(KeycloakAuthPolicy);

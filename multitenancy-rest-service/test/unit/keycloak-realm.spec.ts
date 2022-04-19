@@ -19,10 +19,13 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                 },
                 roles: {
                     create: jest.fn(),
+                    find: jest.fn().mockResolvedValue([{ name: 'sample-role' }]),
                     findOneByName: jest.fn().mockResolvedValue({
                         id: 'id',
                         name: 'name'
                     }),
+                    updateByName: jest.fn(),
+                    delByName: jest.fn(),
                     createComposite: jest.fn()
                 },
                 clients: {
@@ -66,5 +69,54 @@ describe('Testing Keycloak Realm Service', () => {
         const token = 'Bearer token';
         const response = await keycloakRealmService.createRealm('string', 'string', 'string', token);
         expect(response).toEqual('Realm created successfully');
+    });
+
+    it('Testing "createRealmRoles" method', async () => {
+        const tenantName = 'string';
+        const roleDetails = {
+            name: 'string'
+        }
+        const token = 'Bearer token';
+
+        const response = await keycloakRealmService.createRealmRoles(tenantName, roleDetails, token);
+        expect(response).toEqual('Role created successfully');
+    });
+
+    it('Testing "getRealmRoles" method', async () => {
+        const tenantName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakRealmService.getRealmRoles(tenantName, token);
+        expect(response).toEqual(['sample-role']);
+    });
+
+    it('Testing "getRealmRoleInfo" method', async () => {
+        const tenantName = 'string';
+        const roleName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakRealmService.getRealmRoleInfo(tenantName, roleName, token);
+        expect(response).toEqual({ id: 'id', name: 'name' });
+    });
+
+    it('Testing "updateRealmRoles" method', async () => {
+        const tenantName = 'string';
+        const roleName = 'string';
+        const roleDetails = {
+            name: 'string'
+        };
+        const token = 'Bearer token';
+
+        const response = await keycloakRealmService.updateRealmRoles(tenantName, roleName, roleDetails, token);
+        expect(response).toEqual('Role updated successfully');
+    });
+
+    it('Testing "deleteRealmRoles" method', async () => {
+        const tenantName = 'string';
+        const roleName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakRealmService.deleteRealmRoles(tenantName, roleName, token);
+        expect(response).toEqual('Role deleted successfully');
     });
 });

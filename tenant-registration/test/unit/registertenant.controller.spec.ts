@@ -11,6 +11,8 @@ describe('Testing RegisTration MicroService Controller', () => {
     email: 'string',
     password: 'string',
     description: 'string',
+    databaseName: 'string',
+    databaseDescription: 'string',
     clientId: 'string',
     clientSecret: 'string',
   };
@@ -23,6 +25,7 @@ describe('Testing RegisTration MicroService Controller', () => {
   };
   const mockIdentifierService = {
     identify: jest.fn().mockResolvedValue(false),
+    checkDb: jest.fn().mockResolvedValue(false),
   };
 
   beforeAll(async () => {
@@ -49,6 +52,11 @@ describe('Testing RegisTration MicroService Controller', () => {
     ).toEqual(mockMessage);
   });
 
+  it('Testing registerTenantcontroller checkDbName', async () => {
+    const dbName = 'string';
+    expect(await registertenantController.checkDbName(dbName)).toEqual(true);
+  });
+
   it('Testing registerTenantcontroller getClientIdSecret', async () => {
     const tenantname = 'string';
     const mockMessage = { Message: 'Client Id and Secret Successfully' };
@@ -59,9 +67,14 @@ describe('Testing RegisTration MicroService Controller', () => {
   });
 
   it('Testing listAllTenant', async () => {
+    const query = {
+      tenantName: 'tenantName',
+      isDeleted: true,
+      page: 1,
+    };
     const mockMessage = { Message: 'All Tenant received Successfully' };
     mockRegistertenantService.listAll.mockResolvedValue(mockMessage);
-    expect(await registertenantController.listAllTenant(1)).toEqual(
+    expect(await registertenantController.listAllTenant(query)).toEqual(
       mockMessage,
     );
   });

@@ -11,6 +11,7 @@ describe('Testing Config Service', () => {
     tenantName: 'string',
     tenantDbName: 'string',
     description: 'string',
+    databaseName: 'string',
     createdDateTime: 'string',
     host: 'string',
     port: 1234,
@@ -42,7 +43,7 @@ describe('Testing Config Service', () => {
   });
 
   it('Testing getConfig method of TenantConfigService', async () => {
-    expect(await tenantConfigService.getConfig(1234)).toEqual(
+    expect(await tenantConfigService.getConfig('string')).toEqual(
       mockTenantConfigDetails,
     );
   });

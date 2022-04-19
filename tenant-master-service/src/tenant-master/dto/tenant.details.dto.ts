@@ -1,7 +1,7 @@
 export class TenantDetailsDto {
   tenantId: string;
   tenantName: string;
-  tenantDbName?: string;
+  databaseName?: string;
   password: string;
   description: string;
   createdDateTime: string;

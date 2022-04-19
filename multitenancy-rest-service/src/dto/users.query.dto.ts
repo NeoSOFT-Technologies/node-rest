@@ -1,8 +1,5 @@
-import { ApiHideProperty } from "@nestjs/swagger"
-
 export class UsersQueryDto {
-  @ApiHideProperty()
   tenantName?: string
-
+  userName?: string
   page?: number
 }

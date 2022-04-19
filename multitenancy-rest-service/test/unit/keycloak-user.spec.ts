@@ -10,9 +10,15 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     create: jest.fn().mockResolvedValue({
                         id: 'id'
                     }),
-                    find: jest.fn().mockResolvedValue('sample-user'),
-                    count: jest.fn().mockResolvedValue('sample-count'),
+                    find: jest.fn().mockResolvedValue([{
+                        username: 'sample-user',
+                        email: 'sample-email',
+                        createdTimestamp: 1647865779127
+                    }]),
+                    count: jest.fn().mockResolvedValue(1),
                     addRealmRoleMappings: jest.fn(),
+                    delRealmRoleMappings: jest.fn(),
+                    listRealmRoleMappings: jest.fn().mockResolvedValue([{ name: 'sample-role' }]),
                     update: jest.fn(),
                     del: jest.fn()
                 },
@@ -22,6 +28,24 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         id: 'id',
                         name: 'name'
                     }),
+                },
+                clients: {
+                    find: jest.fn().mockResolvedValue([
+                        {
+                            id: 'id',
+                            clientId: 'test-client',
+                        }
+                    ]),
+                    evaluateResource: jest.fn().mockResolvedValue({
+                        results: [{
+                            status: 'PERMIT',
+                            policies: [{
+                                policy: {
+                                    name: 'sample-permission'
+                                }
+                            }]
+                        }]
+                    })
                 },
                 setAccessToken: jest.fn()
             };
@@ -40,6 +64,11 @@ describe('Testing Keycloak User Service', () => {
         keycloakUserService = module.get<KeycloakUser>(KeycloakUser);
     });
 
+    it('Testing "createAdminUser" method', async () => {
+        const response = await keycloakUserService.createAdminUser('string', 'string', 'string');
+        expect(response.id).toEqual('id');
+    });
+
     it('Testing "createUser" method', async () => {
         const mockTenantCredentials = {
             tenantName: 'string',
@@ -48,6 +77,8 @@ describe('Testing Keycloak User Service', () => {
             userName: 'string',
             email: 'stirng',
             password: 'string',
+            roles: ['role'],
+            attributes: ['string']
         };
         const token: string = 'Bearer token'
         const response = await keycloakUserService.createUser(mockTenantCredentials, mockUserDetails, token);
@@ -63,7 +94,32 @@ describe('Testing Keycloak User Service', () => {
             token: 'Bearer token'
         };
         const response = await keycloakUserService.getUsers(mockData);
-        expect(response).toEqual({ data: 'sample-user', count: 'sample-count' });
+        expect(response).toEqual({
+            data: [
+                {
+                    userName: 'sample-user',
+                    email: 'sample-email',
+                    createdTimestamp: '2022/03/21 17:59:39'
+                }
+            ],
+            count: 1
+        });
+    });
+
+    it('Testing "getUserInfo" method', async () => {
+        const tenantName = 'string';
+        const userName = 'string';
+        const clientName = 'string';
+        const token: string = 'Bearer token';
+
+        const response = await keycloakUserService.getUserInfo({ tenantName, userName, clientName }, token);
+        expect(response).toEqual({
+            username: 'sample-user',
+            email: 'sample-email',
+            createdTimestamp: '2022/03/21 17:59:39',
+            tenantName: 'string',
+            roles: ['sample-role']
+        });
     });
 
     it('Testing "updateUsers" method', async () => {
@@ -87,8 +143,16 @@ describe('Testing Keycloak User Service', () => {
         expect(response).toEqual('User deleted Successfully');
     });
 
-    it('Testing "createAdminUser" method', async () => {
-        const response = await keycloakUserService.createAdminUser('string', 'string', 'string');
-        expect(response.id).toEqual('id');
+    it('Testing "getAdminDetails" method', async () => {
+        const userName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakUserService.getAdminDetails(userName, token);
+        expect(response).toEqual({
+            username: 'sample-user',
+            email: 'sample-email',
+            createdTimestamp: '2022/03/21 17:59:39',
+            roles: ['sample-role'],
+        });
     });
 });

@@ -20,18 +20,29 @@ export class TenantConfigController {
   }
 
   @MessagePattern({ cmd: 'get_config' })
-  async getConfig(tenantId: number) {
+  async getConfig(tenantName: string) {
     try {
-      const isIntegerValue = Number.isInteger(tenantId);
-      if (!isIntegerValue) {
-        throw new HttpException(
-          'Please enter an integer value',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
-      }
-      return await this.tenantConfigService.getConfig(tenantId);
+      return await this.tenantConfigService.getConfig(tenantName);
     } catch (e) {
       throw new RpcException(e);
+    }
+  }
+
+  @EventPattern({ cmd: 'update-config' })
+  async updateConfig({ tenantname, newdescription }) {
+    try {
+      await this.tenantConfigService.updateConfig(tenantname, newdescription);
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @EventPattern({ cmd: 'delete-config' })
+  async deleteConfig(tenantname: string) {
+    try {
+      await this.tenantConfigService.deleteConfig(tenantname);
+    } catch (e) {
+      return e;
     }
   }
 }

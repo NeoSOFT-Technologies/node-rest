@@ -34,6 +34,7 @@ describe('Testing Provisioning MicroService Controller', () => {
     const Tenant = {
       tenantName: 'string',
       password: 'string',
+      databaseName: 'string',
     };
     expect(await tenantprovisionController.createDatabase(Tenant)).toEqual({
       Message: 'Tenant Database Provisoned successfully',
@@ -76,6 +77,7 @@ describe('Testing Provisioning MicroService Controller', () => {
     const TenantName = {
       tenantName: 'string',
       password: 'string',
+      databaseName: 'string',
     };
 
     expect(await tenantprovisionController.ping(TenantName)).toEqual({

@@ -22,6 +22,7 @@ API Endpoint:  `/api/login`
     | Name                     | Description             | Type   |
     |--------------------------|-------------------------|--------|
     | tenantName<br>required   | Username of the tenant  | string |
+    | username<br>required     | Username of the tenant  | string |
     | password<br>required     | Password of that tenant | string |
 
 
@@ -131,8 +132,7 @@ API Endpoint:  `/api/refresh-access-token`
 
 **6. API for Forgot Password**
 
-Request Method: `GET` 
-
+Request Method: `GET`  
 API Endpoint:  `/api/forgot-password`
 
 **Input:**  
@@ -149,9 +149,57 @@ API Endpoint:  `/api/forgot-password`
 **Output:** After hitting this API , the user will be redirected to keycloak UI.
 
 ---
+**7. Public Key**
+
+Request Method: `GET`  
+API Endpoint:  `/api/publicKey/{tenantName}`
+
+**Input:**
+1. Request Path Parameter
+    | Name                              | Description          | Type   |
+    |-----------------------------------|----------------------|--------|
+    | tenantName<br>required            | name of the tenant   | string |
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name          | Type   |
+|---------------|--------|
+| public_key    | string |
+
+The `affected` key value 1 means the updation is successfull otherwise it is 0  
+
+---
+
+## /api/admin
+
+**8. Admin Info**
+
+Request Method:  `GET`  
+API Endpoint:  `/api/admin`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+**Output:** Produces `application/json` of the following schema
+| Name            | Description                                  |
+|-----------------|----------------------------------------------|
+| id              | id of table row                              |
+| createdTimestamp| time of creation of user                     |
+| userName        | name of user                                 |
+| email           | email of user                                |
+| roles           | roles assigned to user                       |
+| tenants         | all the tenants details (array)              |
+| count           | total number of tenants                      |
+
+---
 ## /api/tenant
 
-**7. Tenant List**
+**9. Tenant List**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/tenant`
@@ -164,6 +212,14 @@ API Endpoint:  `/api/tenant`
     |---------------|-----------------------|
     | Authorization | Bearer [ACCESS_TOKEN] |
 
+2. Request Query
+    | Name                   | Description                | Type    |
+    |------------------------|----------------------------|---------|
+    | tenantName<br>optional | name of the tenant(search) | string  |
+    | isDeleted<br>optional  | tenant is deleted          | boolean |
+    | page<br>optional       | page number                | number  |
+
+
 **Output:** Produces `application/json` which contains the array of the following schema
 | Name            | Description                        |
 |-----------------|------------------------------------|
@@ -173,44 +229,13 @@ API Endpoint:  `/api/tenant`
 | description     | description of tenant              |
 | createdDateTime | time of creation of tenant         |
 | isDeleted       | if the tenant is active or deleted |
+| count           | total count                        |
 
 **`Note`:** The output is paginated and is to be handled accordingly on the client side
 
 ---
 
-**8. Tenant Details**
-
-Request Method:  `GET`  
-API Endpoint:  `/api/tenant/:id`
-
-> `Note: `Only the admin can use this API
-
-**Input:** 
-1. Headers
-    | Key           | Value                 |
-    |---------------|-----------------------|
-    | Authorization | Bearer [ACCESS_TOKEN] |
-
-2. Request Path Parameters
-    | Name           | Description            | Type   |
-    |----------------|------------------------|--------|
-    | id<br>required | id of the the tenant   | string |
-
-**Output:** Produces `application/json` of the following schema
-| Name            | Description                   |
-|-----------------|-------------------------------|
-| id              | id of table row               |
-| tenantId        | unique tenant id              |
-| tenantName      | name of tenant                |
-| description     | description of tenant         |
-| createdDateTime | time of creation of tenant    |
-| tenantDbName    | db name provisioned to tenant |
-| host            | host of db server             |
-| port            | port of db server             |
-| policy          | policies of tenant            |
-
----
-**9. Create new Tenant**
+**10. Create new Tenant**
 
 Request Method:  `POST`  
 API Endpoint:  `/api/tenant`
@@ -239,12 +264,12 @@ API Endpoint:  `/api/tenant`
 |----------|-----------------------------|
 | message  | success                     |
 ---
-**10. Updating a Tenant**
+**11. Updating a Tenant**
 
 Request Method:  `PATCH`  
 API Endpoint: `/api/tenant`
 
-> `Note: `Only the admin can use this API
+> `Note: `Only the admin and tenantadmin can use this API
 
 **Input:**
 1. Headers
@@ -266,10 +291,10 @@ API Endpoint: `/api/tenant`
 The `affected` key value 1 means the updation is successfull otherwise it is 0  
 
 ---
-**11. Deleting a Tenant**
+**12. Deleting a Tenant**
 
 Request Method: `DELETE`  
-API Endpoint:  `/api/tenant`
+API Endpoint:  `/api/tenant/{tenantName}`
 
 > `Note: `Only the admin can use this API
 
@@ -278,9 +303,8 @@ API Endpoint:  `/api/tenant`
     | Key           | Value                 |
     |---------------|-----------------------|
     | Authorization | Bearer [ACCESS_TOKEN] |
-    | Content-Type  | application/json      |
 
-2. Request Body
+2. Request Path Parameter
     | Name                              | Description                        | Type   |
     |-----------------------------------|------------------------------------|--------|
     | tenantName<br>required            | name of the tenant to be deleted   | string |
@@ -296,10 +320,12 @@ The `affected` key value 1 means the updation is successfull otherwise it is 0
 ---
 ## /api/tenant/config
 
-**12. Tenant Configurations**
+**13. Tenant Configurations**
 
 Request Method:  `GET`  
-API Endpoint: `/api/tenant/config/:id`
+API Endpoint: `/api/tenant/config/{tenantName}`
+
+> Note: `Only the `admin` and `tenantadmin` can access this API`
 
 **Input:** 
 1. Headers
@@ -308,9 +334,9 @@ API Endpoint: `/api/tenant/config/:id`
     | Authorization | Bearer [ACCESS_TOKEN] |
 
 2. Request Path Parameters
-    | Name           | Description            | Type   |
-    |----------------|------------------------|--------|
-    | id<br>required | id of the the tenant   | string |
+    | Name             | Description            | Type   |
+    |------------------|------------------------|--------|
+    | name<br>required | id of the the tenant   | string |
 
 **Output:** Produces `application/json` of the following schema
 
@@ -326,7 +352,7 @@ API Endpoint: `/api/tenant/config/:id`
 ---
 ## /api/user
 
-**13. Create New User**
+**14. Create New User**
 
 Request Method:  `POST`  
 API Endpoint: `/api/user`
@@ -341,22 +367,108 @@ API Endpoint: `/api/user`
     | Content-Type  | application/json      |
 
 2. Request Body
-    | Name             | Description                                             | Type    |
-    |------------------|---------------------------------------------------------|---------|
-    | userName         | name of the new user                                    | string  |
-    | password         | password to be set by user                              | string  |
-    | email            | email of the new user                                   | string  |
+    | Name             | Description                                             | Type     |
+    |------------------|---------------------------------------------------------|----------|
+    | userName         | name of the new user                                    | string   |
+    | password         | password to be set by user                              | string   |
+    | email            | email of the new user                                   | string   |
+    | roles            | roles to be assigned to new user                        | string[ ]|
+    | attributes       | attributes to be assigned to user(permissions)          | string[ ]|    
 
 **Output:** Produces `application/json` of the following schema  
-| Name       | Description                 |
-|------------|-----------------------------|
-| message    | success                     |
+| Name       | Description    |
+|------------|----------------|
+| message    | success        |
 
 ---
-**14. User List**
+**15. User List**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/user`
+
+> `Note: `Only the admin & tenant admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Query
+    | Name                   | Description              | Type   |
+    |------------------------|--------------------------|--------|
+    | tenantName<br>optional | name of the tenant       | string |
+    | userName<br>optional   | name of the user(search) | string |
+    | page<br>optional       | page number              | number |
+
+**Output:** Produces `application/json` of the following schema
+| Name      | Description                                  |
+|-----------|----------------------------------------------|
+| data      | array of users                               |
+| count     | total number of users of that tenant         |
+
+---
+**16. User Info**
+
+Request Method:  `GET`  
+API Endpoint:  `/api/user-info`
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Query
+    | Name                   | Description         | Type   |
+    |------------------------|---------------------|--------|
+    | tenantName<br>optional | name of the tenant  | string |
+    | userName<br>optional   | name of the user    | string |
+
+**Output:** Produces `application/json` of the following schema
+| Name            | Description                                  |
+|-----------------|----------------------------------------------|
+| id              | id of table row                              |
+| createdTimestamp| time of creation of user                     |
+| userName        | name of user                                 |
+| email           | email of user                                |
+| tenanTName      | tenant of that user                          |
+| roles           | roles assigned to user                       |
+| permission      | permission granted to user                   |
+---
+**17. Updating a User**
+
+Request Method:  `PATCH`  
+API Endpoint: `/api/user`
+
+> `Note: `Only the tenant admin & user can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Body
+
+    | Name                  | Description                                       | Type   |
+    |-----------------------|---------------------------------------------------|--------|
+    | userName<br>optional  | name of the user                                  | string |
+    | action<br>required    | key value pair of the configuration to be updated | string |
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name       | Description  |
+|------------|--------------|
+| message    | success      |
+
+---
+
+**18. Deleting a User**
+
+Request Method: `DELETE`  
+API Endpoint:  `/api/user/{userName}`
 
 > `Note: `Only the tenant admin can use this API
 
@@ -366,83 +478,7 @@ API Endpoint:  `/api/user`
     |---------------|-----------------------|
     | Authorization | Bearer [ACCESS_TOKEN] |
 
-**Output:** Produces `application/json` which contains the array of the following schema
-| Name            | Description                                  |
-|-----------------|----------------------------------------------|
-| id              | id of table row                              |
-| createdDateTime | time of creation of user                     |
-| userName        | name of user                                 |
-| email           | email of user                                |
-| access          | the resources which the user has access of   |
----
-
-**15. User Configuration**
-
-Request Method:  `GET`  
-API Endpoint: `/api/user/:id`
-
-**Input**
-1. Headers
-    | Key           | Value                 |
-    |---------------|-----------------------|
-    | Authorization | Bearer [ACCESS_TOKEN] |
-
-2. Request Path Parameters
-    | Name                  | Description                        | Type   |
-    |-----------------------|------------------------------------|--------|
-    | id<br>required        | id of the the user                 | string |
-    | tenantName<br>required| name of the tenant of the user     | string |
-
-**Output:** Produces `application/json` of the following schema
-
-| Name             | Description                                             | Type   |
-|------------------|---------------------------------------------------------|--------| 
-| userId           | id of new user                                          | string |  
-| username         | username created by user                                | string |
-| tenantName       | name of tenant under<br>which the user is to be created | string |
-| createdDateTime  | date and time when the user is created                  | string |
-
----
-**16. Updating a User**
-
-Request Method:  `PATCH`  
-API Endpoint: `/api/user`
-
-**Input:**
-1. Headers
-    | Key           | Value                 |
-    |---------------|-----------------------|
-    | Authorization | Bearer [ACCESS_TOKEN] |
-    | Content-Type  | application/json      |
-
-2. Request Body
-
-    | Name                              | Description                                       | Type   |
-    |-----------------------------------|---------------------------------------------------|--------|
-    | fields(to be updated)<br>required | key value pair of the configuration to be updated | string |
-
-**Output:** Produces `application/json` of the following schema  
-
-| Name       | Description  |
-|------------|--------------|
-| message    | success      |
-
-
----
-
-**17. Deleting a User**
-
-Request Method: `DELETE`  
-API Endpoint:  `/api/user`
-
-**Input:**
-1. Headers
-    | Key           | Value                 |
-    |---------------|-----------------------|
-    | Authorization | Bearer [ACCESS_TOKEN] |
-    | Content-Type  | application/json      |
-
-2. Request Body
+2. Request Path Parameter
     | Name                              | Description                        | Type   |
     |-----------------------------------|------------------------------------|--------|
     | userName<br>required              | name of the user to be deleted     | string |
@@ -455,9 +491,259 @@ API Endpoint:  `/api/user`
 
 
 ---
+## /api/roles
+
+**19. Create New Role**
+
+Request Method:  `POST`  
+API Endpoint: `/api/roles`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Body
+    | Name             | Description                                             | Type     |
+    |------------------|---------------------------------------------------------|----------|
+    | tenantName       | name of the tenant                                      | string   |
+    | roleDetails      | role details like name, description                     | string   |
+
+**Output:** Produces `application/json` of the following schema  
+| Name       | Description    |
+|------------|----------------|
+| message    | success        |
+
+---
+**20. Available Realm Role**
+
+Request Method:  `GET`  
+API Endpoint:  `/api/roles`
+
+> `Note: `Only the admin & tenant admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Query
+    | Name                   | Description              | Type   |
+    |------------------------|--------------------------|--------|
+    | tenantName<br>optional | name of the tenant       | string |
+
+**Output:** Produces `application/json` of the following schema
+| Name      | Description                                  |
+|-----------|----------------------------------------------|
+| roles     | array of available roles                     |
+
+---
+**21. Role Info**
+
+Request Method:  `GET`  
+API Endpoint:  `/api/role-info`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Query
+    | Name                   | Description         | Type   |
+    |------------------------|---------------------|--------|
+    | tenantName<br>required | name of the tenant  | string |
+    | roleName<br>required   | name of the role    | string |
+
+**Output:** Produces `application/json` of the following schema
+| Name            | Description                                  |
+|-----------------|----------------------------------------------|
+| id              | role id                                      |
+| roleName        | name of role                                 |
+| description     | description of role                          |
+
+---
+**22. Update Realm Role**
+
+Request Method:  `PATCH`  
+API Endpoint: `/api/roles`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Body
+
+    | Name                  | Description                                       | Type   |
+    |-----------------------|---------------------------------------------------|--------|
+    | tenantName<br>required| name of the tenant                                | string |
+    | roleName<br>required  | name of the role                                  | string |
+    | action<br>required    | key value pair of the configuration to be updated | string |
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name       | Description  |
+|------------|--------------|
+| message    | success      |
+---
+**23. Delete Realm Role**
+
+Request Method: `DELETE`  
+API Endpoint:  `/api/roles/{tenantName}/{roleName}`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Path Parameter
+
+    | Name                  | Description                                       | Type   |
+    |-----------------------|---------------------------------------------------|--------|
+    | tenantName<br>required| name of the tenant                                | string |
+    | roleName<br>required  | name of the role to be deleted                    | string |
+
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name       | Description  |
+|------------|--------------|
+| message    | success      |
+
+---
+## /api/permission
+
+**24. Create New Permission**
+
+Request Method:  `POST`  
+API Endpoint: `/api/permission`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Body
+    | Name             | Description                                             | Type     |
+    |------------------|---------------------------------------------------------|----------|
+    | tenantName       | name of the tenant                                      | string   |
+    | clientName       | name of the client in keycloak                          | string   |
+    | permissionType   | type of permission (resource-based or scope-based)      | string   |
+    | permissionDetails| details of permission to be created                     | string   |
+
+**Output:** Produces `application/json` of the following schema  
+| Name       | Description    |
+|------------|----------------|
+| message    | success        |
+
+---
+**25. Get Client Permissions**
+
+Request Method:  `GET`  
+API Endpoint:  `/api/permission`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Query
+    | Name                   | Description              | Type   |
+    |------------------------|--------------------------|--------|
+    | tenantName<br>optional | name of the tenant       | string |
+    | clientName<br>required | name of the client       | string |
+
+**Output:** Produces `application/json` of the following schema
+| Name      | Description                                  |
+|-----------|----------------------------------------------|
+| permission| array of client permission with details      |
+
+---
+**26. Update Client Permission**
+
+Request Method:  `PATCH`  
+API Endpoint: `/api/permission`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+    | Content-Type  | application/json      |
+
+2. Request Body
+
+    | Name                       | Description                                       | Type   |
+    |----------------------------|---------------------------------------------------|--------|
+    | tenantName<br>required     | name of the tenant                                | string |
+    | clientName<br>required     | name of the client                                | string |
+    | permissionName<br>required | name of the permission                            | string |
+    | permissionType<br>required | type of permission (resource-based or scope-based)| string |
+    | action<br>required         | key value pair of the configuration to be updated | string |
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name       | Description  |
+|------------|--------------|
+| message    | success      |
+---
+**27. Delete Client Permission**
+
+Request Method: `DELETE`  
+API Endpoint:  `/api/roles/{tenantName}/{clientName}/{permissionName}-{permissionType}`
+
+> `Note: `Only the admin can use this API
+
+**Input:**
+1. Headers
+    | Key           | Value                 |
+    |---------------|-----------------------|
+    | Authorization | Bearer [ACCESS_TOKEN] |
+
+2. Request Path Parameter
+
+    | Name                       | Description                                       | Type   |
+    |--------------------------- |---------------------------------------------------|--------|
+    | tenantName<br>required     | name of the tenant                                | string |
+    | clientName<br>required     | name of the client                                | string |
+    | permissionName<br>required | name of the permission to be deleted              | string |
+    | permissionType<br>required | type of permission (resource-based or scope-based)| string |
+
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name       | Description  |
+|------------|--------------|
+| message    | success      |
+
+---
 ## Testing API's
 
-**18. Test Tenant's connectivity with database**
+**28. Test Tenant's connectivity with database**
 
 Request Method: `GET`  
 API Endpoint:  `/api/connect-database`
@@ -484,7 +770,7 @@ API Endpoint:  `/api/connect-database`
 
 ---
 
-**19. Test Creation of Table in Tenant's Database**
+**29. Test Creation of Table in Tenant's Database**
 
 Request Method: `POST`  
 API Endpoint:  `/api/create-table`

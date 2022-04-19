@@ -2,6 +2,7 @@ import { AppController } from '@app/app.controller';
 import { AppService } from '@app/app.service';
 import { AuthService } from '@app/auth/auth.service';
 import { RegisterTenantDto } from '@app/dto/register.tenant.dto';
+import { PublicKeyCache } from '@app/auth/cache.publicKey';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request, Response } from 'express';
 import * as httpMocks from 'node-mocks-http';
@@ -39,27 +40,42 @@ describe('Testing AppController', () => {
         deleteTenant: jest.fn(() => of(mockMessage)),
         createTable: jest.fn(() => of(mockMessage)),
         createRealm: jest.fn(),
+        getAdminDetails: jest.fn(),
         createUser: jest.fn(),
         listAllUser: jest.fn(),
+        userInfo: jest.fn(),
         updateUser: jest.fn(),
         deleteUser: jest.fn(),
         createResource: jest.fn(),
         createPolicy: jest.fn(),
         createClient: jest.fn(),
+        createRole: jest.fn(),
+        getRoles: jest.fn(),
+        roleInfo: jest.fn(),
+        updateRole: jest.fn(),
+        deleteRole: jest.fn(),
         createScope: jest.fn(),
-        createPermission: jest.fn()
+        createPermission: jest.fn(),
+        getPermissions: jest.fn(),
+        updatePermission: jest.fn(),
+        deletePermission: jest.fn()
     };
 
     const mockAuthService = {
         getAccessToken: jest.fn().mockResolvedValue('token'),
         logout: jest.fn().mockResolvedValue('204'),
         refreshAccessToken: jest.fn().mockResolvedValue('token'),
+        getTenantName: jest.fn().mockResolvedValue('tenantName'),
+        getUserName: jest.fn().mockResolvedValue('userName'),
+        checkUserRole: jest.fn().mockResolvedValue(false),
+        getPermissions: jest.fn().mockResolvedValue(['permission']),
+        getpublicKey: jest.fn().mockResolvedValue('public-key'),
     };
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [AppController],
-            providers: [AppService, AuthService],
+            providers: [AppService, AuthService, PublicKeyCache],
         })
             .overrideProvider(AppService)
             .useValue(mockAppService)
@@ -112,15 +128,36 @@ describe('Testing AppController', () => {
         mockrefreshAccessToken.mockRestore();
     });
 
+    it('Testing appcontroller "publicKey"', async () => {
+        mockRequest.params = {
+            tenantName: 'tenantName'
+        };
+        const getpublicKey = jest.spyOn(authService, 'getpublicKey');
+        await appController.publicKey(mockRequest, mockResponse);
+        expect(getpublicKey).toHaveBeenCalled();
+        getpublicKey.mockRestore();
+    });
+
+    it('Testing appcontroller "adminDetails"', async () => {
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+
+        const getAdminDetails = jest.spyOn(appService, 'getAdminDetails');
+        await appController.adminDetails(mockRequest, mockResponse);
+        expect(getAdminDetails).toHaveBeenCalled();
+        getAdminDetails.mockRestore();
+    });
+
     it('Testing appcontroller "registerTenant"', async () => {
         const mockBody: RegisterTenantDto = {
             tenantName: 'tenantName',
             email: 'tenant@gmail.com',
             password: 'tenant123',
             description: 'This is tenant Database',
-            clientDetails: {
-                clientId: 'clientid'
-            }
+            databaseName: 'tenant_db',
+            databaseDescription: 'This is database description',
+            clientDetails: { clientId: 'clientId' }
         }
         mockRequest.headers = {
             authorization: 'Bearer token'
@@ -129,10 +166,10 @@ describe('Testing AppController', () => {
         const createRealm = jest.spyOn(appService, 'createRealm');
         const createClient = jest.spyOn(appService, 'createClient');
         await appController.registerTenant(mockBody, mockRequest, mockResponse);
-        const { tenantName, email, password, clientDetails } = mockBody;
+        const { tenantName, email, password, clientDetails, databaseName } = mockBody;
         expect(mockSubscribe).toHaveBeenCalled();
         expect(createRealm).toHaveBeenCalledWith(
-            { tenantName, email, password },
+            { tenantName, email, password }, databaseName,
             mockRequest.headers['authorization']);
         expect(createClient).toHaveBeenCalledWith(
             { tenantName, clientDetails },
@@ -141,9 +178,17 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "getTenantConfig"', async () => {
+        mockRequest.params = {
+            tenantName: 'tenantName',
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const getTenantConfig = jest.spyOn(appService, 'getTenantConfig');
         await appController.getTenantConfig(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
+        expect(getTenantConfig).toHaveBeenCalledWith('tenantName');
         mockSubscribe.mockRestore();
     });
 
@@ -157,12 +202,14 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "updateDescription"', async () => {
         mockRequest.body = {
             action: {
-                tenantName: 'string',
-                description: 'string'
+                tenantName: 'tenantName',
+                description: 'newDescription'
             }
-        }
+        };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const updateDescription = jest.spyOn(appService, 'updateDescription');
         await appController.updateDescription(mockRequest, mockResponse);
+        expect(updateDescription).toHaveBeenCalledWith('tenantName', 'newDescription');
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });
@@ -217,6 +264,24 @@ describe('Testing AppController', () => {
         mockSend.mockRestore();
     });
 
+    it('Testing appcontroller "getUserInfo"', async () => {
+        mockRequest.query = {
+            tenantName: 'tenantName',
+            usertName: 'usertName',
+        };
+
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const userInfo = jest.spyOn(appService, 'userInfo');
+        await appController.getUserInfo(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(userInfo).toHaveBeenCalledWith(mockRequest.query, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
     it('Testing appcontroller "updateUser"', async () => {
         mockRequest.body = {
             tenantName: 'tenantName',
@@ -239,9 +304,9 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "deleteUser"', async () => {
-        mockRequest.body = {
+        mockRequest.params = {
             tenantName: 'tenantName',
-            userName: 'userName',
+            userName: 'username',
         };
 
         mockRequest.headers = {
@@ -252,7 +317,7 @@ describe('Testing AppController', () => {
         const deleteUser = jest.spyOn(appService, 'deleteUser');
         await appController.deleteUser(mockRequest, mockResponse);
         expect(mockSend).toHaveBeenCalled();
-        expect(deleteUser).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
+        expect(deleteUser).toHaveBeenCalledWith(mockRequest.params, mockRequest.headers['authorization']);
         mockSend.mockRestore();
     });
 
@@ -272,6 +337,166 @@ describe('Testing AppController', () => {
         await appController.tenantClient(mockRequest, mockResponse);
         expect(mockSend).toHaveBeenCalled();
         expect(createClient).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "createRole"', async () => {
+        mockRequest.body = {
+            tenantName: 'tenantName',
+            roleDetails: {
+                name: 'string'
+            }
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const createRoles = jest.spyOn(appService, 'createRole');
+        await appController.createRole(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(createRoles).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "getAvailableRoles"', async () => {
+        mockRequest.query = {
+            tenantName: 'tenantName',
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const getRoles = jest.spyOn(appService, 'getRoles');
+        await appController.getAvailableRoles(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(getRoles).toHaveBeenCalledWith('tenantName', mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "getRoleInfo"', async () => {
+        mockRequest.query = {
+            tenantName: 'tenantName',
+            roleName: 'roleName'
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const roleInfo = jest.spyOn(appService, 'roleInfo');
+        await appController.getRoleInfo(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(roleInfo).toHaveBeenCalledWith(mockRequest.query, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "updateRole"', async () => {
+        mockRequest.body = {
+            tenantName: 'tenantName',
+            roleName: 'roleName',
+            action: {
+                name: 'string'
+            }
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const updateRoles = jest.spyOn(appService, 'updateRole');
+        await appController.updateRole(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(updateRoles).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "deleteRole"', async () => {
+        mockRequest.params = {
+            tenantName: 'tenantName',
+            roleName: 'roleName',
+        };
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const deleteRoles = jest.spyOn(appService, 'deleteRole');
+        await appController.deleteRole(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(deleteRoles).toHaveBeenCalledWith(mockRequest.params, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "permission"', async () => {
+        mockRequest.body = {
+            tenantName: 'string',
+            password: 'string',
+            clientName: 'string',
+            permissionType: 'string',
+            permissionDetails: {
+                name: 'string'
+            }
+        }
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const createPermission = jest.spyOn(appService, 'createPermission');
+        await appController.permission(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(createPermission).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "listPermission"', async () => {
+        mockRequest.query = {
+            tenantName: 'string',
+            clientName: 'string',
+        }
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const getPermissions = jest.spyOn(appService, 'getPermissions');
+        await appController.listPermission(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(getPermissions).toHaveBeenCalledWith(mockRequest.query, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "updatePermission"', async () => {
+        mockRequest.body = {
+            tenantName: 'string',
+            clientName: 'string',
+            permissionName: 'string',
+            permissionType: 'string',
+            permissionDetails: {
+                name: 'string'
+            }
+        }
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const updatePermission = jest.spyOn(appService, 'updatePermission');
+        await appController.updatePermission(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(updatePermission).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
+        mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "deletePermission"', async () => {
+        mockRequest.params = {
+            tenantName: 'string',
+            clientName: 'string',
+            permissionName: 'string',
+            permissionType: 'string',
+        }
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+        const mockSend = jest.spyOn(mockResponse, 'send');
+        const deletePermission = jest.spyOn(appService, 'deletePermission');
+        await appController.deletePermission(mockRequest, mockResponse);
+        expect(mockSend).toHaveBeenCalled();
+        expect(deletePermission).toHaveBeenCalledWith(mockRequest.params, mockRequest.headers['authorization']);
         mockSend.mockRestore();
     });
 
@@ -329,27 +554,6 @@ describe('Testing AppController', () => {
         await appController.scope(mockRequest, mockResponse);
         expect(mockSend).toHaveBeenCalled();
         expect(createScope).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
-        mockSend.mockRestore();
-    });
-
-    it('Testing appcontroller "permission"', async () => {
-        mockRequest.body = {
-            tenantName: 'string',
-            password: 'string',
-            clientName: 'string',
-            permissionType: 'string',
-            permissionDetails: {
-                name: 'string'
-            }
-        }
-        mockRequest.headers = {
-            authorization: 'Bearer token'
-        };
-        const mockSend = jest.spyOn(mockResponse, 'send');
-        const createPermission = jest.spyOn(appService, 'createPermission');
-        await appController.permission(mockRequest, mockResponse);
-        expect(mockSend).toHaveBeenCalled();
-        expect(createPermission).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
         mockSend.mockRestore();
     });
 

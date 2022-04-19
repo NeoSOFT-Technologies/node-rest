@@ -1,6 +1,6 @@
 import PolicyRepresentation from "@keycloak/keycloak-admin-client/lib/defs/policyRepresentation";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, Matches } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 class PermissionDetails implements PolicyRepresentation{
     name?: string;
@@ -15,7 +15,7 @@ export class PermissionDto{
     @IsString()
     tenantName: string;
     
-    permissionType: string;
     clientName: string;
+    permissionType: string;
     permissionDetails: PermissionDetails;
 }

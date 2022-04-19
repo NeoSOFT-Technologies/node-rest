@@ -29,7 +29,18 @@ services:
         - '8080:8080'
     environment:
         KEYCLOAK_USER: admin
-        KEYCLOAK_PASSWORD: admin
+        KEYCLOAK_PASSWORD: adminPassword@1
+  
+  demo-mail-server:
+    image: mailhog/mailhog
+    container_name: 'node_rest_mail'
+    networks:
+      - internal
+    logging:
+      driver: 'none'
+    ports:
+      - 1025:1025
+      - 8025:8025
 
   multitenancy-rest-service:
     build: 

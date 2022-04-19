@@ -38,6 +38,36 @@ We get the access token and refresh token which we can use further for authorisa
 ![Password Grant type flow](https://user-images.githubusercontent.com/87794374/156330776-51298fe8-efa4-41fa-9a16-8782563a2105.png)
 <p align = "center">Fig - Resource Owner Password Credentials Grant</p>
 
+### **Token Validation**
+The Token validation in this repository takes place in two ways viz: The first method is when the token is generated after the keycloak server is hit and second method is via the use of Public Key. Below we have discussed the methods in details.
+
+**Method - I image**
+
+
+Image
+- The Method-1 Token validation is as follows: 
+- When the token comes at the server side, first it passes through the AuthGuard    middleware.
+- OpenID Connect defines a discovery mechanism, called OpenID Connect Discovery,   where an OpenID server publishes its metadata at a well-known URL.
+- The URL is as follows: `http(s)://{host}:{port}/realms/{realm-name}/.well-known/openid-configuration`
+- It lists endpoints and other configuration options relevant to the OpenID Connect implementation in Keycloak. 
+- To validate the token, we hit the Introspection endpoint whose URL is given as: `http(s)://{host}:{port}/auth/realms/{realm-name}/protocol/openid-connect/token/
+- The Authorization server will check the token signature and also exp, aud etc. If the token is valid, a validated response containing isActive: true field is returned. Else isActive: false is returned.
+
+**Method - II image**
+
+iMAGE
+- The Method - II validation is as follows
+- In this method rather than sending the token to the Authorization server to introspect, we validate the token on the server itself.
+- But to validate the signature of the server, we need to have the public key. OIDC well-known configuration lists an API to retrieve the public key.
+- The URL which is hit is as follows: `http(s)://{host}:{port}/auth/realms/{realm-name}/protocol/openid-connect/
+certs`.
+- After verifying the token signature, next we decode the token to check expiry time of the token. If expiry time is also valid, the validated response can be sent containing isActive: true field. Otherwise send isActive: false in response.
+
+**Challenges in Method - II**
+- In Method 2, if we don’t want to go to the Authorization Server to reduce latency, we must have the public key saved on the server itself. Public keys are different for different tenants. 
+- So it is not good to store the Public Key on the server. 
+- In order to encounter this problem we will be using Caching mechanism to store the Public Key.
+
 ### **NestJS Guard for Authorization**
 
 After the token is received , the resources of the client can accessed. We are using Role based Access Control(RBAC) and to establish the access control layer we are implementing a custom guard namely *`KeycloakAuthGuard`*.

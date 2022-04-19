@@ -43,8 +43,8 @@ The Token validation in this repository takes place in two ways viz: The first m
 
 **Method - I image**
 
+![Token-Validation-Method-I](https://user-images.githubusercontent.com/87708447/164010136-f3f366c9-261a-4adf-9a0e-cbeda50edbdc.png)
 
-Image
 - The Method-1 Token validation is as follows: 
 - When the token comes at the server side, first it passes through the AuthGuard    middleware.
 - OpenID Connect defines a discovery mechanism, called OpenID Connect Discovery,   where an OpenID server publishes its metadata at a well-known URL.
@@ -55,7 +55,8 @@ Image
 
 **Method - II image**
 
-iMAGE
+![Token-validation-Method-II](https://user-images.githubusercontent.com/87708447/164010290-0d0c38c3-d400-4a9f-9d54-d6b355b0bfb6.png)
+
 - The Method - II validation is as follows
 - In this method rather than sending the token to the Authorization server to introspect, we validate the token on the server itself.
 - But to validate the signature of the server, we need to have the public key. OIDC well-known configuration lists an API to retrieve the public key.

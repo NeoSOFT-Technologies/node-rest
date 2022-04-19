@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { ConflictException, Controller } from '@nestjs/common';
 import { MessagePattern, RpcException } from '@nestjs/microservices';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { IdentifierService } from './identifier/identifier.service';
@@ -22,6 +22,18 @@ export class RegistertenantController {
       return await this.tenantService.register(tenant);
     } catch (e) {
       return e;
+    }
+  }
+
+  @MessagePattern({ cmd: 'check-dbName' })
+  async checkDbName(dbName: string) {
+    try {
+      if (await this.identifierService.checkDb(dbName)) {
+        throw new ConflictException('Database name already taken');
+      }
+      return true;
+    } catch (e) {
+      throw new RpcException(e);
     }
   }
 

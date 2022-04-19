@@ -166,10 +166,10 @@ describe('Testing AppController', () => {
         const createRealm = jest.spyOn(appService, 'createRealm');
         const createClient = jest.spyOn(appService, 'createClient');
         await appController.registerTenant(mockBody, mockRequest, mockResponse);
-        const { tenantName, email, password, clientDetails } = mockBody;
+        const { tenantName, email, password, clientDetails, databaseName } = mockBody;
         expect(mockSubscribe).toHaveBeenCalled();
         expect(createRealm).toHaveBeenCalledWith(
-            { tenantName, email, password },
+            { tenantName, email, password }, databaseName,
             mockRequest.headers['authorization']);
         expect(createClient).toHaveBeenCalledWith(
             { tenantName, clientDetails },
@@ -209,7 +209,7 @@ describe('Testing AppController', () => {
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         const updateDescription = jest.spyOn(appService, 'updateDescription');
         await appController.updateDescription(mockRequest, mockResponse);
-        expect(updateDescription).toHaveBeenCalledWith('tenantName','newDescription');
+        expect(updateDescription).toHaveBeenCalledWith('tenantName', 'newDescription');
         expect(mockSubscribe).toHaveBeenCalled();
         mockSubscribe.mockRestore();
     });

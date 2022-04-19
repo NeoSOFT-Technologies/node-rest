@@ -27,7 +27,7 @@ export class AppService {
     private readonly keycloakAuthScope: KeycloakAuthScope,
     private readonly keycloakAuthPermission: KeycloakAuthPermission,
     private config: ConfigService
-  ) {  }
+  ) { }
 
 
   register(tenant: RegisterTenantDto) {
@@ -69,7 +69,7 @@ export class AppService {
     return this.client1.send({ cmd: 'list-all-tenant' }, { tenantName, isDeleted, page });
   }
   updateDescription(tenantname: string, newdescription: string) {
-    this.client2.emit({ cmd: 'update-config' },  { tenantname, newdescription });
+    this.client2.emit({ cmd: 'update-config' }, { tenantname, newdescription });
     return this.client1.send({ cmd: 'update-description' }, { tenantname, newdescription });
   }
   async deleteTenant(tenantname: string, token: string) {
@@ -83,8 +83,19 @@ export class AppService {
   createTable(tableDto: ProvisionTenantTableDto) {
     return this.client3.send({ cmd: 'create-table' }, tableDto);
   }
-  createRealm(tenantDetails: CreateRealmDto, token: string) {
+  async createRealm(tenantDetails: CreateRealmDto, dbName: string, token: string) {
     const { tenantName, email, password } = tenantDetails;
+    const response =  this.client1.send({ cmd: 'check-dbName' }, dbName);
+    await new Promise((resolve, reject) => {
+      response.subscribe({
+        next: next => {
+          resolve('done');
+        },
+        error: error => {
+          reject(error);
+        },
+      });
+    });
     return this.keycloakRealm.createRealm(tenantName, email, password, token);
   }
   getAdminDetails(userName: string, token: string) {

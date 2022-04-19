@@ -244,10 +244,18 @@ describe('Testing AppService', () => {
             email: 'string',
             password: 'string'
         };
+        const dbName = 'string';
         const token = 'Bearer token';
-        const mockcreateRealm = jest.spyOn(keycloakRealm, 'createRealm');
-        appService.createRealm(tenantDetails, token);
 
+        mockClient1.send.mockImplementation(() => {
+            return of('done');
+        });
+
+        const checkDbName = jest.spyOn(mockClient1, 'send');
+        const mockcreateRealm = jest.spyOn(keycloakRealm, 'createRealm');
+        await appService.createRealm(tenantDetails, dbName, token);
+
+        expect(checkDbName).toHaveBeenCalled();
         expect(mockcreateRealm).toHaveBeenCalled();
         mockcreateRealm.mockRestore();
     });

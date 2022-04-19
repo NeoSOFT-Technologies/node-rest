@@ -168,16 +168,19 @@ export class AppController {
   // @Permission(['create'])
   async registerTenant(@Body() body: RegisterTenantDto, @Req() req: Request, @Res() res: Response) {
     try {
-      let { tenantName, email, password, clientDetails } = body;
+      let { tenantName, email, password, clientDetails, databaseName } = body;
       const token = req.headers['authorization'];
 
-      await this.appService.createRealm({ tenantName, email, password }, token);
+      await this.appService.createRealm({ tenantName, email, password }, databaseName, token);
       const client = await this.appService.createClient({ tenantName, clientDetails }, token);
 
       const response = this.appService.register({ ...body, ...client });
       response.subscribe((result) => { res.send(result) });
     } catch (e) {
-      if (e.response && e.response.status) {
+      if (e.status) {
+        res.status(e.status).send(e.message);
+      }
+      else if (e.response && e.response.status) {
         res.status(e.response.status).send(e.response.data);
       }
       else {

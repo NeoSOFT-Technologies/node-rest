@@ -12,7 +12,7 @@ import { Keycloak, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, Key
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`${process.cwd()}/config/.env`],
+      envFilePath: (process.env.NODE_ENV) ? [`${process.cwd()}/config/${process.env.NODE_ENV}.env`] : [`${process.cwd()}/config/.env`],
       isGlobal: true,
       expandVariables: true,
       load: config,

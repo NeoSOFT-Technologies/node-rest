@@ -39,7 +39,7 @@ export class AppService {
     const redirectUrl = `${keycloakRedirectUrl}/admin/${tenantName}/console/`;
     return redirectUrl;
   }
-  getTenantConfig(tenantName: String) {
+  getTenantConfig(tenantName: string) {
     return this.client2.send({ cmd: 'get_config' }, tenantName);
   }
   async clientIdSecret(tenantName: string) {
@@ -85,7 +85,7 @@ export class AppService {
   }
   async createRealm(tenantDetails: CreateRealmDto, dbName: string, token: string) {
     const { tenantName, email, password } = tenantDetails;
-    const response =  this.client1.send({ cmd: 'check-dbName' }, dbName);
+    const response = this.client1.send({ cmd: 'check-dbName' }, dbName);
     await new Promise((resolve, reject) => {
       response.subscribe({
         next: next => {

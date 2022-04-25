@@ -38,6 +38,25 @@ We get the access token and refresh token which we can use further for authorisa
 ![Password Grant type flow](https://user-images.githubusercontent.com/87794374/156330776-51298fe8-efa4-41fa-9a16-8782563a2105.png)
 <p align = "center">Fig - Resource Owner Password Credentials Grant</p>
 
+
+### **NestJS Guard for Authorization**
+
+After the token is received , the resources of the client can accessed. We are using Role based Access Control(RBAC) and to establish the access control layer we are implementing a custom guard namely *`KeycloakAuthGuard`*.
+
+It performs two important tasks for us before granting access to any resource:
+
+1. Token Validation: It validates the token received from Authorization header using public key *`jwks_uri endpoint`*
+    > /realms/{realm-name}/protocol/openid-connect/certs
+
+    We have *`validateTokenwithKey`* method in out `AuthService` class.  This method takes in token and public key (which we get using the above endpoint) as the input and returns error if the token is invalid.The implementation stores public key in cache so as not to hit authorization server repeatedly.
+
+2. Extract `available roles & permissions` from access token to grant access to the resources after checking if the `required role & permissions` are present in the available roles & permissions.
+
+### **Logout endpoint**
+The logout endpoint logs out the authenticated user. To invoke this endpoint directly the refresh token needs to be included as well as the credentials required to authenticate the client.
+
+> /realms/{realm-name}/protocol/openid-connect/logout
+
 ### **Token Validation**
 The Token validation in this repository takes place in two ways viz: The first method is when the token is generated after the keycloak server is hit and second method is via the use of Public Key. Below we have discussed the methods in details.
 
@@ -67,23 +86,14 @@ certs`.
 **Challenges in Method - II**
 - In Method 2, if we don’t want to go to the Authorization Server to reduce latency, we must have the public key saved on the server itself. Public keys are different for different tenants. 
 - So it is not good to store the Public Key on the server. 
-- In order to encounter this problem we will be using Caching mechanism to store the Public Key.
+- In order to encounter this problem we are Caching mechanism to store the Public Key.
 
-### **NestJS Guard for Authorization**
+**Working Of Caching**
 
-After the token is received , the resources of the client can accessed. We are using Role based Access Control(RBAC) and to establish the access control layer we are implementing a custom guard namely *`KeycloakAuthGuard`*.
+Image
 
-It performs two important tasks for us before granting access to any resource:
-
-1. Token Validation: It validates the token received from Authorization header using public key *`jwks_uri endpoint`*
-    > /realms/{realm-name}/protocol/openid-connect/certs
-
-    We have *`validateTokenwithKey`* method in out `AuthService` class.  This method takes in token and public key (which we get using the above endpoint) as the input and returns error if the token is invalid.The implementation stores public key in cache so as not to hit authorization server repeatedly.
-
-2. Extract `available roles & permissions` from access token to grant access to the resources after checking if the `required role & permissions` are present in the available roles & permissions.
-
-### **Logout endpoint**
-The logout endpoint logs out the authenticated user. To invoke this endpoint directly the refresh token needs to be included as well as the credentials required to authenticate the client.
-
-> /realms/{realm-name}/protocol/openid-connect/logout
-
+- The caching mechanism works as follows: 
+- 1. Authentication of the API Consumer takes place.
+- 2. The Keycloak Server generates the Access Token and returns to the API Consumer.
+- 3. In order to access the middleware(AuthGuard) the access-token is passed in the form of header and in the middleware the Token is validated , its roles and permission are checked and then the Public Key is generated.
+- 4. If the Public Key is not present in the cache then it is generated from the Keycloak Server.

@@ -20,6 +20,7 @@ describe('Testing Config Service', () => {
   const mockconfigRepository = {
     save: jest.fn().mockResolvedValue('Config saved successfully'),
     findOneOrFail: jest.fn().mockResolvedValue(mockTenantConfigDetails),
+    remove: jest.fn(),
   };
 
   beforeAll(async () => {

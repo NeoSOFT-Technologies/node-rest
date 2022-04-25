@@ -27,6 +27,7 @@ import { GetPermissionsDto } from "./getpermissions.dto";
 import { UpdatePermissionDto } from "./update.permission.dto";
 import { DeletePermissionDto } from "./delete.permission.dto";
 
+
 export {
     columnDto,
     CredentialsDto,

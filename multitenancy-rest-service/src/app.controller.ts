@@ -189,9 +189,9 @@ export class AppController {
     }
   }
 
-  @Get('tenants/:tenantName')
+  @Get('tenant-info')
   @ApiTags('Tenants')
-  @ApiParam({ name: 'tenantName', required: true, type: String })
+  @ApiQuery({ name: 'tenantName', type: 'string', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
   @Roles(['admin', 'tenantadmin'])
@@ -199,10 +199,19 @@ export class AppController {
   async getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
-      const tenantName: string = req.params.tenantName;
-      const tenantNameFromToken: string = await this.authService.getTenantName(token);
-      if (tenantName !== tenantNameFromToken) {
-        throw new HttpException('Details cannot be displayed', HttpStatus.FORBIDDEN);
+      const tenantNameFromToken = await this.authService.getTenantName(token);
+      let tenantName: string = req.query.tenantName as string;
+
+      if (tenantNameFromToken === 'master' && !tenantName) {
+        throw new HttpException('Please enter TenantName', HttpStatus.BAD_REQUEST);
+      }
+      else if (tenantNameFromToken !== 'master') {
+        if (!tenantName) {
+          tenantName = tenantNameFromToken;
+        }
+        else if (tenantName !== tenantNameFromToken) {
+          throw new HttpException('Not Allowed', HttpStatus.FORBIDDEN);
+        }
       }
       const response = this.appService.getTenantConfig(tenantName);
       const observer = {
@@ -213,13 +222,7 @@ export class AppController {
       }
       response.subscribe(observer);
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
+      if (e.status) {
         res.status(e.status).send(e.response);
       }
     }
@@ -273,8 +276,18 @@ export class AppController {
         }
       }
       const response = this.appService.updateDescription(tenantName, newDescription);
-      response.subscribe(async (result) => res.send(result));
+      const observer = {
+        next: async (result: any) => {
+          res.send(result)
+        },
+        error: async (error: any) => {
+          res.status(error.status).send(error.message)
+        },
+      };
+      response.subscribe(observer);
+      // response.subscribe(async (result) => res.send(result));
     } catch (e) {
+      console.log('Error: ', e);
       res.status(e.status).send(e.response);
     }
   }

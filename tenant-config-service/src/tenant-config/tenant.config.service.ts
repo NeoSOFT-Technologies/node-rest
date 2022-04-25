@@ -39,7 +39,7 @@ export class TenantConfigService {
         description: newdescription,
       });
     } catch (e) {
-      return e;
+      throw new NotFoundException('Entity not Found in the database');
     }
   }
 

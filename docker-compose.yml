@@ -60,6 +60,7 @@ services:
       - '5000:5000'
     env_file:
       - ./multitenancy-rest-service/config/.env
+      - ./multitenancy-rest-service/config/staging.env
 
   tenant-registration:
     build: ./tenant-registration

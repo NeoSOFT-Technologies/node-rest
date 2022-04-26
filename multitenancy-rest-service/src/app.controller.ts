@@ -185,9 +185,12 @@ export class AppController {
       }
       const response = this.appService.getTenantConfig(tenantName);
       const observer = {
-        next: async (result: any) => res.send(result),
-        error: async (error: any) => {
-          throw error;
+        next: (result: any) => res.send(result),
+        error: (error: any) => {
+          res.status(error.status).send({
+            statusCode: error.status,
+            message: error.message
+          })
         },
       }
       response.subscribe(observer);
@@ -249,7 +252,10 @@ export class AppController {
           res.send(result)
         },
         error: async (error: any) => {
-          throw error
+          res.status(error.status).send({
+            statusCode: error.status,
+            message: error.message
+          })
         },
       };
       response.subscribe(observer);
@@ -518,7 +524,8 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createPermission(req.body, token));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Get('permission')
@@ -552,7 +559,8 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.updatePermission(req.body, token));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Delete('permission/:tenantName/:clientName/:permissionName-:permissionType')
@@ -570,7 +578,8 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.deletePermission(req.params as any, token));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Post('client')
@@ -585,7 +594,8 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createClient(req.body, token));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Post('resource')
@@ -600,7 +610,8 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createResource(req.body, token));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Post('policy')
@@ -615,7 +626,8 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createPolicy(req.body, token));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Post('scope')
@@ -630,7 +642,8 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createScope(req.body, token));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Get('connect-database')
@@ -645,7 +658,8 @@ export class AppController {
         res.send(response);
       }
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 
   @Post('create-table')
@@ -657,6 +671,7 @@ export class AppController {
       const response = this.appService.createTable(tableDto);
       response.subscribe((result) => res.send(result));
     } catch (e) {
-      throw e;    }
+      throw e;
+    }
   }
 }

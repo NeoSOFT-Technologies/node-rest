@@ -68,8 +68,18 @@ export class AppService {
   listAllTenant(tenantName: string, isDeleted: boolean, page: number) {
     return this.client1.send({ cmd: 'list-all-tenant' }, { tenantName, isDeleted, page });
   }
-  updateDescription(tenantname: string, newdescription: string) {
-    this.client2.emit({ cmd: 'update-config' }, { tenantname, newdescription });
+  async updateDescription(tenantname: string, newdescription: string) {
+    const response = this.client2.send({ cmd: 'update-config' }, { tenantname, newdescription });
+    await new Promise((resolve, reject) => {
+      response.subscribe({
+        next: next => {
+          resolve(true);
+        },
+        error: error => {
+          reject(error);
+        },
+      });
+    });
     return this.client1.send({ cmd: 'update-description' }, { tenantname, newdescription });
   }
   async deleteTenant(tenantname: string, token: string) {

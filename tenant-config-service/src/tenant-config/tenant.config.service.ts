@@ -38,8 +38,9 @@ export class TenantConfigService {
         ...tenant,
         description: newdescription,
       });
+      return 'Updated successfully';
     } catch (e) {
-      throw new NotFoundException('Entity not Found in the database');
+      throw new NotFoundException('Tenant not found');
     }
   }
 

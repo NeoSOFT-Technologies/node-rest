@@ -28,12 +28,15 @@ export class TenantConfigController {
     }
   }
 
-  @EventPattern({ cmd: 'update-config' })
+  @MessagePattern({ cmd: 'update-config' })
   async updateConfig({ tenantname, newdescription }) {
     try {
-      await this.tenantConfigService.updateConfig(tenantname, newdescription);
+      return await this.tenantConfigService.updateConfig(
+        tenantname,
+        newdescription,
+      );
     } catch (e) {
-      return e;
+      throw new RpcException(e);
     }
   }
 

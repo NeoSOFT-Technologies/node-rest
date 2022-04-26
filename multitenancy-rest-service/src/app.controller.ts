@@ -275,7 +275,7 @@ export class AppController {
           throw new HttpException('Updation Not Allowed', HttpStatus.FORBIDDEN);
         }
       }
-      const response = this.appService.updateDescription(tenantName, newDescription);
+      const response = await this.appService.updateDescription(tenantName, newDescription);
       const observer = {
         next: async (result: any) => {
           res.send(result)
@@ -285,7 +285,6 @@ export class AppController {
         },
       };
       response.subscribe(observer);
-      // response.subscribe(async (result) => res.send(result));
     } catch (e) {
       console.log('Error: ', e);
       res.status(e.status).send(e.response);

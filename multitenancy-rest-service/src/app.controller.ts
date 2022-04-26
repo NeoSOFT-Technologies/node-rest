@@ -1,6 +1,6 @@
 import {
   Body, Controller, Delete, Get, HttpException, HttpStatus,
-  Patch, Post, Req, Res, UseGuards, UsePipes, ValidationPipe
+  Patch, Post, Req, Res, UseFilters, UseGuards, UsePipes, ValidationPipe
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppService } from './app.service';
@@ -8,15 +8,17 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swa
 import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
+import { Permission } from './auth/permission.decorator';
+import { HttpErrorFilter } from './filter/http-exception.filter';
 import {
   CredentialsDto, DbDetailsDto, LogoutDto, ProvisionTenantTableDto, RegisterTenantDto,
   TenantUserDto, UpdateTenantDto, UsersQueryDto, UpdateUserDto, RefreshAccessTokenDto,
   ClientDto, ResourceDto, PolicyDto, ScopeDto, PermissionDto, GetUsersInfoDto, CreateRoleDto,
   UpdateRoleDto, GetRoleInfoDto, GetPermissionsDto, UpdatePermissionDto
 } from './dto';
-import { Permission } from './auth/permission.decorator';
 
 @Controller('api')
+@UseFilters(new HttpErrorFilter())
 export class AppController {
   constructor(
     private readonly appService: AppService,
@@ -41,15 +43,7 @@ export class AppController {
       res.send((await this.authService.getAccessToken({ ...body, ...response })).data);
       // login successful
     } catch (e) {
-      if (e.status) {
-        res.status(e.status).send(e.message);
-      }
-      else if (e.response && e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
-      }
+      throw e;
     }
   }
 
@@ -72,15 +66,7 @@ export class AppController {
       res.sendStatus(await this.authService.logout({ ...body, ...response }));
       // logout successful
     } catch (e) {
-      if (e.status) {
-        res.status(e.status).send(e.message);
-      }
-      else if (e.response && e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
-      }
+      throw e;
     }
   }
 
@@ -102,15 +88,7 @@ export class AppController {
       }
       res.send((await this.authService.refreshAccessToken({ ...body, ...response })).data);
     } catch (e) {
-      if (e.status) {
-        res.status(e.status).send(e.message);
-      }
-      else if (e.response && e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
-      }
+      throw e;
     }
   }
 
@@ -123,7 +101,7 @@ export class AppController {
       const redirectUrl = this.appService.createRedirectUrl(tenantName);
       res.redirect(redirectUrl);
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 
@@ -136,7 +114,7 @@ export class AppController {
       const key = await this.authService.getpublicKey(tenantname);
       res.send(key);
     } catch (e) {
-      res.status(HttpStatus.NOT_FOUND).send(e);
+      throw new HttpException(e, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -154,7 +132,7 @@ export class AppController {
       const adminDetails = await this.appService.getAdminDetails(userName, token);
       res.send(adminDetails);
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 
@@ -177,15 +155,7 @@ export class AppController {
       const response = this.appService.register({ ...body, ...client });
       response.subscribe((result) => { res.send(result) });
     } catch (e) {
-      if (e.status) {
-        res.status(e.status).send(e.message);
-      }
-      else if (e.response && e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e);
-      }
+      throw e;
     }
   }
 
@@ -215,16 +185,17 @@ export class AppController {
       }
       const response = this.appService.getTenantConfig(tenantName);
       const observer = {
-        next: async (result: any) => res.send(result),
-        error: async (error: any) => {
-          res.status(error.status).send(error.message)
+        next: (result: any) => res.send(result),
+        error: (error: any) => {
+          res.status(error.status).send({
+            statusCode: error.status,
+            message: error.message
+          })
         },
       }
       response.subscribe(observer);
     } catch (e) {
-      if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -246,7 +217,7 @@ export class AppController {
         res.send({ data, count })
       });
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 
@@ -281,14 +252,16 @@ export class AppController {
           res.send(result)
         },
         error: async (error: any) => {
-          res.status(error.status).send(error.message)
+          res.status(error.status).send({
+            statusCode: error.status,
+            message: error.message
+          })
         },
       };
       response.subscribe(observer);
       // response.subscribe(async (result) => res.send(result));
     } catch (e) {
-      console.log('Error: ', e);
-      res.status(e.status).send(e.response);
+      throw e;
     }
   }
 
@@ -306,7 +279,7 @@ export class AppController {
       const response = await this.appService.deleteTenant(tenantname, token);
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -326,7 +299,7 @@ export class AppController {
       }
       res.send(await this.appService.createUser(req.body, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -348,7 +321,7 @@ export class AppController {
       }
       res.send(await this.appService.listAllUser(data));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -381,15 +354,7 @@ export class AppController {
       const permissions = await this.authService.getPermissions(token);
       res.send({ ...userInfo, permissions });
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -422,15 +387,7 @@ export class AppController {
       };
       res.send(await this.appService.updateUser(req.body, token));
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -451,15 +408,7 @@ export class AppController {
       }
       res.send(await this.appService.deleteUser(req.params as any, token));
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -478,12 +427,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createRole(req.body, token));
     } catch (e) {
-      if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -503,7 +447,7 @@ export class AppController {
       const tenantName = req.query.tenantName as string;
       res.send(await this.appService.getRoles(tenantName, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -525,15 +469,7 @@ export class AppController {
       }
       res.send(await this.appService.roleInfo(req.query as any, token));
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -555,15 +491,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.updateRole(req.body, token));
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -580,12 +508,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.deleteRole(req.params as any, token));
     } catch (e) {
-      if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
-      else if (e.status) {
-        res.status(e.status).send(e.response);
-      }
+      throw e;
     }
   }
 
@@ -601,7 +524,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createPermission(req.body, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -620,12 +543,7 @@ export class AppController {
       }
       res.send(await this.appService.getPermissions(req.query as any, token));
     } catch (e) {
-      if (e.response.statusCode) {
-        res.status(e.response.statusCode).send(e.response.message);
-      }
-      else if (e.response.status) {
-        res.status(e.response.status).send(e.response.data);
-      }
+      throw e;
     }
   }
 
@@ -641,7 +559,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.updatePermission(req.body, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -660,7 +578,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.deletePermission(req.params as any, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -676,7 +594,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createClient(req.body, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -692,7 +610,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createResource(req.body, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -708,7 +626,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createPolicy(req.body, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -724,7 +642,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createScope(req.body, token));
     } catch (e) {
-      res.status(e.response.status).send(e.response.data);
+      throw e;
     }
   }
 
@@ -740,7 +658,7 @@ export class AppController {
         res.send(response);
       }
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 
@@ -753,7 +671,7 @@ export class AppController {
       const response = this.appService.createTable(tableDto);
       response.subscribe((result) => res.send(result));
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 }

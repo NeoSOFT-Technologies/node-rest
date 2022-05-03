@@ -222,6 +222,16 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "tenantUser"', async () => {
+        const mockBody = {
+            tenantName: 'tenantName',
+            userDetails: {
+                userName: 'userName',
+                email: 'tenant@gmail.com',
+                password: 'user123',
+                roles: ['role'],
+                attributes: ['permission']
+            }
+        };
         mockRequest.body = {
             tenantName: 'tenantName',
             password: 'tenant123',
@@ -237,7 +247,7 @@ describe('Testing AppController', () => {
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createUser = jest.spyOn(appService, 'createUser');
-        await appController.tenantUser(mockRequest, mockResponse);
+        await appController.tenantUser(mockBody, mockRequest, mockResponse);
         expect(mockSend).toHaveBeenCalled();
         expect(createUser).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
         mockSend.mockRestore();

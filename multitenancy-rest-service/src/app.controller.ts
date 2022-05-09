@@ -290,7 +290,7 @@ export class AppController {
   @UseGuards(KeycloakAuthGuard)
   @Roles(['tenantadmin'])
   @Permission(['create'])
-  async tenantUser(@Req() req: Request, @Res() res: Response) {
+  async tenantUser(@Body() body: TenantUserDto, @Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
       if (!req.body.tenantName) {

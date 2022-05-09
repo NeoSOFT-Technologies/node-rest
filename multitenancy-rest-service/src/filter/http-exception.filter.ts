@@ -13,11 +13,7 @@ export class HttpErrorFilter implements ExceptionFilter {
         const response = ctx.getResponse<Response>();
 
         let statusCode: number, message: any;
-        if (exception instanceof HttpException) {
-            statusCode = exception.getStatus()
-            message = exception.message
-        }
-        else if (exception.response && exception.response.statusCode) {
+        if (exception.response && exception.response.statusCode) {
             statusCode = exception.response.statusCode
             message = exception.response.message
         }
@@ -29,12 +25,16 @@ export class HttpErrorFilter implements ExceptionFilter {
             statusCode = exception.status
             message = exception.message
         }
+        else if (exception instanceof HttpException) {
+            statusCode = exception.getStatus()
+            message = exception.message
+        }
         else {
             statusCode = HttpStatus.INTERNAL_SERVER_ERROR
             message = 'Internal server error'
         }
 
-        this.logger.error({ statusCode, message }, );
+        this.logger.error({ statusCode, message });
 
         response
             .status(statusCode)

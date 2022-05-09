@@ -191,9 +191,12 @@ describe('Testing AppService', () => {
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
         });
+        mockClient2.send.mockImplementation(() => {
+            return of(mockMessage);
+        });
         const mockupdateDescription = jest.spyOn(mockClient1, 'send');
-        const mockUpdateConfig = jest.spyOn(mockClient2, 'emit');
-        const response = appService.updateDescription(tenantName, newDescription);
+        const mockUpdateConfig = jest.spyOn(mockClient2, 'send');
+        const response = await appService.updateDescription(tenantName, newDescription);
 
         expect(mockupdateDescription).toHaveBeenCalled();
         expect(mockUpdateConfig).toHaveBeenCalled();

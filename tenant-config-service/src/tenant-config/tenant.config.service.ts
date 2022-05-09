@@ -52,6 +52,7 @@ export class TenantConfigService {
         },
       });
       await this.configRepository.remove(tenantEntity);
+      return 'Deletion Successfull';
     } catch (e) {
       return e;
     }

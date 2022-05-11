@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
-import { encodePassword } from './utils/crypto';
+import { encodePassword } from './utils/bcrypt';
 
 
 @Injectable()
@@ -25,8 +25,8 @@ export class RegistertenantService {
         Math.random().toString(16).slice(-4);
     }
 
-    const password = encodePassword(tenant.password);
-    tenant.password = password;
+    const password = tenant.password;
+    tenant.password = encodePassword(tenant.password);
 
     tenant.createdDateTime = new Date()
       .toISOString()
@@ -43,7 +43,6 @@ export class RegistertenantService {
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };
-    console.log(`password:${tenant.password}`);
 
     this.client.emit({ cmd: 'tenant-master' }, tenantDetails);
     return { Message: 'Tenant Registered Successfully' };

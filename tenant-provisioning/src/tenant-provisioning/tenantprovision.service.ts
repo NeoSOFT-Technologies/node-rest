@@ -5,7 +5,6 @@ import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
 import { SeedingDataeDto } from './dto/seeding-data.dto';
 import { ConfigService } from '@nestjs/config';
 import { ConnectionUtils } from './connection.utils';
-import { decodePassword } from './utils/decrypt';
 
 @Injectable()
 export class TenantprovisionService {
@@ -15,7 +14,7 @@ export class TenantprovisionService {
     tenant: ProvisionTenantDto,
   ): Promise<Record<string, any>> {
     const tenantName = tenant.tenantName;
-    const password = decodePassword(tenant.password).toString();
+    const password = tenant.password;
     const query = readFileSync(
       `${__dirname}/scripts/create-database.sql`,
     ).toString();

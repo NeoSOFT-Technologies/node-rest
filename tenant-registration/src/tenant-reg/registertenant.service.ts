@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
-import { encodePassword } from './utils/crypto';
+import { encodePassword } from './utils/bcrypt';
 
 
 @Injectable()

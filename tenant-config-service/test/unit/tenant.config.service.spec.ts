@@ -20,6 +20,8 @@ describe('Testing Config Service', () => {
   const mockconfigRepository = {
     save: jest.fn().mockResolvedValue('Config saved successfully'),
     findOneOrFail: jest.fn().mockResolvedValue(mockTenantConfigDetails),
+    remove: jest.fn(),
+    update: jest.fn(),
   };
 
   beforeAll(async () => {
@@ -45,6 +47,18 @@ describe('Testing Config Service', () => {
   it('Testing getConfig method of TenantConfigService', async () => {
     expect(await tenantConfigService.getConfig('string')).toEqual(
       mockTenantConfigDetails,
+    );
+  });
+
+  it('Testing updateConfig method of TenantConfigService', async () => {
+    expect(await tenantConfigService.updateConfig('string', 'string')).toEqual(
+      'Updated successfully',
+    );
+  });
+
+  it('Testing deleteConfig method of TenantConfigService', async () => {
+    expect(await tenantConfigService.deleteConfig('string')).toEqual(
+      'Deletion Successfull',
     );
   });
 });

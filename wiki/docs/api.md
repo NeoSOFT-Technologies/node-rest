@@ -132,8 +132,7 @@ API Endpoint:  `/api/refresh-access-token`
 
 **6. API for Forgot Password**
 
-Request Method: `GET` 
-
+Request Method: `GET`  
 API Endpoint:  `/api/forgot-password`
 
 **Input:**  
@@ -150,9 +149,30 @@ API Endpoint:  `/api/forgot-password`
 **Output:** After hitting this API , the user will be redirected to keycloak UI.
 
 ---
+**7. Public Key**
+
+Request Method: `GET`  
+API Endpoint:  `/api/publicKey/{tenantName}`
+
+**Input:**
+1. Request Path Parameter
+    | Name                              | Description          | Type   |
+    |-----------------------------------|----------------------|--------|
+    | tenantName<br>required            | name of the tenant   | string |
+
+**Output:** Produces `application/json` of the following schema  
+
+| Name          | Type   |
+|---------------|--------|
+| public_key    | string |
+
+The `affected` key value 1 means the updation is successfull otherwise it is 0  
+
+---
+
 ## /api/admin
 
-**7. Admin Info**
+**8. Admin Info**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/admin`
@@ -179,7 +199,7 @@ API Endpoint:  `/api/admin`
 ---
 ## /api/tenant
 
-**8. Tenant List**
+**9. Tenant List**
 
 Request Method:  `GET`  
 API Endpoint:  `/api/tenant`
@@ -215,38 +235,6 @@ API Endpoint:  `/api/tenant`
 
 ---
 
-**9. Tenant Details**
-
-Request Method:  `GET`  
-API Endpoint:  `/api/tenant/:id`
-
-> `Note: `Only the admin can use this API
-
-**Input:** 
-1. Headers
-    | Key           | Value                 |
-    |---------------|-----------------------|
-    | Authorization | Bearer [ACCESS_TOKEN] |
-
-2. Request Path Parameters
-    | Name           | Description            | Type   |
-    |----------------|------------------------|--------|
-    | id<br>required | id of the the tenant   | string |
-
-**Output:** Produces `application/json` of the following schema
-| Name            | Description                   |
-|-----------------|-------------------------------|
-| id              | id of table row               |
-| tenantId        | unique tenant id              |
-| tenantName      | name of tenant                |
-| description     | description of tenant         |
-| createdDateTime | time of creation of tenant    |
-| tenantDbName    | db name provisioned to tenant |
-| host            | host of db server             |
-| port            | port of db server             |
-| policy          | policies of tenant            |
-
----
 **10. Create new Tenant**
 
 Request Method:  `POST`  
@@ -281,7 +269,7 @@ API Endpoint:  `/api/tenant`
 Request Method:  `PATCH`  
 API Endpoint: `/api/tenant`
 
-> `Note: `Only the admin can use this API
+> `Note: `Only the admin and tenantadmin can use this API
 
 **Input:**
 1. Headers
@@ -335,7 +323,9 @@ The `affected` key value 1 means the updation is successfull otherwise it is 0
 **13. Tenant Configurations**
 
 Request Method:  `GET`  
-API Endpoint: `/api/tenant/config/:id`
+API Endpoint: `/api/tenant/config/{tenantName}`
+
+> Note: `Only the `admin` and `tenantadmin` can access this API`
 
 **Input:** 
 1. Headers
@@ -344,9 +334,9 @@ API Endpoint: `/api/tenant/config/:id`
     | Authorization | Bearer [ACCESS_TOKEN] |
 
 2. Request Path Parameters
-    | Name           | Description            | Type   |
-    |----------------|------------------------|--------|
-    | id<br>required | id of the the tenant   | string |
+    | Name             | Description            | Type   |
+    |------------------|------------------------|--------|
+    | name<br>required | id of the the tenant   | string |
 
 **Output:** Produces `application/json` of the following schema
 
@@ -383,6 +373,7 @@ API Endpoint: `/api/user`
     | password         | password to be set by user                              | string   |
     | email            | email of the new user                                   | string   |
     | roles            | roles to be assigned to new user                        | string[ ]|
+    | attributes       | attributes to be assigned to user(permissions)          | string[ ]|    
 
 **Output:** Produces `application/json` of the following schema  
 | Name       | Description    |

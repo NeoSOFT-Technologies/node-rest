@@ -20,4 +20,12 @@ export class IdentifierService {
       },
     });
   }
+
+  async checkDb(dbName: string): Promise<number> {
+    return this.tenantRepository.count({
+      where: {
+        databaseName: dbName,
+      },
+    });
+  }
 }

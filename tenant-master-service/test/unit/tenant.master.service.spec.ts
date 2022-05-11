@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { TenantMasterService } from '@app/tenant-master/tenant.master.service';
+import { ConfigModule } from '@nestjs/config';
+import config from '@app/tenant-master/config';
 
 describe('Testing Tenant Master Service', () => {
   let tenantMasterService: TenantMasterService;
@@ -27,6 +29,14 @@ describe('Testing Tenant Master Service', () => {
   };
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          envFilePath: [`${process.cwd()}/config/.env`],
+          isGlobal: true,
+          expandVariables: true,
+          load: config,
+        }),
+      ],
       providers: [
         TenantMasterService,
         {

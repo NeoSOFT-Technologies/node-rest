@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 
@@ -7,6 +8,7 @@ export class TenantMasterService {
   constructor(
     @Inject('TENANT_PROVISION_SERVICE') private readonly client1: ClientProxy,
     @Inject('TENANT_CONFIG_SERVICE') private readonly client2: ClientProxy,
+    private config: ConfigService,
   ) {}
   async masterTenantService(tenantDetails: TenantDetailsDto) {
     const tenant = {
@@ -23,8 +25,8 @@ export class TenantMasterService {
     const Tenantconfig: TenantDetailsDto = {
       ...tenantDetails,
       databaseName,
-      host: '127.0.0.1',
-      port: 3306,
+      host: this.config.get('db.host'),
+      port: this.config.get('db.port'),
     };
     this.client2.emit({ cmd: 'set_config' }, Tenantconfig);
   }

@@ -3,6 +3,24 @@ import { Test, TestingModule } from '@nestjs/testing';
 import config from '@app/tenant-provisioning/config';
 import { TenantprovisionService } from '@app/tenant-provisioning/tenantprovision.service';
 
+jest.mock('@app/tenant-provisioning/connection.utils', () => {
+  return {
+    ConnectionUtils: {
+      getConnection: jest.fn(() => ({
+        query: jest
+          .fn()
+          .mockImplementationOnce((arg1, arg2, cb) => {
+            cb(null, ['Tenant-Database', 'Tenant-Table']);
+          })
+          .mockImplementation((arg1, arg2, cb) => {
+            cb();
+          }),
+      })),
+      endConnection: jest.fn(),
+    },
+  };
+});
+
 describe('Testing Provisioning MicroService Service', () => {
   let tenantprovisionService: TenantprovisionService;
 
@@ -24,16 +42,30 @@ describe('Testing Provisioning MicroService Service', () => {
     );
   });
 
+  it('Testing tenantprovisionService ping', async () => {
+    const TenantName = {
+      tenantName: 'string',
+      password: 'string',
+      databaseName: 'string',
+    };
+
+    expect(await tenantprovisionService.ping(TenantName)).toEqual({
+      'Tenant-Database': 'Tenant-Database',
+      'Tenant-Table': 'Tenant-Table',
+    });
+  });
+
   it('Testing tenantprovisionService createDatabase', async () => {
     const TenantName = {
       tenantName: 'string',
       password: 'string',
+      databaseName: 'db-string',
     };
-
     expect(
       (await tenantprovisionService.createDatabase(TenantName)).status,
     ).toEqual('Database created successfully');
   });
+
   it('Testing tenantprovisionService createTable', async () => {
     const provisionTenantTable = {
       dbName: 'db-string',
@@ -62,14 +94,5 @@ describe('Testing Provisioning MicroService Service', () => {
     expect((await tenantprovisionService.seed(SeedingData)).status).toEqual(
       'Data seeded successfully',
     );
-  });
-
-  it('Testing tenantprovisionService ping', async () => {
-    const TenantName = {
-      tenantName: 'string',
-      password: 'string',
-    };
-
-    expect(await tenantprovisionService.ping(TenantName)).toBeDefined();
   });
 });

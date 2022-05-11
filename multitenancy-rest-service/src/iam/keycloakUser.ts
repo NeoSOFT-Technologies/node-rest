@@ -29,6 +29,9 @@ export class KeycloakUser {
                 type: 'password',
                 value: password,
             }],
+            attributes: {
+                "permission": ["create", "view", "edit", "delete"]
+            },
             realm: realmName
         });
     };
@@ -47,7 +50,6 @@ export class KeycloakUser {
         const parts = token.split(' ')
         kcTenantAdminClient.setAccessToken(parts[1]);
 
-
         const createdUser = await kcTenantAdminClient.users.create({
             username: userDetails.userName,
             email: userDetails.email,
@@ -56,14 +58,17 @@ export class KeycloakUser {
                 temporary: false,
                 type: 'password',
                 value: userDetails.password,
-            }]
+            }],
+            attributes: {
+                "permission": userDetails.attributes
+            }
         });
 
         for (const role of userDetails.roles) {
             const userRole: RoleRepresentation = await this.createUserRole(kcTenantAdminClient, role)
             await this.userRoleMapping(kcTenantAdminClient, createdUser, userRole)
         };
-
+        
         return 'User created successfully';
     };
 
@@ -121,13 +126,11 @@ export class KeycloakUser {
         };
         const createdTimestamp = this.formatTimeStamp(userInfo[0]);
         const roles = await this.getUserRoles(kcClient, { id: userInfo[0].id });
-        const permissions = await this.getUserPermission(kcClient, { id: userInfo[0].id }, clientName);
         return {
             ...userInfo[0],
             createdTimestamp,
             tenantName,
-            roles,
-            permissions
+            roles
         };
     };
 

@@ -23,6 +23,7 @@ describe('Testing AppService', () => {
         send: jest.fn().mockImplementation(() => {
             return of({ Message: 'Tenant Config recieved Successfully' });
         }),
+        emit: jest.fn()
     };
     const mockClient3 = {
         send: jest.fn().mockImplementation(() => {
@@ -190,10 +191,15 @@ describe('Testing AppService', () => {
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
         });
+        mockClient2.send.mockImplementation(() => {
+            return of(mockMessage);
+        });
         const mockupdateDescription = jest.spyOn(mockClient1, 'send');
-        const response = appService.updateDescription(tenantName, newDescription);
+        const mockUpdateConfig = jest.spyOn(mockClient2, 'send');
+        const response = await appService.updateDescription(tenantName, newDescription);
 
         expect(mockupdateDescription).toHaveBeenCalled();
+        expect(mockUpdateConfig).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));
         mockupdateDescription.mockRestore();
     });
@@ -206,9 +212,11 @@ describe('Testing AppService', () => {
         });
         const token = 'Bearer Token'
         const mocklistAllTenant = jest.spyOn(mockClient1, 'send');
+        const mockDeleteTenantFromconfig = jest.spyOn(mockClient2, 'emit');
         const response = await appService.deleteTenant(tenantName, token);
 
         expect(mocklistAllTenant).toHaveBeenCalled();
+        expect(mockDeleteTenantFromconfig).toHaveBeenCalled();
         response.subscribe((result) => expect(result).toEqual(mockMessage));
         mocklistAllTenant.mockRestore();
     });
@@ -239,10 +247,18 @@ describe('Testing AppService', () => {
             email: 'string',
             password: 'string'
         };
+        const dbName = 'string';
         const token = 'Bearer token';
-        const mockcreateRealm = jest.spyOn(keycloakRealm, 'createRealm');
-        appService.createRealm(tenantDetails, token);
 
+        mockClient1.send.mockImplementation(() => {
+            return of('done');
+        });
+
+        const checkDbName = jest.spyOn(mockClient1, 'send');
+        const mockcreateRealm = jest.spyOn(keycloakRealm, 'createRealm');
+        await appService.createRealm(tenantDetails, dbName, token);
+
+        expect(checkDbName).toHaveBeenCalled();
         expect(mockcreateRealm).toHaveBeenCalled();
         mockcreateRealm.mockRestore();
     });
@@ -264,7 +280,8 @@ describe('Testing AppService', () => {
                 userName: 'string',
                 email: 'string',
                 password: 'string',
-                roles: ['roles']
+                roles: ['roles'],
+                attributes: ['string']
             }
         };
         const token = 'Bearer token';

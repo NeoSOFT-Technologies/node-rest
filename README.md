@@ -114,6 +114,38 @@ Please find below a detailed description of the app's folder structures:
 | .eslintrc                | Config settings for ESLint code style checking                                                |
 | .eslintignore            | Config settings for paths to exclude from linting                                             |
 
+---
+
+### List of Services and Ports
+
+| Sr No. | Name of the Services         | Port Number |
+|--------|------------------------------|-------------|
+| 1.     | Multi-Tenancy-Rest-Service   | 5000        |
+| 2.     | Tenant Registeration Service | 8875        |
+| 3.     | Tenant Provision Service     | 8878        |
+| 4.     | Tenant Master Service        | 8847        |
+| 5.     | Tenant Config Service        | 8848        |
+| 6.     | MySQL Database               | 3306        |
+| 7.     | Keycloak Server              | 8080        |
+| 8.     | Demo Mailer Server           | 1025 & 8025 |
+
+---
+
+### Setting up project on VM
+Following are the steps to set-up this repository on Virtual Machine.
+
+- Install Remote Desktop Application (Eg For Linux it is Remmina) in your Machine.
+- Launch the remote desktop which will look like this.
+- 
+![Selection_177](https://user-images.githubusercontent.com/87708447/165104970-55cb2753-a814-42fb-a8ae-d3e59d309d01.png)
+
+- Enter the IP address.
+- Once the IP address is verified the following screen will appear.
+- Enter the required credentials i.e admin and password, and then the VM is connected.
+- Open any browser and then clone the repository of node-rest boilerplate by copy pasting the link `https://github.com/NeoSOFT-Technologies/node-rest`
+- Open the Terminal in the `node-rest` directory and then type the following command - `docker-compose up` and the application will start.
+- Open the browser and hit the following  URL: `http://localhost:5000/api/docs` and the Swagger UI will be displayed.
+---
 ### Microservices
 - [Tenant Registration Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/microservices/tenant-registration.md)
 - [Tenant Master Service](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/microservices/tenant-master-service.md)

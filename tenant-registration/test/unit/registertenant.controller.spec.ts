@@ -25,6 +25,7 @@ describe('Testing RegisTration MicroService Controller', () => {
   };
   const mockIdentifierService = {
     identify: jest.fn().mockResolvedValue(false),
+    checkDb: jest.fn().mockResolvedValue(false),
   };
 
   beforeAll(async () => {
@@ -49,6 +50,11 @@ describe('Testing RegisTration MicroService Controller', () => {
     expect(
       await registertenantController.registerTenant(TenantDetails),
     ).toEqual(mockMessage);
+  });
+
+  it('Testing registerTenantcontroller checkDbName', async () => {
+    const dbName = 'string';
+    expect(await registertenantController.checkDbName(dbName)).toEqual(true);
   });
 
   it('Testing registerTenantcontroller getClientIdSecret', async () => {

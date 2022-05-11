@@ -38,8 +38,9 @@ export class TenantConfigService {
         ...tenant,
         description: newdescription,
       });
+      return 'Updated successfully';
     } catch (e) {
-      return e;
+      throw new NotFoundException('Tenant not found');
     }
   }
 
@@ -51,6 +52,7 @@ export class TenantConfigService {
         },
       });
       await this.configRepository.remove(tenantEntity);
+      return 'Deletion Successfull';
     } catch (e) {
       return e;
     }

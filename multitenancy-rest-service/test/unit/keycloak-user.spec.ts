@@ -77,7 +77,8 @@ describe('Testing Keycloak User Service', () => {
             userName: 'string',
             email: 'stirng',
             password: 'string',
-            roles: ['role']
+            roles: ['role'],
+            attributes: ['string']
         };
         const token: string = 'Bearer token'
         const response = await keycloakUserService.createUser(mockTenantCredentials, mockUserDetails, token);
@@ -117,8 +118,7 @@ describe('Testing Keycloak User Service', () => {
             email: 'sample-email',
             createdTimestamp: '2022/03/21 17:59:39',
             tenantName: 'string',
-            roles: ['sample-role'],
-            permissions: ['sample-permission']
+            roles: ['sample-role']
         });
     });
 

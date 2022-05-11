@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
-import { encodePassword } from './utils/bcrypt';
+import { encodePassword } from './utils/crypto';
 
 
 @Injectable()
@@ -26,7 +26,7 @@ export class RegistertenantService {
     }
 
     const password = tenant.password;
-    tenant.password = encodePassword(tenant.password);
+    tenant.password = encodePassword(password);
 
     tenant.createdDateTime = new Date()
       .toISOString()

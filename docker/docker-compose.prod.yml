@@ -1,0 +1,6 @@
+version: '3.3'
+services:
+  multitenancy-rest-service:
+    command: npm run start:prod
+    env_file:
+      - ./multitenancy-rest-service/config/prod.env

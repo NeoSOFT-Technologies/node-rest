@@ -7,6 +7,7 @@ import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import { KeycloakUser } from "./keycloakUser";
 import { ConfigService } from "@nestjs/config";
 import ClientRepresentation from "@keycloak/keycloak-admin-client/lib/defs/clientRepresentation";
+import { Role } from "../utils/enums";
 
 
 @Injectable()
@@ -170,11 +171,11 @@ export class KeycloakRealm {
 
     private async createAdminRealmRole(realm: Realm): Promise<RoleRepresentation> {
         await this.kcMasterAdminClient.roles.create({
-            name: 'tenantadmin',
+            name: Role.TENANTADMIN,
             realm: realm.realmName
         });
         return await this.kcMasterAdminClient.roles.findOneByName({
-            name: 'tenantadmin',
+            name: Role.TENANTADMIN,
             realm: realm.realmName
         });
     };

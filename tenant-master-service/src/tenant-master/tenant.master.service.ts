@@ -1,15 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 
 @Injectable()
 export class TenantMasterService {
+  private readonly logger: Logger;
   constructor(
     @Inject('TENANT_PROVISION_SERVICE') private readonly client1: ClientProxy,
     @Inject('TENANT_CONFIG_SERVICE') private readonly client2: ClientProxy,
     private config: ConfigService,
-  ) {}
+  ) {
+    this.logger = new Logger('Tenant Master Service');
+  }
   async masterTenantService(tenantDetails: TenantDetailsDto) {
     const tenant = {
       tenantName: tenantDetails.tenantName,

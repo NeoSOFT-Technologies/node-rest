@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { setupLogger } from './logger';
 import { setupSwagger } from './swagger';
 import { setupCors } from './utils/cors';
 
@@ -16,6 +17,7 @@ async function bootstrap() {
     setupSwagger(app);
     setupCors(app);
   }
+  setupLogger(app);
   await app.listen(PORT, () => {
     console.log(`Listening on ::${PORT}`);
   });

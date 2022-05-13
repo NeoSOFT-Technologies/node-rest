@@ -8,7 +8,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swa
 import { AuthService } from './auth/auth.service';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import { Roles } from './auth/roles.decorator';
-import { Permission } from './auth/permission.decorator';
+import { Permissions } from './auth/permission.decorator';
 import { HttpErrorFilter } from './filter/http-exception.filter';
 import {
   CredentialsDto, DbDetailsDto, LogoutDto, ProvisionTenantTableDto, RegisterTenantDto,
@@ -16,6 +16,7 @@ import {
   ClientDto, ResourceDto, PolicyDto, ScopeDto, PermissionDto, GetUsersInfoDto, CreateRoleDto,
   UpdateRoleDto, GetRoleInfoDto, GetPermissionsDto, UpdatePermissionDto
 } from './dto';
+import { Role, Permission } from './utils/enums';
 
 @Controller('api')
 @UseFilters(new HttpErrorFilter())
@@ -122,8 +123,8 @@ export class AppController {
   @ApiTags('Admin')
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  // @Permission(['view'])
+  @Roles([Role.ADMIN])
+  // @Permissions([Permission.VIEW])
   async adminDetails(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -142,8 +143,8 @@ export class AppController {
   @ApiBody({ type: RegisterTenantDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  // @Permission(['create'])
+  @Roles([Role.ADMIN])
+  // @Permissions([Permission.CREATE])
   async registerTenant(@Body() body: RegisterTenantDto, @Req() req: Request, @Res() res: Response) {
     try {
       let { tenantName, email, password, clientDetails, databaseName } = body;
@@ -164,8 +165,8 @@ export class AppController {
   @ApiQuery({ name: 'tenantName', type: 'string', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin', 'tenantadmin'])
-  // @Permission(['view'])
+  @Roles([Role.ADMIN, Role.TENANTADMIN])
+  // @Permissions([Permission.VIEW])
   async getTenantConfig(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -206,8 +207,8 @@ export class AppController {
   @ApiQuery({ name: 'tenantName', type: 'string', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  // @Permission(['view'])
+  @Roles([Role.ADMIN])
+  // @Permissions([Permission.VIEW])
   listAllTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const { tenantName, isDeleted, page } = req.query as any;
@@ -226,8 +227,8 @@ export class AppController {
   @ApiBody({ type: UpdateTenantDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin', 'tenantadmin'])
-  // @Permission(['edit'])
+  @Roles([Role.ADMIN, Role.TENANTADMIN])
+  // @Permissions([Permission.EDIT])
   async updateDescription(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -269,8 +270,8 @@ export class AppController {
   @ApiParam({ name: 'tenantName', type: 'string', required: true })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  // @Permission(['delete'])
+  @Roles([Role.ADMIN])
+  // @Permissions([Permission.DELETE])
   async deleteTenant(@Req() req: Request, @Res() res: Response) {
     try {
       const tenantname: string = req.params.tenantName;
@@ -288,8 +289,8 @@ export class AppController {
   @UsePipes(new ValidationPipe())
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['tenantadmin'])
-  @Permission(['create'])
+  @Roles([Role.TENANTADMIN])
+  @Permissions([Permission.CREATE])
   async tenantUser(@Body() body: TenantUserDto, @Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -307,8 +308,8 @@ export class AppController {
   @ApiQuery({ type: UsersQueryDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin', 'tenantadmin'])
-  @Permission(['view'])
+  @Roles([Role.ADMIN, Role.TENANTADMIN])
+  @Permissions([Permission.VIEW])
   async listAllUser(@Req() req: Request, @Res() res: Response) {
     try {
       const data = {
@@ -329,8 +330,8 @@ export class AppController {
   @ApiQuery({ type: GetUsersInfoDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin', 'tenantadmin', 'user'])
-  @Permission(['view'])
+  @Roles([Role.ADMIN, Role.TENANTADMIN, Role.USER])
+  @Permissions([Permission.VIEW])
   async getUserInfo(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -362,8 +363,8 @@ export class AppController {
   @ApiBody({ type: UpdateUserDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['tenantadmin', 'user'])
-  @Permission(['edit'])
+  @Roles([Role.TENANTADMIN, Role.USER])
+  @Permissions([Permission.EDIT])
   async updateUser(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -395,8 +396,8 @@ export class AppController {
   @ApiParam({ name: 'userName', type: 'string', required: true })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['tenantadmin'])
-  @Permission(['delete'])
+  @Roles([Role.TENANTADMIN])
+  @Permissions([Permission.DELETE])
   async deleteUser(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -416,8 +417,8 @@ export class AppController {
   @ApiBody({ type: CreateRoleDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['create'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.CREATE])
   async createRole(@Req() req: Request, @Res() res: Response) {
     try {
       if (!req.body.tenantName) {
@@ -435,8 +436,8 @@ export class AppController {
   @ApiQuery({ name: 'tenantName', type: 'string', required: false })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin', 'tenantadmin'])
-  @Permission(['view'])
+  @Roles([Role.ADMIN, Role.TENANTADMIN])
+  @Permissions([Permission.VIEW])
   async getAvailableRoles(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -455,8 +456,8 @@ export class AppController {
   @ApiQuery({ type: GetRoleInfoDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['view'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.VIEW])
   async getRoleInfo(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -477,8 +478,8 @@ export class AppController {
   @ApiBody({ type: UpdateRoleDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['edit'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.EDIT])
   async updateRole(@Req() req: Request, @Res() res: Response) {
     try {
       if (!req.body.tenantName) {
@@ -500,8 +501,8 @@ export class AppController {
   @ApiParam({ name: 'tenantName', type: 'string', required: true })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['delete'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.DELETE])
   async deleteRole(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -516,8 +517,8 @@ export class AppController {
   @ApiBody({ type: PermissionDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['create'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.CREATE])
   async permission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -532,8 +533,8 @@ export class AppController {
   @ApiQuery({ type: GetPermissionsDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin', 'tenantadmin'])
-  @Permission(['read'])
+  @Roles([Role.ADMIN, Role.TENANTADMIN])
+  @Permissions([Permission.VIEW])
   async listPermission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -551,8 +552,8 @@ export class AppController {
   @ApiBody({ type: UpdatePermissionDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['edit'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.EDIT])
   async updatePermission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -570,8 +571,8 @@ export class AppController {
   @ApiParam({ name: 'tenantName', type: 'string', required: true })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['delete'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.DELETE])
   async deletePermission(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -586,8 +587,8 @@ export class AppController {
   @ApiBody({ type: ClientDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['create'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.CREATE])
   async tenantClient(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -602,8 +603,8 @@ export class AppController {
   @ApiBody({ type: ResourceDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['create'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.CREATE])
   async resource(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -618,8 +619,8 @@ export class AppController {
   @ApiBody({ type: PolicyDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['create'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.CREATE])
   async policy(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];
@@ -634,8 +635,8 @@ export class AppController {
   @ApiBody({ type: ScopeDto })
   @ApiBearerAuth()
   @UseGuards(KeycloakAuthGuard)
-  @Roles(['admin'])
-  @Permission(['create'])
+  @Roles([Role.ADMIN])
+  @Permissions([Permission.CREATE])
   async scope(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.headers['authorization'];

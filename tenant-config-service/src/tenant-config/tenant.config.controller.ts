@@ -15,7 +15,7 @@ export class TenantConfigController {
     try {
       await this.tenantConfigService.setConfig(tenantconfig);
     } catch (e) {
-      return e;
+      throw new RpcException(e);
     }
   }
 
@@ -45,7 +45,7 @@ export class TenantConfigController {
     try {
       await this.tenantConfigService.deleteConfig(tenantname);
     } catch (e) {
-      return e;
+      throw new RpcException(e);
     }
   }
 }

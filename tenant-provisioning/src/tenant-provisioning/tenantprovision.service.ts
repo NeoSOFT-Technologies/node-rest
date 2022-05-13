@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { ProvisionTenantDto } from './dto/provision.tenant.dto';
 import { ProvisionTenantTableDto } from './dto/provision.tenant.table.dto';
@@ -8,7 +8,10 @@ import { ConnectionUtils } from './connection.utils';
 
 @Injectable()
 export class TenantprovisionService {
-  constructor(private config: ConfigService) {}
+  private readonly logger: Logger;
+  constructor(private config: ConfigService) {
+    this.logger = new Logger('Tenant Provision Service');
+  }
 
   async createDatabase(
     tenant: ProvisionTenantDto,
@@ -19,6 +22,7 @@ export class TenantprovisionService {
     const query = readFileSync(
       `${__dirname}/scripts/create-database.sql`,
     ).toString();
+    this.logger.log(`Creating tenant database ${databaseName} ...`);
     const db_connection = ConnectionUtils.getConnection(this.config);
 
     return await new Promise((res, rej) => {
@@ -28,9 +32,15 @@ export class TenantprovisionService {
           [databaseName, tenantName, password],
           (err) => {
             if (err) {
+              this.logger.error(
+                `Error while creating database ${databaseName}: ${err}`,
+              );
               rej(err);
             } else {
               ConnectionUtils.endConnection(db_connection);
+              this.logger.log(
+                `Tenant database ${databaseName} created successfully`,
+              );
               res({
                 status: 'Database created successfully',
                 database_name: databaseName,

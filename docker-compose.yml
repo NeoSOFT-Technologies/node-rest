@@ -1,36 +1,5 @@
 version: '3.3'
 services:
-  database:
-    image: 'mysql:8'
-    cap_add:
-      - SYS_NICE
-    container_name: 'rest_api_mysql'
-    hostname: 'rest_api_mysql'
-    networks:
-        - internal
-    ports:
-        - '127.0.0.1:3306:3306'
-    volumes:
-        - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-        - mysql:/var/lib/mysql
-    environment:
-        MYSQL_EXPOSE_PORT: '3306'
-        MYSQL_ROOT_PASSWORD: 'root'
-        MYSQL_USER: 'root'
-        MYSQL_ROOT_USER: 'root'
-        MYSQL_PASSWORD: 'root'
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:16.1.0
-    container_name: 'node_rest_keycloak'
-    networks:
-      - internal
-    ports:
-        - '8080:8080'
-    environment:
-        KEYCLOAK_USER: admin
-        KEYCLOAK_PASSWORD: admin
-
   multitenancy-rest-service:
     build: 
       context: ./multitenancy-rest-service
@@ -40,15 +9,8 @@ services:
       - ./multitenancy-rest-service:/usr/src/app
     networks:
       - internal
-    depends_on:
-      - database
-      - tenant-config-service
-      - tenant-registration
-      - keycloak
     ports:
       - '5000:5000'
-    env_file:
-      - ./multitenancy-rest-service/config/.env
 
   tenant-registration:
     build: ./tenant-registration
@@ -57,14 +19,8 @@ services:
       - ./tenant-registration:/usr/src/app
     networks:
       - internal
-    depends_on:
-      - database
-      - tenant-master-service
     ports:
       - '8875:8875'
-    env_file:
-      - ./config/.env
-      - ./tenant-registration/config/.env
 
   tenant-master-service:
     build: ./tenant-master-service
@@ -73,13 +29,8 @@ services:
       - ./tenant-master-service:/usr/src/app
     networks:
       - internal
-    depends_on:
-      - tenant-provisioning
-      - tenant-config-service
     ports:
       - '8847:8847'
-    env_file:
-      - ./tenant-master-service/config/.env
 
   tenant-provisioning:
     build: ./tenant-provisioning
@@ -88,13 +39,8 @@ services:
       - ./tenant-provisioning:/usr/src/app
     networks:
       - internal
-    depends_on:
-      - database
     ports:
       - '8878:8878'
-    env_file:
-      - ./config/.env
-      - ./tenant-provisioning/config/.env
 
   tenant-config-service:
     build:
@@ -105,14 +51,8 @@ services:
       - ./tenant-config-service:/usr/src/app
     networks:
       - internal
-    depends_on:
-      - database
     ports:
       - '8848:8848'
-    env_file:
-      - ./config/.env
-      - ./tenant-config-service/config/.env
-
 networks:
   internal:
 volumes:

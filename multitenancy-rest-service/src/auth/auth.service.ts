@@ -177,7 +177,7 @@ export class AuthService {
         if (realm_access.roles) {
             roles = realm_access.roles;
         }
-        return roles.includes(Role.USER);
+        return roles.includes(Role.r3);
     }
     private parseToken(token: string) {
         const parts = token.split(' ');

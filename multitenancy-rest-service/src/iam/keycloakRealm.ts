@@ -171,11 +171,11 @@ export class KeycloakRealm {
 
     private async createAdminRealmRole(realm: Realm): Promise<RoleRepresentation> {
         await this.kcMasterAdminClient.roles.create({
-            name: Role.TENANTADMIN,
+            name: Role.r1,
             realm: realm.realmName
         });
         return await this.kcMasterAdminClient.roles.findOneByName({
-            name: Role.TENANTADMIN,
+            name: Role.r1,
             realm: realm.realmName
         });
     };

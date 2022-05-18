@@ -10,7 +10,7 @@ export function logger(req: Request, res: Response, next: NextFunction) {
 
     res.on("finish", () => {
       const { statusCode } = res;
-      const contentLength = res.get("content-length");
+      const contentLength = res.get("content-length") || 0;
       const message = `${method} ${url} ${statusCode} ${Date.now() - startAt}ms ${contentLength} - ${userAgent} ${ip}`;
 
       if (statusCode >= 400) {

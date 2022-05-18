@@ -13,6 +13,7 @@ export const ConnectionUtils = {
     });
     db_connection.connect((err) => {
       if (err) {
+        console.log(`Error while connecting to db server: ${err}`);
         throw err;
       }
       console.log('connected');
@@ -24,6 +25,7 @@ export const ConnectionUtils = {
   endConnection: function (db_connection: Connection) {
     db_connection.end((err) => {
       if (err) {
+        console.log(`Error while ending connection from db server: ${err}`);
         throw err;
       }
       console.log('connection ended');

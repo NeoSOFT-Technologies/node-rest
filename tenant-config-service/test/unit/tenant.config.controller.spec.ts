@@ -6,7 +6,8 @@ describe('Testing Tenant Config Controller', () => {
   let tenantConfigController: TenantConfigController;
   let tenantConfigService: TenantConfigService;
   const mockMessage = { Message: 'Tenant Config set successfully' };
-  const mockId = 1;
+  const mockDeleteMessage = { Message: 'Delete Tenant successfully' };
+  const mockTenantName = 'string';
   const mockTenantDetails = {
     id: 1,
     tenant_id: 1,
@@ -21,6 +22,8 @@ describe('Testing Tenant Config Controller', () => {
   const mockTenantConfigService = {
     setConfig: jest.fn().mockResolvedValue(mockMessage),
     getConfig: jest.fn().mockResolvedValue(mockTenantDetails),
+    deleteConfig: jest.fn().mockResolvedValue(mockDeleteMessage),
+    updateConfig: jest.fn(),
   };
 
   const tenantConfig = {
@@ -28,6 +31,7 @@ describe('Testing Tenant Config Controller', () => {
     tenantName: 'string',
     tenantDbName: 'string',
     description: 'string',
+    databaseName: 'string',
     createdDateTime: 'string',
     host: 'string',
     port: 3306,
@@ -52,8 +56,25 @@ describe('Testing Tenant Config Controller', () => {
   });
 
   it('Testing getConfig from Tenant Config Controller', async () => {
-    expect(await tenantConfigController.getConfig(mockId)).toEqual(
+    expect(await tenantConfigController.getConfig(mockTenantName)).toEqual(
       mockTenantDetails,
+    );
+  });
+
+  it('Testing updateConfig from Tenant Config Controller', async () => {
+    const tenantname = 'tenantName';
+    const newdescription = 'new Description';
+    await tenantConfigController.updateConfig({ tenantname, newdescription });
+    expect(tenantConfigService.updateConfig).toHaveBeenCalledWith(
+      tenantname,
+      newdescription,
+    );
+  });
+
+  it('Testing deleteConfig from Tenant Config Controller', async () => {
+    await tenantConfigController.deleteConfig(mockTenantName);
+    expect(tenantConfigService.deleteConfig).toHaveBeenCalledWith(
+      mockTenantName,
     );
   });
 });

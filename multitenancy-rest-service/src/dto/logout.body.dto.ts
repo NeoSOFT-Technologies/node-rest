@@ -1,14 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsJWT, IsNotEmpty, IsString } from 'class-validator';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { IsJWT, IsNotEmpty } from 'class-validator';
 
 export class LogoutDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
+  @ApiHideProperty()
   tenantName: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsJWT()
   refreshToken: string;
+
+  @ApiHideProperty()
+  clientId: string;
+
+  @ApiHideProperty()
+  clientSecret: string
 }

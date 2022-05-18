@@ -1,7 +1,7 @@
 export class TenantConfigDto {
   tenantId: number;
   tenantName: string;
-  tenantDbName: string;
+  databaseName: string;
   description: string;
   createdDateTime: string;
   host: string;

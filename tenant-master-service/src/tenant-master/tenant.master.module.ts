@@ -25,7 +25,10 @@ import { TenantMasterService } from './tenant.master.service';
       },
     ]),
     ConfigModule.forRoot({
-      envFilePath: [`${process.cwd()}/config/.env`],
+      envFilePath: [
+        `${process.cwd()}/../config/.env`,
+        `${process.cwd()}/config/.env`,
+      ],
       isGlobal: true,
       expandVariables: true,
       load: config,

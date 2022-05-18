@@ -1,55 +1,64 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { TenantConfig } from '@app/tenant-config/entities/tenant.entity';
-import { DatabaseModule } from '@app/tenant-config/db/database.module';
 import { TenantConfigService } from '@app/tenant-config/tenant.config.service';
-import { ConfigModule } from '@nestjs/config';
-import config from '@app/tenant-config/config';
-import { TenantConfigController } from '@app/tenant-config/tenant.config.controller';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('Testing Config Service', () => {
+  let tenantConfigService: TenantConfigService;
+
   const mockTenantConfigDetails = {
     tenantId: 1234,
     tenantName: 'string',
     tenantDbName: 'string',
     description: 'string',
+    databaseName: 'string',
     createdDateTime: 'string',
     host: 'string',
     port: 1234,
   };
-  let tenantConfigService: TenantConfigService;
+
+  const mockconfigRepository = {
+    save: jest.fn().mockResolvedValue('Config saved successfully'),
+    findOneOrFail: jest.fn().mockResolvedValue(mockTenantConfigDetails),
+    remove: jest.fn(),
+    update: jest.fn(),
+  };
+
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        DatabaseModule,
-        TypeOrmModule.forFeature([TenantConfig]),
-        ConfigModule.forRoot({
-          envFilePath: [`${process.cwd()}/config/.env`],
-          isGlobal: true,
-          expandVariables: true,
-          load: config,
-        }),
+      providers: [
+        TenantConfigService,
+        {
+          provide: getRepositoryToken(TenantConfig),
+          useValue: mockconfigRepository,
+        },
       ],
-      controllers: [TenantConfigController],
-      providers: [TenantConfigService],
     }).compile();
 
     tenantConfigService = module.get<TenantConfigService>(TenantConfigService);
   });
 
   it('Testing setConfig method of TenantConfigService', async () => {
-    const mockResponse = expect(
+    expect(
       await tenantConfigService.setConfig(mockTenantConfigDetails),
-    ).toEqual({
-      id: 1,
-      ...mockTenantConfigDetails,
-    });
+    ).toEqual('Config saved successfully');
   });
 
   it('Testing getConfig method of TenantConfigService', async () => {
-    expect(await tenantConfigService.getConfig(1234)).toEqual({
-      id: 1,
-      ...mockTenantConfigDetails,
-    });
+    expect(await tenantConfigService.getConfig('string')).toEqual(
+      mockTenantConfigDetails,
+    );
+  });
+
+  it('Testing updateConfig method of TenantConfigService', async () => {
+    expect(await tenantConfigService.updateConfig('string', 'string')).toEqual(
+      'Updated successfully',
+    );
+  });
+
+  it('Testing deleteConfig method of TenantConfigService', async () => {
+    expect(await tenantConfigService.deleteConfig('string')).toEqual(
+      'Deletion Successfull',
+    );
   });
 });

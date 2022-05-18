@@ -1,5 +1,5 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { ConflictException, Controller } from '@nestjs/common';
+import { MessagePattern, RpcException } from '@nestjs/microservices';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { IdentifierService } from './identifier/identifier.service';
 import { RegistertenantService } from './registertenant.service';
@@ -16,7 +16,7 @@ export class RegistertenantController {
     try {
       if (await this.identifierService.identify(tenant)) {
         return {
-          status: 'this tenant already exists',
+          status: 'This tenant already exists',
         };
       }
       return await this.tenantService.register(tenant);
@@ -25,10 +25,31 @@ export class RegistertenantController {
     }
   }
 
-  @MessagePattern({ cmd: 'list-all-tenant' })
-  async listAllTenant() {
+  @MessagePattern({ cmd: 'check-dbName' })
+  async checkDbName(dbName: string) {
     try {
-      return await this.tenantService.listAll();
+      if (await this.identifierService.checkDb(dbName)) {
+        throw new ConflictException('Database name already taken');
+      }
+      return true;
+    } catch (e) {
+      throw new RpcException(e);
+    }
+  }
+
+  @MessagePattern({ cmd: 'get-client-id-secret' })
+  async getClientIdSecret(tenantName: string) {
+    try {
+      return await this.tenantService.getIdSecret(tenantName);
+    } catch (e) {
+      throw new RpcException(e);
+    }
+  }
+
+  @MessagePattern({ cmd: 'list-all-tenant' })
+  async listAllTenant({ tenantName, isDeleted, page }) {
+    try {
+      return await this.tenantService.listAll(tenantName, isDeleted, page);
     } catch (e) {
       return e;
     }

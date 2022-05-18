@@ -35,21 +35,65 @@ The parameters required by this function are:
 
 We get the access token and refresh token which we can use further for authorisation.
 
+![Password Grant type flow](https://user-images.githubusercontent.com/87794374/156330776-51298fe8-efa4-41fa-9a16-8782563a2105.png)
+<p align = "center">Fig - Resource Owner Password Credentials Grant</p>
+
+
 ### **NestJS Guard for Authorization**
 
 After the token is received , the resources of the client can accessed. We are using Role based Access Control(RBAC) and to establish the access control layer we are implementing a custom guard namely *`KeycloakAuthGuard`*.
 
 It performs two important tasks for us before granting access to any resource:
 
-1. Token Validation: It validates the token received from Authorization header using *`Introspection endpoint`*
-    > /realms/{realm-name}/protocol/openid-connect/token/introspect
+1. Token Validation: It validates the token received from Authorization header using public key *`jwks_uri endpoint`*
+    > /realms/{realm-name}/protocol/openid-connect/certs
 
-    We have *`validateToken`* method in out `AuthService` class which abstracts the use of this endpoint. This method takes in token as the input and returns `true` if the token is active.
+    We have *`validateTokenwithKey`* method in out `AuthService` class.  This method takes in token and public key (which we get using the above endpoint) as the input and returns error if the token is invalid.The implementation stores public key in cache so as not to hit authorization server repeatedly.
 
-2. Extract `available roles` from access token to grant access to the resources after checking if the `required role` is present in the available roles.
+2. Extract `available roles & permissions` from access token to grant access to the resources after checking if the `required role & permissions` are present in the available roles & permissions.
 
 ### **Logout endpoint**
 The logout endpoint logs out the authenticated user. To invoke this endpoint directly the refresh token needs to be included as well as the credentials required to authenticate the client.
 
 > /realms/{realm-name}/protocol/openid-connect/logout
 
+### **Token Validation**
+The Token validation in this repository takes place in two ways viz: The first method is when the token is generated after the keycloak server is hit and second method is via the use of Public Key. Below we have discussed the methods in details.
+
+**Method - I image**
+
+![Token-Validation-Method-I](https://user-images.githubusercontent.com/87708447/164010136-f3f366c9-261a-4adf-9a0e-cbeda50edbdc.png)
+
+- The Method-1 Token validation is as follows: 
+- When the token comes at the server side, first it passes through the AuthGuard    middleware.
+- OpenID Connect defines a discovery mechanism, called OpenID Connect Discovery,   where an OpenID server publishes its metadata at a well-known URL.
+- The URL is as follows: `http(s)://{host}:{port}/realms/{realm-name}/.well-known/openid-configuration`
+- It lists endpoints and other configuration options relevant to the OpenID Connect implementation in Keycloak. 
+- To validate the token, we hit the Introspection endpoint whose URL is given as: `http(s)://{host}:{port}/auth/realms/{realm-name}/protocol/openid-connect/token/
+- The Authorization server will check the token signature and also exp, aud etc. If the token is valid, a validated response containing isActive: true field is returned. Else isActive: false is returned.
+
+**Method - II image**
+
+![Token-validation-Method-II](https://user-images.githubusercontent.com/87708447/164010290-0d0c38c3-d400-4a9f-9d54-d6b355b0bfb6.png)
+
+- The Method - II validation is as follows
+- In this method rather than sending the token to the Authorization server to introspect, we validate the token on the server itself.
+- But to validate the signature of the server, we need to have the public key. OIDC well-known configuration lists an API to retrieve the public key.
+- The URL which is hit is as follows: `http(s)://{host}:{port}/auth/realms/{realm-name}/protocol/openid-connect/
+certs`.
+- After verifying the token signature, next we decode the token to check expiry time of the token. If expiry time is also valid, the validated response can be sent containing isActive: true field. Otherwise send isActive: false in response.
+
+**Challenges in Method - II**
+- In Method 2, if we don’t want to go to the Authorization Server to reduce latency, we must have the public key saved on the server itself. Public keys are different for different tenants. 
+- So it is not good to store the Public Key on the server. 
+- In order to encounter this problem we are Caching mechanism to store the Public Key.
+
+**Working Of Caching**
+
+Image
+
+- The caching mechanism works as follows: 
+- 1. Authentication of the API Consumer takes place.
+- 2. The Keycloak Server generates the Access Token and returns to the API Consumer.
+- 3. In order to access the middleware(AuthGuard) the access-token is passed in the form of header and in the middleware the Token is validated , its roles and permission are checked and then the Public Key is generated.
+- 4. If the Public Key is not present in the cache then it is generated from the Keycloak Server.

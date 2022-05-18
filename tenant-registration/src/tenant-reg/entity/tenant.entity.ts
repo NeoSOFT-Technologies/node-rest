@@ -1,9 +1,4 @@
-import {
-  Column,
-  Entity,
-  ObjectIdColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Tenant {
@@ -23,8 +18,20 @@ export class Tenant {
   description: string;
 
   @Column()
+  databaseName: string;
+
+  @Column()
+  databaseDescription: string;
+
+  @Column()
   createdDateTime: string;
 
   @Column({ default: false })
-  isDelete: boolean;
+  isDeleted: boolean;
+
+  @Column()
+  clientId: string;
+
+  @Column()
+  clientSecret: string;
 }

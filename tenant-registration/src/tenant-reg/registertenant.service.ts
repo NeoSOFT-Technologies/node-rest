@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { RegisterTenantDto } from './dto/register.tenant.dto';
 import { TenantDetailsDto } from './dto/tenant.details.dto';
 import { Tenant } from './entity/tenant.entity';
+import { encodePassword } from './utils/bcrypt';
 
 @Injectable()
 export class RegistertenantService {
@@ -22,54 +23,113 @@ export class RegistertenantService {
         '-' +
         Math.random().toString(16).slice(-4);
     }
-
-    tenant.createdDateTime = new Date()
+    const password = tenant.password;
+    tenant.password = encodePassword(tenant.password);
+    const date = new Date();
+    tenant.createdDateTime = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000,
+    )
       .toISOString()
       .slice(0, 19)
       .replace(/-/g, '/')
       .replace('T', ' ');
 
     const registered_tenant = await this.tenantRepository.save(tenant);
-
     const tenantDetails: TenantDetailsDto = {
       tenantId: registered_tenant.id,
       tenantName: registered_tenant.tenantName,
-      password: registered_tenant.password,
+      databaseName: registered_tenant.databaseName,
+      password: password,
       description: registered_tenant.description,
       createdDateTime: registered_tenant.createdDateTime,
     };
-
     this.client.emit({ cmd: 'tenant-master' }, tenantDetails);
     return { Message: 'Tenant Registered Successfully' };
   }
 
-  listAll(): Promise<Tenant[]> {
-    return this.tenantRepository.find();
+  async getIdSecret(tenantName: string): Promise<Tenant> {
+    try {
+      return await this.tenantRepository.findOneOrFail({
+        where: {
+          tenantName,
+          isDeleted: false,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException('Tenant not found');
+    }
+  }
+
+  listAll(
+    tenantName = '',
+    isDeleted = '',
+    page = 1,
+  ): Promise<[Tenant[], number]> {
+    if (isDeleted === '') {
+      return this.tenantRepository.findAndCount({
+        select: [
+          'id',
+          'tenantName',
+          'email',
+          'description',
+          'databaseName',
+          'databaseDescription',
+          'createdDateTime',
+        ],
+        where: {
+          tenantName: Like(`%${tenantName}%`),
+        },
+        take: 10,
+        skip: 10 * (page - 1),
+      });
+    } else {
+      return this.tenantRepository.findAndCount({
+        select: [
+          'id',
+          'tenantName',
+          'email',
+          'description',
+          'databaseName',
+          'databaseDescription',
+          'createdDateTime',
+        ],
+        where: {
+          tenantName: Like(`%${tenantName}%`),
+          isDeleted: isDeleted === 'true',
+        },
+        take: 10,
+        skip: 10 * (page - 1),
+      });
+    }
   }
 
   async updateDescription(tenantname: string, newdescription: string) {
     const tenant: Tenant = await this.tenantRepository.findOneOrFail({
       where: {
         tenantName: tenantname,
+        isDeleted: false,
       },
     });
 
-    return this.tenantRepository.update(tenant.id, {
+    await this.tenantRepository.update(tenant.id, {
       ...tenant,
       description: newdescription,
     });
+    return 'Tenant Updated Successfully';
   }
 
   async softDelete(tenantname: string) {
     const tenant: Tenant = await this.tenantRepository.findOneOrFail({
       where: {
         tenantName: tenantname,
+        isDeleted: false,
       },
     });
 
-    return this.tenantRepository.update(tenant.id, {
+    await this.tenantRepository.update(tenant.id, {
       ...tenant,
-      isDelete: true,
+      isDeleted: true,
     });
+    return 'Tenant Deleted Successfully';
   }
 }

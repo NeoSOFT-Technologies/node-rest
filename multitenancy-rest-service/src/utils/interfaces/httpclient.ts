@@ -1,4 +1,5 @@
 export interface IHttpClient {
+    get<T=any, D=any>(parameters: IHttpClientRequestParameters<D>): Promise<T>
     post<T=any, D=any>(parameters: IHttpClientRequestParameters<D>): Promise<T>
 }
 

@@ -4,16 +4,15 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
+import { PublicKeyCache } from './auth/cache.publicKey';
 import { KeycloakAuthGuard } from './auth/guards/keycloak-auth.guard';
 import config from './config';
-import { Keycloak } from './iam/keycloak';
-import { KeycloakRealm } from './iam/keycloakRealm';
-import { KeycloakUser } from './iam/keycloakUser';
+import { Keycloak, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, KeycloakRealm, KeycloakUser, KeycloakAuthScope, KeycloakAuthPermission } from './iam';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`${process.cwd()}/config/.env`],
+      envFilePath: (process.env.NODE_ENV) ? [`${process.cwd()}/config/${process.env.NODE_ENV}.env`] : [`${process.cwd()}/config/.env`],
       isGlobal: true,
       expandVariables: true,
       load: config,
@@ -46,6 +45,6 @@ import { KeycloakUser } from './iam/keycloakUser';
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, KeycloakAuthGuard, Keycloak, KeycloakUser, KeycloakRealm],
+  providers: [AppService, AuthService, PublicKeyCache, KeycloakAuthGuard, Keycloak, KeycloakUser, KeycloakRealm, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, KeycloakAuthScope, KeycloakAuthPermission],
 })
-export class AppModule {}
+export class AppModule { }

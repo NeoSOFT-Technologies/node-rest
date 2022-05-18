@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('keycloak', () => ({
-    user: process.env.KEYCLOAK_ADMIN_USER || 'admin',
-    password: process.env.KEYCLOAK_ADMIN_PASSWORD || 'admin',
-    server: process.env.KEYCLOAK_SERVER || 'http://keycloak:8080/auth'
+    server: process.env.KEYCLOAK_SERVER || 'http://keycloak:8080/auth',
+    redirectUrl: process.env.KEYCLOAK_REDIRECT_URL || 'http://localhost:8080/auth',
+    key: process.env.KEY
 }));

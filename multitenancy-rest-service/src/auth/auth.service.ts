@@ -1,106 +1,188 @@
 import { Injectable } from "@nestjs/common";
 import { stringify } from "querystring";
-import jwt_decode from "jwt-decode";
+import * as jwt from "jsonwebtoken";
+import * as jwksClient from "jwks-rsa";
 import { ConfigService } from "@nestjs/config";
-import { CredentialsDto, LogoutDto } from "../dto";
-import { httpClient } from "../utils";
+import { CredentialsDto, LogoutDto, RefreshAccessTokenDto } from "@app/dto";
+import { httpClient } from "@app/utils";
 
 @Injectable()
 export class AuthService {
     constructor(private config: ConfigService) {
         this.keycloakServer = this.config.get('keycloak.server');
-        this.clientId = this.config.get('client.id');;
-        this.clientSecret = this.config.get('client.secret');;
     }
 
     tokenURL: string;
     logoutURL: string;
     validateURL: string;
     keycloakServer: string;
-    clientId: string;
-    clientSecret: string;
 
     async getAccessToken(body: CredentialsDto) {
-        const { username, password, tenantName } = body;
+        let { username, password, tenantName, clientId, clientSecret } = body;
+
+        if (!tenantName && !clientId && !clientSecret) {
+            tenantName = 'master'
+            clientId = 'admin-cli'
+        }
+
         this.tokenURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/token`;
         const params: string = stringify({
             username,
             password,
             grant_type: 'password',
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            client_id: clientId,
+            client_secret: clientSecret,
         });
         const headers = {
             "content-type": "application/x-www-form-urlencoded",
-        }
+        };
 
-        try {
-            const response = await httpClient.post({
-                url: this.tokenURL,
-                payload: params,
-                headers: headers
-            })
-            return response;
-        } catch (e) {
-            throw e
-        }
+        const response = await httpClient.post({
+            url: this.tokenURL,
+            payload: params,
+            headers: headers
+        });
+        return response;
     }
 
     async logout(body: LogoutDto) {
-        const { tenantName, refreshToken } = body;
+        let { tenantName, refreshToken, clientId, clientSecret } = body;
+        if (tenantName === 'master' && !clientId && !clientSecret) {
+            clientId = 'admin-cli'
+        }
+
         this.logoutURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/logout`;
         const params = stringify({
             refresh_token: refreshToken,
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            client_id: clientId,
+            client_secret: clientSecret,
         });
 
         const headers = {
             "content-type": "application/x-www-form-urlencoded",
         }
-        try {
-            const response = await httpClient.post({
-                url: this.logoutURL,
-                payload: params,
-                headers: headers
-            })
-            return response.status;
-        } catch (e) {
-            throw e
-        }
+
+        const response = await httpClient.post({
+            url: this.logoutURL,
+            payload: params,
+            headers: headers
+        })
+        return response.status;
     }
 
-    async validateToken(token: string) {
-        const { iss }: any = jwt_decode(token);
+    async refreshAccessToken(body: RefreshAccessTokenDto) {
+        let { tenantName, refreshToken, clientId, clientSecret } = body;
+        if (tenantName === 'master' && !clientId && !clientSecret) {
+            clientId = 'admin-cli'
+        }
+
+        this.tokenURL = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/token`;
+        const params: string = stringify({
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+            client_id: clientId,
+            client_secret: clientSecret
+        });
+        const headers = {
+            "content-type": "application/x-www-form-urlencoded",
+        };
+
+        const response = await httpClient.post({
+            url: this.tokenURL,
+            payload: params,
+            headers: headers
+        });
+        return response;
+    }
+
+    async validateToken(token: string, clientId: string, clientSecret: string) {
+        const { iss }: any = jwt.decode(token) as jwt.JwtPayload;
 
         this.validateURL = `${iss}/protocol/openid-connect/token/introspect`;
         const params = stringify({
             token,
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            client_id: clientId,
+            client_secret: clientSecret,
         });
         const headers = {
             "content-type": "application/x-www-form-urlencoded",
         }
-        try {
-            const response = await httpClient.post({
-                url: this.validateURL,
-                payload: params,
-                headers: headers
-            })
-            return response.data.active;
-        } catch (e) {
-            throw e
-        }
+
+        const response = await httpClient.post({
+            url: this.validateURL,
+            payload: params,
+            headers: headers
+        })
+        return response.data.active;
     }
 
-    async getUserRoles(token: string) {
-        const { realm_access }: any = jwt_decode(token);
+    async validateTokenwithKey(token: string, publicKey: string) {
+        jwt.verify(token, publicKey);
+    }
+
+    async getpublicKey(tenantName: string) {
+        const publicKeyURI = `${this.keycloakServer}/realms/${tenantName}/protocol/openid-connect/certs`;
+        const client = jwksClient({
+            jwksUri: publicKeyURI
+        });
+        const key = await client.getSigningKey();
+        const signingKey = key.getPublicKey();
+        
+        return { public_key: signingKey };
+    }
+
+    async getTenantName(token: string) {
+        token = this.parseToken(token);
+        const { iss }: any = jwt.decode(token) as jwt.JwtPayload;
+        return iss.split("/").pop();
+    }
+
+    async getUserName(token: string) {
+        token = this.parseToken(token);
+        const { preferred_username }: any = jwt.decode(token) as jwt.JwtPayload;;
+        return preferred_username;
+    }
+
+    async getExpTime(token: string) {
+        token = this.parseToken(token);
+        const { exp }: any = jwt.decode(token) as jwt.JwtPayload;;
+        return exp;
+    }
+
+    async getRoles(token: string) {
+        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
 
         let roles: string[] = [];
         if (realm_access.roles) {
             roles = realm_access.roles;
         }
         return roles;
+    }
+
+    async getPermissions(token: string) {
+        token = this.parseToken(token);
+        let { permission }: any = jwt.decode(token) as jwt.JwtPayload;
+        if (typeof permission === 'string') {
+            permission = permission.split(',');
+        }
+        return permission;
+    }
+
+    async checkUserRole(token: string) {
+        token = this.parseToken(token);
+        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
+
+        let roles: string[] = [];
+        if (realm_access.roles) {
+            roles = realm_access.roles;
+        }
+        return roles.includes('user');
+    }
+    private parseToken(token: string) {
+        const parts = token.split(' ');
+        if (parts.length === 2 && parts[0] === 'Bearer') {
+            token = parts[1];
+        }
+        return token;
     }
 }

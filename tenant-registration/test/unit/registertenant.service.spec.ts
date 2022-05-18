@@ -1,7 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { Tenant } from '@app/tenant-reg/entity/tenant.entity';
 import { RegistertenantService } from '@app/tenant-reg/registertenant.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+
+jest.mock('bcryptjs', () => ({
+  hashSync: jest.fn().mockReturnValue('string'),
+}));
 
 describe('Testing RegisTration MicroService Service', () => {
   let registertenantService: RegistertenantService;
@@ -11,11 +15,16 @@ describe('Testing RegisTration MicroService Service', () => {
     email: 'string',
     password: 'string',
     description: 'string',
+    databaseName: 'string',
+    databaseDescription: 'string',
     createdDateTime: 'string',
+    clientId: 'string',
+    clientSecret: 'string',
   };
+  const count = 50;
   const mockTenantRepository = {
     save: jest.fn().mockResolvedValue(tenant),
-    find: jest.fn().mockResolvedValue(tenant),
+    findAndCount: jest.fn().mockResolvedValue([[tenant], count]),
     findOneOrFail: jest.fn().mockResolvedValue(tenant),
     update: jest.fn().mockResolvedValue(tenant),
   };
@@ -48,8 +57,14 @@ describe('Testing RegisTration MicroService Service', () => {
     expect(await registertenantService.register(tenant)).toEqual(mockMessage);
   });
 
+  it('Testing getIdSecret', async () => {
+    expect(await registertenantService.getIdSecret(tenant.tenantName)).toEqual(
+      tenant,
+    );
+  });
+
   it('Testing listAll', async () => {
-    expect(await registertenantService.listAll()).toEqual(tenant);
+    expect(await registertenantService.listAll()).toEqual([[tenant], count]);
   });
 
   it('Testing updateDescription', async () => {
@@ -58,12 +73,12 @@ describe('Testing RegisTration MicroService Service', () => {
         tenant.tenantName,
         tenant.description,
       ),
-    ).toEqual(tenant);
+    ).toEqual('Tenant Updated Successfully');
   });
 
   it('Testing softDelete', async () => {
     expect(await registertenantService.softDelete(tenant.tenantName)).toEqual(
-      tenant,
+      'Tenant Deleted Successfully',
     );
   });
 });

@@ -24,3 +24,4 @@ services:
     command: npm run start:staging
     env_file:
       - ./tenant-config-service/config/staging.env
+

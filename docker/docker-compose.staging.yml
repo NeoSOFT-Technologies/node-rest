@@ -4,3 +4,24 @@ services:
     command: npm run start:staging
     env_file:
       - ./multitenancy-rest-service/config/staging.env
+
+  tenant-registration:
+    command: npm run start:staging
+    env_file:
+      - ./tenant-registration/config/staging.env
+
+  tenant-master-service:
+    command: npm run start:staging
+    env_file:
+      - ./tenant-master-service/config/staging.env
+
+  tenant-provisioning:
+    command: npm run start:staging
+    env_file:
+      - ./tenant-provisioning/config/staging.env
+
+  tenant-config-service:
+    command: npm run start:staging
+    env_file:
+      - ./tenant-config-service/config/staging.env
+

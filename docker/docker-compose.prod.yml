@@ -17,4 +17,3 @@ services:
   tenant-config-service:
     command: npm run start:prod
 
-

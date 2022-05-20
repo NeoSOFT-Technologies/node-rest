@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  multitenancy-rest-service:
+    command: npm run start:staging
+    env_file:
+      - ./multitenancy-rest-service/config/staging.env
+
+  tenant-registration:
+    command: npm run start:staging
+  
+  tenant-master-service:
+    command: npm run start:staging
+
+  tenant-provisioning:
+    command: npm run start:staging
+
+  tenant-config-service:
+    command: npm run start:staging

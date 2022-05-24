@@ -67,7 +67,7 @@ describe('Testing Keycloak Realm Service', () => {
 
     it('Testing "createRealm" method', async () => {
         const token = 'Bearer token';
-        const response = await keycloakRealmService.createRealm('string', 'string', 'string', token);
+        const response = await keycloakRealmService.createRealm('string','string', 'string', 'string', token);
         expect(response).toEqual('Realm created successfully');
     });
 

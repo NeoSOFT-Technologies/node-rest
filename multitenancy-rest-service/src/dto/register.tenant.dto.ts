@@ -19,6 +19,11 @@ export class RegisterTenantDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
+  userName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
   @IsEmail()
   email: string;
 

@@ -19,9 +19,9 @@ export class KeycloakUser {
     }
     keycloakServer: string;
 
-    public async createAdminUser(realmName: string, email: string, password: string): Promise<TenantAdminUser> {
+    public async createAdminUser(realmName: string, userName: string, email: string, password: string): Promise<TenantAdminUser> {
         return await this.kcMasterAdminClient.users.create({
-            username: 'tenantadmin',
+            username: userName,
             email: email,
             enabled: true,
             credentials: [{
@@ -278,7 +278,10 @@ export class KeycloakUser {
         const roles = await client.users.listRealmRoleMappings({
             id: user.id
         });
-        const rolesName = roles.map(role => role.name)
+        let rolesName = roles.map(role => role.name)
+        rolesName = rolesName.filter(role => {
+            return !(role.includes('default-roles') || role.includes('uma') || role.includes('offline_access'));
+        })
         return rolesName;
     };
 

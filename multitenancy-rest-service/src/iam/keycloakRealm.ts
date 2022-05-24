@@ -23,12 +23,12 @@ export class KeycloakRealm {
     }
     keycloakServer: string;
 
-    public async createRealm(realmName: string, email: string, password: string, token: string): Promise<any> {
+    public async createRealm(realmName: string, userName: string, email: string, password: string, token: string): Promise<any> {
         const parts = token.split(' ')
         this.kcMasterAdminClient.setAccessToken(parts[1]);
 
         const tenantRealm: Realm = await this.createTenantRealm(realmName, email);
-        const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, email, password);
+        const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, userName, email, password);
         const adminRole: RoleRepresentation = await this.createAdminRealmRole(tenantRealm);
         await this.createCompositeRole(tenantRealm, adminRole);
         await this.RealmRoleMapping(tenantRealm, adminUser, adminRole);
@@ -68,7 +68,10 @@ export class KeycloakRealm {
         kcClient.setAccessToken(parts[1]);
 
         const roles = await kcClient.roles.find();
-        const rolesName = roles.map(role => role.name)
+        let rolesName = roles.map(role => role.name)
+        rolesName = rolesName.filter(role => {
+            return !(role.includes('default-roles') || role.includes('uma') || role.includes('offline_access'));
+        })
         return rolesName;
     };
 

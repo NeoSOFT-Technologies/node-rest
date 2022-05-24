@@ -648,11 +648,19 @@ export class AppController {
   @Get('connect-database')
   @ApiTags('Miscellaneous')
   @ApiQuery({ type: DbDetailsDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
   async connectDatabase(@Req() req: Request, @Res() res: Response) {
     try {
       const dbDetails: DbDetailsDto = req.query as any;
-      const response = await this.appService.connect(dbDetails);
+      const token = req.headers['authorization'];
+      const tenantNameFromToken: string = await this.authService.getTenantName(token);
+      let tenantName: string = req.query.tenantName as string;
 
+      if (tenantName !== tenantNameFromToken) {
+          throw new HttpException('Wrong Tenant Name', HttpStatus.FORBIDDEN);
+      }
+      const response = await this.appService.connect(dbDetails);
       if (response) {
         res.send(response);
       }
@@ -664,10 +672,14 @@ export class AppController {
   @Post('create-table')
   @ApiTags('Miscellaneous')
   @ApiBody({ type: ProvisionTenantTableDto })
+  @UsePipes(new ValidationPipe())
+  @ApiBearerAuth()
   async createTable(@Req() req: Request, @Res() res: Response) {
     try {
       const tableDto: ProvisionTenantTableDto = req.body;
+      const token = req.headers['authorization'];
       const response = this.appService.createTable(tableDto);
+      
       response.subscribe((result) => res.send(result));
     } catch (e) {
       throw e;

@@ -1,4 +1,4 @@
-import { Controller, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import {
   EventPattern,
   MessagePattern,

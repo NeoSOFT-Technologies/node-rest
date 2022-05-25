@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
@@ -9,11 +9,14 @@ import { encodePassword } from './utils/bcrypt';
 
 @Injectable()
 export class RegistertenantService {
+  private readonly logger: Logger;
   constructor(
     @InjectRepository(Tenant)
     private readonly tenantRepository: Repository<Tenant>,
     @Inject('Tenant-Master') private readonly client: ClientProxy,
-  ) {}
+  ) {
+    this.logger = new Logger('Register Tenant Service');
+  }
   async register(tenant: RegisterTenantDto) {
     if (!tenant.tenantName) {
       tenant.tenantName =
@@ -34,7 +37,9 @@ export class RegistertenantService {
       .replace(/-/g, '/')
       .replace('T', ' ');
 
+    this.logger.log('Inserting tenant data in tenant table ...');
     const registered_tenant = await this.tenantRepository.save(tenant);
+    this.logger.log('Inserted successfully !!');
     const tenantDetails: TenantDetailsDto = {
       tenantId: registered_tenant.id,
       tenantName: registered_tenant.tenantName,

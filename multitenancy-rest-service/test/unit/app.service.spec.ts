@@ -120,6 +120,7 @@ describe('Testing AppService', () => {
         const mockMessage = { Message: 'Tenant Registered Successfully' };
         const tenantDetails = {
             tenantName: 'string',
+            userName: 'string',
             email: 'string',
             password: 'string',
             description: 'string',
@@ -244,6 +245,7 @@ describe('Testing AppService', () => {
     it('Testing "createRealm"', async () => {
         const tenantDetails = {
             tenantName: 'string',
+            userName: 'string',
             email: 'string',
             password: 'string'
         };

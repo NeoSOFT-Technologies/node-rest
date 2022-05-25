@@ -649,9 +649,20 @@ export class AppController {
   @Get('connect-database')
   @ApiTags('Miscellaneous')
   @ApiQuery({ type: DbDetailsDto })
+  @ApiBearerAuth()
+  @UseGuards(KeycloakAuthGuard)
+  @Roles([Role.r2])
+  @Permissions([Permission.p2])
   async connectDatabase(@Req() req: Request, @Res() res: Response) {
     try {
       const dbDetails: DbDetailsDto = req.query as any;
+      const token = req.headers['authorization'];
+      const tenantNameFromToken = await this.authService.getTenantName(token);
+      let tenantName: string = req.query.tenantName as string;
+
+      if (tenantName !== tenantNameFromToken){
+        throw new HttpException('Updation Not Allowed', HttpStatus.FORBIDDEN);
+      }
       const response = await this.appService.connect(dbDetails);
 
       if (response) {

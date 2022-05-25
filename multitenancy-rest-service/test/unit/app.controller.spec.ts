@@ -7,8 +7,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Request, Response } from 'express';
 import * as httpMocks from 'node-mocks-http';
 import { Observable, of } from 'rxjs';
-import { DbDetailsDto } from '@app/dto';
-import { Param } from '@nestjs/common';
 
 describe('Testing AppController', () => {
     let appController: AppController;
@@ -581,7 +579,6 @@ describe('Testing AppController', () => {
         mockRequest.headers = {
             authorization: 'Bearer token'
         };
-
 
         const connect = jest.spyOn(appService, 'connect');
         await appController.connectDatabase(mockRequest, mockResponse);

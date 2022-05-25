@@ -7,6 +7,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Request, Response } from 'express';
 import * as httpMocks from 'node-mocks-http';
 import { Observable, of } from 'rxjs';
+import { DbDetailsDto } from '@app/dto';
+import { Param } from '@nestjs/common';
 
 describe('Testing AppController', () => {
     let appController: AppController;
@@ -568,10 +570,23 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "connectDatabase"', async () => {
-        const mockSend = jest.spyOn(mockResponse, 'send');
+        mockRequest.query = {
+            host: 'host',
+            port: '3306',
+            tenantName: 'tenantName',
+            password: 'tenant123',
+            dbName: 'tenant_db'
+        }
+        
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+
+
+        const connect = jest.spyOn(appService, 'connect');
         await appController.connectDatabase(mockRequest, mockResponse);
-        expect(mockSend).toHaveBeenCalled();
-        mockSend.mockRestore();
+        expect(connect).toHaveBeenCalled();
+        connect.mockRestore();
     });
 
     it('Testing appcontroller "createTable"', async () => {

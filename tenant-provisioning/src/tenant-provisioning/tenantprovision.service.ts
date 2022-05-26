@@ -9,7 +9,7 @@ import { ConnectionUtils } from './connection.utils';
 @Injectable()
 export class TenantprovisionService {
   private readonly logger: Logger;
-  constructor(private config: ConfigService) {
+  constructor(private readonly config: ConfigService) {
     this.logger = new Logger('Tenant Provision Service');
   }
 
@@ -25,7 +25,7 @@ export class TenantprovisionService {
     this.logger.log(`Creating tenant database ${databaseName} ...`);
     const db_connection = ConnectionUtils.getConnection(this.config);
 
-    return await new Promise((res, rej) => {
+    return new Promise((res, rej) => {
       if (query) {
         db_connection.query(
           query,
@@ -64,7 +64,7 @@ export class TenantprovisionService {
     ).toString();
     const db_connection = ConnectionUtils.getConnection(this.config);
 
-    return await new Promise((res, rej) => {
+    return new Promise((res, rej) => {
       db_connection.query(
         query,
         [dbName, tableName, columns[0].columnName],
@@ -90,7 +90,7 @@ export class TenantprovisionService {
     const query = readFileSync(`${__dirname}/scripts/seed-data.sql`).toString();
     const db_connection = ConnectionUtils.getConnection(this.config);
 
-    return await new Promise((res, rej) => {
+    return new Promise((res, rej) => {
       db_connection.query(
         query,
         [dbName, tableName, columns, values],
@@ -113,7 +113,7 @@ export class TenantprovisionService {
     const query = readFileSync(`${__dirname}/scripts/ping.sql`).toString();
     const db_connection = ConnectionUtils.getConnection(this.config);
 
-    return await new Promise((res, rej) => {
+    return new Promise((res, rej) => {
       db_connection.query(query, [dbName, dbName], (err, result) => {
         if (err) {
           rej(err);

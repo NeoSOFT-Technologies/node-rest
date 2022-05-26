@@ -20,4 +20,4 @@ export function logger(req: Request, res: Response, next: NextFunction) {
     });
 
     next();
-};
+}

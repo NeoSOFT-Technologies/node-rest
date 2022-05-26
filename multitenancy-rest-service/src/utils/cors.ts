@@ -6,4 +6,4 @@ export function setupCors(app: INestApplication) {
         methods: ['GET', 'POST', 'PATCH', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization']
     })
-};
+}

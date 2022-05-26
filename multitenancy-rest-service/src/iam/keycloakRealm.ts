@@ -12,12 +12,12 @@ import { Role } from "../utils/enums";
 
 @Injectable()
 export class KeycloakRealm {
-    private kcMasterAdminClient: KcAdminClient;
+    private readonly kcMasterAdminClient: KcAdminClient;
 
     constructor(
-        private keycloak: Keycloak,
-        private keycloakUser: KeycloakUser,
-        private config: ConfigService) {
+        private readonly keycloak: Keycloak,
+        private readonly keycloakUser: KeycloakUser,
+        private readonly config: ConfigService) {
         this.kcMasterAdminClient = this.keycloak.kcMasterAdminClient
         this.keycloakServer = this.keycloakUser.keycloakServer
     }
@@ -43,9 +43,8 @@ export class KeycloakRealm {
             }
         }
         await this.createRealmRoles(realmName, userRoleDetails, token)
-        
         return 'Realm created successfully';
-    };
+    }
 
     public async createRealmRoles(tenantName: string, roleDetails: RoleRepresentation, token: string): Promise<string> {
         const kcClient: KcAdminClient = new KcAdminClient({
@@ -57,7 +56,7 @@ export class KeycloakRealm {
 
         await kcClient.roles.create(roleDetails);
         return 'Role created successfully';
-    };
+    }
 
     public async getRealmRoles(tenantName: string, token: string): Promise<string[]> {
         const kcClient: KcAdminClient = new KcAdminClient({
@@ -73,7 +72,7 @@ export class KeycloakRealm {
             return !(role.includes('default-roles') || role.includes('uma') || role.includes('offline_access'));
         })
         return rolesName;
-    };
+    }
 
     public async getRealmRoleInfo(tenantName: string, roleName: string, token: string): Promise<RoleRepresentation> {
         const kcClient: KcAdminClient = new KcAdminClient({
@@ -88,9 +87,9 @@ export class KeycloakRealm {
         });
         if (!role) {
             throw new NotFoundException('Role not found');
-        };
+        }
         return role;
-    };
+    }
 
     public async updateRealmRoles(tenantName: string, roleName: string, roleDetails: RoleRepresentation, token: string): Promise<string> {
         const kcClient: KcAdminClient = new KcAdminClient({
@@ -105,7 +104,7 @@ export class KeycloakRealm {
         });
         if (!role) {
             throw new NotFoundException('Role not found');
-        };
+        }
 
         await kcClient.roles.updateByName(
             { name: roleName },
@@ -133,7 +132,7 @@ export class KeycloakRealm {
             await this.deleteCompositeRole(kcClient, deleteCompositeRoles, client[0], role);
         }
         return 'Role updated successfully';
-    };
+    }
 
     public async deleteRealmRoles(tenantName: string, roleName: string, token: string): Promise<string> {
         const kcClient: KcAdminClient = new KcAdminClient({
@@ -147,7 +146,7 @@ export class KeycloakRealm {
             name: roleName
         });
         return 'Role deleted successfully';
-    };
+    }
 
 
     public async deleteRealm(tenantname: string, token: string): Promise<any> {
@@ -159,7 +158,7 @@ export class KeycloakRealm {
     }
 
     private async createTenantRealm(realmName: string, email: string): Promise<Realm> {
-        return await this.kcMasterAdminClient.realms.create({
+        return this.kcMasterAdminClient.realms.create({
             id: realmName,
             realm: realmName,
             enabled: true,
@@ -170,18 +169,18 @@ export class KeycloakRealm {
                 "from": email,
             }
         });
-    };
+    }
 
     private async createAdminRealmRole(realm: Realm): Promise<RoleRepresentation> {
         await this.kcMasterAdminClient.roles.create({
             name: Role.r2,
             realm: realm.realmName
         });
-        return await this.kcMasterAdminClient.roles.findOneByName({
+        return this.kcMasterAdminClient.roles.findOneByName({
             name: Role.r2,
             realm: realm.realmName
         });
-    };
+    }
 
     private async RealmRoleMapping(realm: Realm, adminUser: TenantAdminUser, adminRole: RoleRepresentation): Promise<void> {
         await this.kcMasterAdminClient.users.addRealmRoleMappings({
@@ -194,7 +193,7 @@ export class KeycloakRealm {
             ],
             realm: realm.realmName
         });
-    };
+    }
 
     private async createCompositeRole(realm: Realm, adminRole: RoleRepresentation): Promise<void> {
         const clients = await this.kcMasterAdminClient.clients.find({
@@ -206,10 +205,10 @@ export class KeycloakRealm {
             realm: realm.realmName
         });
         await this.kcMasterAdminClient.roles.createComposite({ roleId: adminRole.id, realm: realm.realmName }, realm_management_roles);
-    };
+    }
 
     private async addCompositeRole(kcClient: KcAdminClient, addRoles: string[], client: ClientRepresentation, role: RoleRepresentation) {
-        let addCompositeRoles: RoleRepresentation[] = [];
+        const addCompositeRoles: RoleRepresentation[] = [];
         for (const role of addRoles) {
             const clientRole = await kcClient.clients.findRole({
                 id: client.id,
@@ -217,18 +216,18 @@ export class KeycloakRealm {
             });
             if (!clientRole) {
                 throw new NotFoundException(`${role} role not found`);
-            };
+            }
             addCompositeRoles.push(clientRole);
-        };
+        }
 
         await kcClient.roles.createComposite(
             { roleId: role.id },
             addCompositeRoles
         )
-    };
+    }
 
     private async deleteCompositeRole(kcClient: KcAdminClient, deleteRoles: string[], client: ClientRepresentation, role: RoleRepresentation) {
-        let deleteCompositeRoles: RoleRepresentation[] = [];
+        const deleteCompositeRoles: RoleRepresentation[] = [];
         for (const role of deleteRoles) {
             const clientRole = await kcClient.clients.findRole({
                 id: client.id,
@@ -236,13 +235,13 @@ export class KeycloakRealm {
             });
             if (!clientRole) {
                 throw new NotFoundException(`${role} role not found`);
-            };
+            }
             deleteCompositeRoles.push(clientRole);
-        };
+        }
 
         await kcClient.roles.delCompositeRoles(
             { id: role.id },
             deleteCompositeRoles
         )
-    };
-};
+    }
+}

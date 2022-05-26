@@ -4,13 +4,12 @@ import { ConnectionUtils } from './utils';
 import {
   ClientDto, CreateRealmDto, CreateRoleDto, DbDetailsDto, DeletePermissionDto, DeleteRoleDto, DeleteUserDto,
   GetPermissionsDto, GetRoleInfoDto, GetUsersInfoDto, PermissionDto, PolicyDto, ProvisionTenantTableDto,
-  RegisterTenantDto, ResourceDto, TenantUserDto, UpdatePermissionDto, UpdateRoleDto, UpdateUserDto, UsersQueryDto
+  RegisterTenantDto, ResourceDto, TenantUserDto, UpdatePermissionDto, UpdateRoleDto, UpdateUserDto, UsersQueryDto, ScopeDto
 } from './dto';
 import {
   KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient,
   KeycloakRealm, KeycloakUser, KeycloakAuthScope, KeycloakAuthPermission
 } from './iam';
-import { ScopeDto } from './dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -26,7 +25,7 @@ export class AppService {
     private readonly keycloakAuthResource: KeycloakAuthResource,
     private readonly keycloakAuthScope: KeycloakAuthScope,
     private readonly keycloakAuthPermission: KeycloakAuthPermission,
-    private config: ConfigService
+    private readonly config: ConfigService
   ) { }
 
 
@@ -36,8 +35,8 @@ export class AppService {
   }
   createRedirectUrl(tenantName: string) {
     const keycloakRedirectUrl = this.config.get('keycloak.redirectUrl');
-    const redirectUrl = `${keycloakRedirectUrl}/admin/${tenantName}/console/`;
-    return redirectUrl;
+    return `${keycloakRedirectUrl}/admin/${tenantName}/console/`;
+  
   }
   getTenantConfig(tenantName: string) {
     return this.client2.send({ cmd: 'get_config' }, tenantName);

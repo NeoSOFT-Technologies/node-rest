@@ -33,6 +33,7 @@ By running one command, you will get a production-ready Node.js app installed an
 - **Production-Ready Skeleton**
 - **Followed SOLID Principles**
 - **Microservice Architecture**: using [NestJS](https://docs.nestjs.com/microservices/basics)
+- **Multitenant APIs - Database Per Tenant**: [API documentation](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/api.md)
 - **Authentication and authorization**: using [Keycloak](https://www.keycloak.org/)
 - **Validation**: request data validation using [Nest JS Pipe](https://docs.nestjs.com/techniques/validation)
 - **Logging**: using [winston](https://github.com/winstonjs/winston) 

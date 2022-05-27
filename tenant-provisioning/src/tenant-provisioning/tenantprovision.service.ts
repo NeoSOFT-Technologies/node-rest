@@ -23,11 +23,11 @@ export class TenantprovisionService {
       `${__dirname}/scripts/create-database.sql`,
     ).toString();
     this.logger.log(`Creating tenant database ${databaseName} ...`);
-    const db_connection = ConnectionUtils.getConnection(this.config);
+    const DbConnection = ConnectionUtils.getConnection(this.config);
 
     return new Promise((res, rej) => {
       if (query) {
-        db_connection.query(
+        DbConnection.query(
           query,
           [databaseName, tenantName, password],
           (err) => {
@@ -37,7 +37,7 @@ export class TenantprovisionService {
               );
               rej(err);
             } else {
-              ConnectionUtils.endConnection(db_connection);
+              ConnectionUtils.endConnection(DbConnection);
               this.logger.log(
                 `Tenant database ${databaseName} created successfully`,
               );
@@ -53,26 +53,26 @@ export class TenantprovisionService {
   }
 
   async createTable(
-    table_details: ProvisionTenantTableDto,
+    tableDetails: ProvisionTenantTableDto,
   ): Promise<Record<string, any>> {
-    const dbName = table_details.dbName;
-    const tableName = table_details.tableName;
-    const columns = table_details.columns;
+    const dbName = tableDetails.dbName;
+    const tableName = tableDetails.tableName;
+    const columns = tableDetails.columns;
 
     const query = readFileSync(
       `${__dirname}/scripts/create-table.sql`,
     ).toString();
-    const db_connection = ConnectionUtils.getConnection(this.config);
+    const DbConnection = ConnectionUtils.getConnection(this.config);
 
     return new Promise((res, rej) => {
-      db_connection.query(
+      DbConnection.query(
         query,
         [dbName, tableName, columns[0].columnName],
         (err) => {
           if (err) {
             rej(err);
           } else {
-            ConnectionUtils.endConnection(db_connection);
+            ConnectionUtils.endConnection(DbConnection);
             res({
               status: 'Table created successfully',
             });
@@ -88,17 +88,17 @@ export class TenantprovisionService {
     const values = data.values;
 
     const query = readFileSync(`${__dirname}/scripts/seed-data.sql`).toString();
-    const db_connection = ConnectionUtils.getConnection(this.config);
+    const DbConnection = ConnectionUtils.getConnection(this.config);
 
     return new Promise((res, rej) => {
-      db_connection.query(
+      DbConnection.query(
         query,
         [dbName, tableName, columns, values],
         (err) => {
           if (err) {
             rej(err);
           } else {
-            ConnectionUtils.endConnection(db_connection);
+            ConnectionUtils.endConnection(DbConnection);
             res({
               status: 'Data seeded successfully',
             });
@@ -111,14 +111,14 @@ export class TenantprovisionService {
     const dbName = 'db-' + tenantData.tenantName;
 
     const query = readFileSync(`${__dirname}/scripts/ping.sql`).toString();
-    const db_connection = ConnectionUtils.getConnection(this.config);
+    const DbConnection = ConnectionUtils.getConnection(this.config);
 
     return new Promise((res, rej) => {
-      db_connection.query(query, [dbName, dbName], (err, result) => {
+      DbConnection.query(query, [dbName, dbName], (err, result) => {
         if (err) {
           rej(err);
         } else {
-          ConnectionUtils.endConnection(db_connection);
+          ConnectionUtils.endConnection(DbConnection);
           res({
             'Tenant-Database': result[0],
             'Tenant-Table': result[1],

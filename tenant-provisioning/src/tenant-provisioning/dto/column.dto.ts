@@ -1,4 +1,4 @@
-export class columnDto {
+export class ColumnDto {
   columnName: string;
   columntype: any;
 }

@@ -22,6 +22,7 @@ export class KeycloakRealm {
         this.keycloakServer = this.keycloakUser.keycloakServer
     }
     keycloakServer: string;
+    clientID = 'realm-management';
 
     public async createRealm(realmName: string, userName: string, email: string, password: string, token: string): Promise<any> {
         const parts = token.split(' ')
@@ -116,10 +117,10 @@ export class KeycloakRealm {
 
         if (roleDetails.composites) {
             const client = await kcClient.clients.find({
-                clientId: 'realm-management'
+                clientId: this.clientID
             });
 
-            const updatedCompositeRoles = roleDetails.composites.client['realm-management'];
+            const updatedCompositeRoles = roleDetails.composites.client[this.clientID];
             const compositeRoles = await kcClient.roles.getCompositeRoles({
                 id: role.id
             });
@@ -199,12 +200,12 @@ export class KeycloakRealm {
         const clients = await this.kcMasterAdminClient.clients.find({
             realm: realm.realmName
         });
-        const realm_management_client = clients.filter((client) => client.clientId === 'realm-management');
-        const realm_management_roles = await this.kcMasterAdminClient.clients.listRoles({
-            id: realm_management_client[0].id,
+        const RealmManagementClient = clients.filter((client) => client.clientId === this.clientID);
+        const RealmManagementRoles = await this.kcMasterAdminClient.clients.listRoles({
+            id: RealmManagementClient[0].id,
             realm: realm.realmName
         });
-        await this.kcMasterAdminClient.roles.createComposite({ roleId: adminRole.id, realm: realm.realmName }, realm_management_roles);
+        await this.kcMasterAdminClient.roles.createComposite({ roleId: adminRole.id, realm: realm.realmName }, RealmManagementRoles);
     }
 
     private async addCompositeRole(kcClient: KcAdminClient, addRoles: string[], client: ClientRepresentation, role: RoleRepresentation) {

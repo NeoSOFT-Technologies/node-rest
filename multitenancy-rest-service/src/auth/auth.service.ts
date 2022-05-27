@@ -17,6 +17,7 @@ export class AuthService {
     logoutURL: string;
     validateURL: string;
     keycloakServer: string;
+    contentType = "application/x-www-form-urlencoded";
 
     async getAccessToken(body: CredentialsDto) {
         let { username, password, tenantName, clientId, clientSecret } = body;
@@ -35,7 +36,7 @@ export class AuthService {
             client_secret: clientSecret,
         });
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type": this.contentType,
         };
 
         return await httpClient.post({
@@ -59,7 +60,7 @@ export class AuthService {
         });
 
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type":  this.contentType,
         }
 
         const response = await httpClient.post({
@@ -84,7 +85,7 @@ export class AuthService {
             client_secret: clientSecret
         });
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type":  this.contentType,
         };
 
         return await httpClient.post({
@@ -104,7 +105,7 @@ export class AuthService {
             client_secret: clientSecret,
         });
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type":  this.contentType,
         }
 
         const response = await httpClient.post({

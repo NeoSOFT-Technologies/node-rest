@@ -22,7 +22,7 @@ By running one command, you will get a production-ready Node.js app installed an
 - [Contributing To This Project](#contributing-to-this-project)
 - [Issues and Discussions](#issues-and-discussions)
 - [Miscellaneous](#miscellaneous)
-- [Stay in touch](stay-in-touch)
+- [Stay in touch](#stay-in-touch)
 
 
 ## Features
@@ -146,7 +146,7 @@ Please find below a detailed description of the app's folder structures:
 ## Documentation
 
 ### 1.  Setting up project on VM
-Following are the steps to set-up this repository on [Virtual Machine](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/microservices/vm.md).
+Following are the steps to set-up this repository on [Virtual Machine](https://github.com/NeoSOFT-Technologies/node-rest/blob/main/wiki/docs/vm.md).
 
 - Install Remote Desktop Application (Eg For Linux it is Remmina) in your Machine.
 - Launch the remote desktop which will look like this.

@@ -10,8 +10,8 @@ import { KeycloakClient } from './client';
 export class KeycloakAuthResource {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private keycloakClient: KeycloakClient,
-        private config: ConfigService
+        private readonly keycloakClient: KeycloakClient,
+        private readonly config: ConfigService
     ) { }
 
     public async createResource(body: ResourceDto, token: string): Promise<any> {
@@ -37,5 +37,5 @@ export class KeycloakAuthResource {
         )
 
         return 'Resource created successfully';
-    };
-};
+    }
+}

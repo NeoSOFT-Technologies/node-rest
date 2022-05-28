@@ -4,10 +4,10 @@ import * as jwksClient from "jwks-rsa";
 
 @Injectable()
 export class PublicKeyCache {
-    private millisecondsToLive: number;
+    private readonly millisecondsToLive: number;
     private cache: Record<string, any> = {};
     private kid: string;
-    private minutesToLive: number = 10;
+    private readonly minutesToLive = 10;
 
     constructor() {
         this.millisecondsToLive = this.minutesToLive * 60 * 1000;
@@ -35,12 +35,10 @@ export class PublicKeyCache {
         const client = jwksClient({
             jwksUri: `${iss}/protocol/openid-connect/certs`
         });
-
         const key = await client.getSigningKey(this.kid);       
-        const signingKey = key.getPublicKey();
-
-        return signingKey;
+        return key.getPublicKey();
     }
+
     private getkid(token: string) {
         const { header } = jwt.decode(token, { complete: true });
         return header.kid;

@@ -45,6 +45,7 @@ import { Keycloak, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, Key
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, PublicKeyCache, KeycloakAuthGuard, Keycloak, KeycloakUser, KeycloakRealm, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, KeycloakAuthScope, KeycloakAuthPermission],
+  providers: [AppService, AuthService, PublicKeyCache, KeycloakAuthGuard, 
+    Keycloak, KeycloakUser, KeycloakRealm, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, KeycloakAuthScope, KeycloakAuthPermission],
 })
 export class AppModule { }

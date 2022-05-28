@@ -1,5 +1,5 @@
 import ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation';
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 class ClientDetails implements ClientRepresentation {

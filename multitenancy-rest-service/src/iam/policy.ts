@@ -10,8 +10,8 @@ import { KeycloakClient } from './client';
 export class KeycloakAuthPolicy {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private keycloakClient: KeycloakClient,
-        private config: ConfigService
+        private readonly keycloakClient: KeycloakClient,
+        private readonly config: ConfigService
     ) { }
 
     public async createPolicy(body: PolicyDto, token: string): Promise<any> {
@@ -33,5 +33,5 @@ export class KeycloakAuthPolicy {
         )
 
         return 'Policy created successfully';
-    };
-};
+    }
+}

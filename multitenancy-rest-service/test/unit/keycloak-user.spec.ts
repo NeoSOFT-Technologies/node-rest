@@ -80,7 +80,7 @@ describe('Testing Keycloak User Service', () => {
             roles: ['role'],
             attributes: ['string']
         };
-        const token: string = 'Bearer token'
+        const token = 'Bearer token'
         const response = await keycloakUserService.createUser(mockTenantCredentials, mockUserDetails, token);
         expect(response).toEqual('User created successfully');
     });
@@ -110,7 +110,7 @@ describe('Testing Keycloak User Service', () => {
         const tenantName = 'string';
         const userName = 'string';
         const clientName = 'string';
-        const token: string = 'Bearer token';
+        const token = 'Bearer token';
 
         const response = await keycloakUserService.getUserInfo({ tenantName, userName, clientName }, token);
         expect(response).toEqual({

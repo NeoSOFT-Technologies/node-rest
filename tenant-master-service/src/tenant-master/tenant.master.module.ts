@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import config from './config';
 import { TenantMasterController } from './tenant.master.controller';
 import { TenantMasterService } from './tenant.master.service';
+import config from './config';
+
 @Module({
   imports: [
     ClientsModule.register([

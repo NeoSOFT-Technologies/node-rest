@@ -31,7 +31,7 @@ export class AppService {
 
 
   register(tenant: RegisterTenantDto) {
-    const { clientDetails, ...tenantDetails } = tenant;
+    const { clientDetails, userName, ...tenantDetails } = tenant;
     return this.client1.send({ cmd: 'register-tenant' }, tenantDetails);
   }
   createRedirectUrl(tenantName: string) {
@@ -94,7 +94,7 @@ export class AppService {
     return this.client3.send({ cmd: 'create-table' }, tableDto);
   }
   async createRealm(tenantDetails: CreateRealmDto, dbName: string, token: string) {
-    const { tenantName, email, password } = tenantDetails;
+    const { tenantName, userName, email, password } = tenantDetails;
     const response = this.client1.send({ cmd: 'check-dbName' }, dbName);
     await new Promise((resolve, reject) => {
       response.subscribe({
@@ -106,7 +106,7 @@ export class AppService {
         },
       });
     });
-    return this.keycloakRealm.createRealm(tenantName, email, password, token);
+    return this.keycloakRealm.createRealm(tenantName, userName, email, password, token);
   }
   getAdminDetails(userName: string, token: string) {
     return this.keycloakUser.getAdminDetails(userName, token);

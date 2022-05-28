@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TenantConfigDto } from './dto/tenant.config.dto';
@@ -6,13 +6,21 @@ import { TenantConfig } from './entities/tenant.entity';
 
 @Injectable()
 export class TenantConfigService {
+  private readonly logger: Logger;
   constructor(
     @InjectRepository(TenantConfig)
     private readonly configRepository: Repository<TenantConfig>,
-  ) {}
+  ) {
+    this.logger = new Logger('Tenant Config Service');
+  }
 
   async setConfig(tenantconfig: TenantConfigDto) {
-    return await this.configRepository.save(tenantconfig);
+    try {
+      return await this.configRepository.save(tenantconfig);
+    } catch (error) {
+      this.logger.error(`Error while setting config: ${error}`);
+      throw error;
+    }
   }
 
   async getConfig(tenantName: string) {
@@ -23,6 +31,7 @@ export class TenantConfigService {
         },
       });
     } catch (error) {
+      this.logger.error('Incorrect Tenant name entered');
       throw new NotFoundException('Incorrect Tenant name entered');
     }
   }
@@ -40,6 +49,7 @@ export class TenantConfigService {
       });
       return 'Updated successfully';
     } catch (e) {
+      this.logger.error('Tenant not found');
       throw new NotFoundException('Tenant not found');
     }
   }
@@ -53,8 +63,9 @@ export class TenantConfigService {
       });
       await this.configRepository.remove(tenantEntity);
       return 'Deletion Successfull';
-    } catch (e) {
-      return e;
+    } catch (error) {
+      this.logger.error(`Error while deleting config: ${error}`);
+      throw error;
     }
   }
 }

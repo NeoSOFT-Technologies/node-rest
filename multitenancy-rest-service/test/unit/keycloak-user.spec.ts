@@ -65,7 +65,7 @@ describe('Testing Keycloak User Service', () => {
     });
 
     it('Testing "createAdminUser" method', async () => {
-        const response = await keycloakUserService.createAdminUser('string', 'string', 'string');
+        const response = await keycloakUserService.createAdminUser('string','string', 'string', 'string');
         expect(response.id).toEqual('id');
     });
 

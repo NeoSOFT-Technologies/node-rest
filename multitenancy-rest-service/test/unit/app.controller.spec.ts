@@ -152,6 +152,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "registerTenant"', async () => {
         const mockBody: RegisterTenantDto = {
             tenantName: 'tenantName',
+            userName: 'userName',
             email: 'tenant@gmail.com',
             password: 'tenant123',
             description: 'This is tenant Database',
@@ -166,10 +167,10 @@ describe('Testing AppController', () => {
         const createRealm = jest.spyOn(appService, 'createRealm');
         const createClient = jest.spyOn(appService, 'createClient');
         await appController.registerTenant(mockBody, mockRequest, mockResponse);
-        const { tenantName, email, password, clientDetails, databaseName } = mockBody;
+        const { tenantName, userName, email, password, clientDetails, databaseName } = mockBody;
         expect(mockSubscribe).toHaveBeenCalled();
         expect(createRealm).toHaveBeenCalledWith(
-            { tenantName, email, password }, databaseName,
+            { tenantName, userName, email, password }, databaseName,
             mockRequest.headers['authorization']);
         expect(createClient).toHaveBeenCalledWith(
             { tenantName, clientDetails },
@@ -568,10 +569,22 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "connectDatabase"', async () => {
-        const mockSend = jest.spyOn(mockResponse, 'send');
+        mockRequest.query = {
+            host: 'host',
+            port: '3306',
+            tenantName: 'tenantName',
+            password: 'tenant123',
+            dbName: 'tenant_db'
+        }
+        
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+
+        const connect = jest.spyOn(appService, 'connect');
         await appController.connectDatabase(mockRequest, mockResponse);
-        expect(mockSend).toHaveBeenCalled();
-        mockSend.mockRestore();
+        expect(connect).toHaveBeenCalled();
+        connect.mockRestore();
     });
 
     it('Testing appcontroller "createTable"', async () => {

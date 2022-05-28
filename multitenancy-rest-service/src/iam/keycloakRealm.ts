@@ -7,6 +7,7 @@ import { TenantAdminUser } from "@app/dto/tenant.adminuser.dto";
 import { KeycloakUser } from "./keycloakUser";
 import { ConfigService } from "@nestjs/config";
 import ClientRepresentation from "@keycloak/keycloak-admin-client/lib/defs/clientRepresentation";
+import { Role } from "../utils/enums";
 
 
 @Injectable()
@@ -22,12 +23,12 @@ export class KeycloakRealm {
     }
     keycloakServer: string;
 
-    public async createRealm(realmName: string, email: string, password: string, token: string): Promise<any> {
+    public async createRealm(realmName: string, userName: string, email: string, password: string, token: string): Promise<any> {
         const parts = token.split(' ')
         this.kcMasterAdminClient.setAccessToken(parts[1]);
 
         const tenantRealm: Realm = await this.createTenantRealm(realmName, email);
-        const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, email, password);
+        const adminUser: TenantAdminUser = await this.keycloakUser.createAdminUser(realmName, userName, email, password);
         const adminRole: RoleRepresentation = await this.createAdminRealmRole(tenantRealm);
         await this.createCompositeRole(tenantRealm, adminRole);
         await this.RealmRoleMapping(tenantRealm, adminUser, adminRole);
@@ -67,7 +68,10 @@ export class KeycloakRealm {
         kcClient.setAccessToken(parts[1]);
 
         const roles = await kcClient.roles.find();
-        const rolesName = roles.map(role => role.name)
+        let rolesName = roles.map(role => role.name)
+        rolesName = rolesName.filter(role => {
+            return !(role.includes('default-roles') || role.includes('uma') || role.includes('offline_access'));
+        })
         return rolesName;
     };
 
@@ -170,11 +174,11 @@ export class KeycloakRealm {
 
     private async createAdminRealmRole(realm: Realm): Promise<RoleRepresentation> {
         await this.kcMasterAdminClient.roles.create({
-            name: 'tenantadmin',
+            name: Role.r2,
             realm: realm.realmName
         });
         return await this.kcMasterAdminClient.roles.findOneByName({
-            name: 'tenantadmin',
+            name: Role.r2,
             realm: realm.realmName
         });
     };

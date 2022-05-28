@@ -5,6 +5,7 @@ import * as jwksClient from "jwks-rsa";
 import { ConfigService } from "@nestjs/config";
 import { CredentialsDto, LogoutDto, RefreshAccessTokenDto } from "@app/dto";
 import { httpClient } from "@app/utils";
+import { Role } from "../utils/enums";
 
 @Injectable()
 export class AuthService {
@@ -176,7 +177,7 @@ export class AuthService {
         if (realm_access.roles) {
             roles = realm_access.roles;
         }
-        return roles.includes('user');
+        return roles.includes(Role.r3);
     }
     private parseToken(token: string) {
         const parts = token.split(' ');

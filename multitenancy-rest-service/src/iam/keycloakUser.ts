@@ -121,7 +121,7 @@ export class KeycloakUser {
             exact: true
         });
         if (!userInfo[0]) {
-            throw new NotFoundException('UserInfo not found');
+            throw new NotFoundException('User not found');
         }
         const createdTimestamp = this.formatTimeStamp(userInfo[0]);
         const roles = await this.getUserRoles(kcClient, { id: userInfo[0].id });

@@ -160,7 +160,8 @@ export class AppController {
 
       const response = this.appService.register({ ...body, ...client });
       response.subscribe((result) => {
-        res.send(result) });
+        res.send(result)
+      });
     } catch (e) {
       console.error(e);
       throw e;
@@ -188,7 +189,7 @@ export class AppController {
           tenantName = tenantNameFromToken;
         }
         else if (tenantName !== tenantNameFromToken) {
-          throw new HttpException('TenantName is not matched', HttpStatus.FORBIDDEN);
+          throw new HttpException('Not Allowed', HttpStatus.FORBIDDEN);
         }
       }
       const response = this.appService.getTenantConfig(tenantName);
@@ -359,7 +360,7 @@ export class AppController {
       }
       else if (isUser && req.query.userName !== userName) {
         throw new HttpException(
-          'Username is not matched',
+          'Not Allowed',
           HttpStatus.METHOD_NOT_ALLOWED,
         );
       }
@@ -394,7 +395,7 @@ export class AppController {
         req.body.userName = userName;
       }
       else if (isUser && req.body.userName !== userName) {
-        throw new HttpException('Wrong username entered', HttpStatus.FORBIDDEN);
+        throw new HttpException('Not Allowed', HttpStatus.FORBIDDEN);
       }
       if (isUser && req.body.action.realmRoles) {
         throw new HttpException('Roles Updation not allowed', HttpStatus.FORBIDDEN)
@@ -419,7 +420,7 @@ export class AppController {
       req.params.tenantName = await this.authService.getTenantName(token);
       const userName = await this.authService.getUserName(token);
       if (userName === req.params.userName) {
-        throw new HttpException('Username is incorrect', HttpStatus.FORBIDDEN);
+        throw new HttpException('Not Allowed', HttpStatus.FORBIDDEN);
       }
       res.send(await this.appService.deleteUser(req.params as any, token));
     } catch (e) {
@@ -438,7 +439,7 @@ export class AppController {
   async createRole(@Req() req: Request, @Res() res: Response) {
     try {
       if (!req.body.tenantName) {
-        throw new HttpException('Enter the tenantName', HttpStatus.BAD_REQUEST);
+        throw new HttpException('Please enter tenantName', HttpStatus.BAD_REQUEST);
       }
       const token = req.headers['authorization'];
       res.send(await this.appService.createRole(req.body, token));
@@ -689,8 +690,8 @@ export class AppController {
       const tenantNameFromToken = await this.authService.getTenantName(token);
       const tenantName: string = req.query.tenantName as string;
 
-      if (tenantName !== tenantNameFromToken){
-        throw new HttpException('Wrong tenantName entered', HttpStatus.FORBIDDEN);
+      if (tenantName !== tenantNameFromToken) {
+        throw new HttpException('Updation Not Allowed', HttpStatus.FORBIDDEN);
       }
       const response = await this.appService.connect(dbDetails);
 

@@ -8,4 +8,4 @@ RUN npm run build
 
 EXPOSE 8847
 
-CMD [ "npm", "run", "start:dev" ]
+CMD [ "npm", "run", "start" ]

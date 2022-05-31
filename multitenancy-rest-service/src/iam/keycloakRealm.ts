@@ -124,12 +124,12 @@ export class KeycloakRealm {
             const compositeRoles = await kcClient.roles.getCompositeRoles({
                 id: role.id
             });
-            const currentCompositeRoles = compositeRoles.map(role => role.name);
+            const currentCompositeRoles = compositeRoles.map(Role => Role.name);
 
-            const addCompositeRoles = updatedCompositeRoles.filter(role => !currentCompositeRoles.includes(role));
+            const addCompositeRoles = updatedCompositeRoles.filter(Role => !currentCompositeRoles.includes(Role));
             await this.addCompositeRole(kcClient, addCompositeRoles, client[0], role);
 
-            const deleteCompositeRoles = currentCompositeRoles.filter(role => !updatedCompositeRoles.includes(role));
+            const deleteCompositeRoles = currentCompositeRoles.filter(Role => !updatedCompositeRoles.includes(Role));
             await this.deleteCompositeRole(kcClient, deleteCompositeRoles, client[0], role);
         }
         return 'Role updated successfully';
@@ -210,13 +210,13 @@ export class KeycloakRealm {
 
     private async addCompositeRole(kcClient: KcAdminClient, addRoles: string[], client: ClientRepresentation, role: RoleRepresentation) {
         const addCompositeRoles: RoleRepresentation[] = [];
-        for (const role of addRoles) {
+        for (const Role of addRoles) {
             const clientRole = await kcClient.clients.findRole({
                 id: client.id,
-                roleName: role
+                roleName: Role
             });
             if (!clientRole) {
-                throw new NotFoundException(`${role} role not found`);
+                throw new NotFoundException(`${Role} role not found`);
             }
             addCompositeRoles.push(clientRole);
         }
@@ -229,13 +229,13 @@ export class KeycloakRealm {
 
     private async deleteCompositeRole(kcClient: KcAdminClient, deleteRoles: string[], client: ClientRepresentation, role: RoleRepresentation) {
         const deleteCompositeRoles: RoleRepresentation[] = [];
-        for (const role of deleteRoles) {
+        for (const Role of deleteRoles) {
             const clientRole = await kcClient.clients.findRole({
                 id: client.id,
-                roleName: role
+                roleName: Role
             });
             if (!clientRole) {
-                throw new NotFoundException(`${role} role not found`);
+                throw new NotFoundException(`${Role} role not found`);
             }
             deleteCompositeRoles.push(clientRole);
         }

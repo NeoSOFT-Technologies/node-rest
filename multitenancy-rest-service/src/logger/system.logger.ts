@@ -15,8 +15,8 @@ export default class SystemLogger implements LoggerService {
   constructor(context: string) {
     const { combine, timestamp, errors, label, printf } = format;
     const customLoggerFormat = printf(
-      ({ level, message, label, timestamp, stack }) => {
-        const log = `${timestamp} ${level} [${label}]: ${message}`;
+      ({ level, message, Label, Timestamp, stack }) => {
+        const log = `${Timestamp} ${level} [${Label}]: ${message}`;
         return stack ? `${log}\n${stack}` : log;
       }
     );

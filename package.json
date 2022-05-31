@@ -27,7 +27,10 @@
     "test:tenant-provisioning": "cd tenant-provisioning && npm run test",
     "test:tenant-master-service": "cd tenant-master-service && npm run test",
     "test:tenant-config-service": "cd tenant-config-service && npm run test",
-    "test": "run-s test:*"
+    "test": "run-s test:*",
+    "app:setup:dev": "docker-compose up",
+    "app:setup:staging": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.staging.yml up",
+    "app:setup:prod": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.prod.yml up"
   },
   "repository": {
     "type": "git",

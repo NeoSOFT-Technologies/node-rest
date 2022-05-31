@@ -44,6 +44,7 @@ export class AppController {
       res.send((await this.authService.getAccessToken({ ...body, ...response })).data);
       // login successful
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -67,6 +68,7 @@ export class AppController {
       res.sendStatus(await this.authService.logout({ ...body, ...response }));
       // logout successful
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -89,6 +91,7 @@ export class AppController {
       }
       res.send((await this.authService.refreshAccessToken({ ...body, ...response })).data);
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -102,6 +105,7 @@ export class AppController {
       const redirectUrl = this.appService.createRedirectUrl(tenantName);
       res.redirect(redirectUrl);
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -133,6 +137,7 @@ export class AppController {
       const adminDetails = await this.appService.getAdminDetails(userName, token);
       res.send(adminDetails);
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -147,15 +152,18 @@ export class AppController {
   // @Permissions([Permission.p1])
   async registerTenant(@Body() body: RegisterTenantDto, @Req() req: Request, @Res() res: Response) {
     try {
-      let { tenantName, userName, email, password, clientDetails, databaseName } = body;
+      const { tenantName, userName, email, password, clientDetails, databaseName } = body;
       const token = req.headers['authorization'];
 
       await this.appService.createRealm({ tenantName, userName, email, password }, databaseName, token);
       const client = await this.appService.createClient({ tenantName, clientDetails }, token);
 
       const response = this.appService.register({ ...body, ...client });
-      response.subscribe((result) => { res.send(result) });
+      response.subscribe((result) => {
+        res.send(result)
+      });
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -196,6 +204,7 @@ export class AppController {
       }
       response.subscribe(observer);
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -218,6 +227,7 @@ export class AppController {
         res.send({ data, count })
       });
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -261,6 +271,7 @@ export class AppController {
       };
       response.subscribe(observer);
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -279,6 +290,7 @@ export class AppController {
       const response = await this.appService.deleteTenant(tenantname, token);
       response.subscribe(async (result) => res.send(result));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -299,6 +311,7 @@ export class AppController {
       }
       res.send(await this.appService.createUser(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -321,6 +334,7 @@ export class AppController {
       }
       res.send(await this.appService.listAllUser(data));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -354,6 +368,7 @@ export class AppController {
       const permissions = await this.authService.getPermissions(token);
       res.send({ ...userInfo, permissions });
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -384,9 +399,10 @@ export class AppController {
       }
       if (isUser && req.body.action.realmRoles) {
         throw new HttpException('Roles Updation not allowed', HttpStatus.FORBIDDEN)
-      };
+      }
       res.send(await this.appService.updateUser(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -408,6 +424,7 @@ export class AppController {
       }
       res.send(await this.appService.deleteUser(req.params as any, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -427,6 +444,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createRole(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -447,6 +465,7 @@ export class AppController {
       const tenantName = req.query.tenantName as string;
       res.send(await this.appService.getRoles(tenantName, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -469,6 +488,7 @@ export class AppController {
       }
       res.send(await this.appService.roleInfo(req.query as any, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -491,6 +511,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.updateRole(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -508,6 +529,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.deleteRole(req.params as any, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -524,6 +546,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createPermission(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -543,6 +566,7 @@ export class AppController {
       }
       res.send(await this.appService.getPermissions(req.query as any, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -559,6 +583,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.updatePermission(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -578,6 +603,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.deletePermission(req.params as any, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -594,6 +620,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createClient(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -610,6 +637,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createResource(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -626,6 +654,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createPolicy(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -642,6 +671,7 @@ export class AppController {
       const token = req.headers['authorization'];
       res.send(await this.appService.createScope(req.body, token));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -658,9 +688,9 @@ export class AppController {
       const dbDetails: DbDetailsDto = req.query as any;
       const token = req.headers['authorization'];
       const tenantNameFromToken = await this.authService.getTenantName(token);
-      let tenantName: string = req.query.tenantName as string;
+      const tenantName: string = req.query.tenantName as string;
 
-      if (tenantName !== tenantNameFromToken){
+      if (tenantName !== tenantNameFromToken) {
         throw new HttpException('Updation Not Allowed', HttpStatus.FORBIDDEN);
       }
       const response = await this.appService.connect(dbDetails);
@@ -669,6 +699,7 @@ export class AppController {
         res.send(response);
       }
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -682,6 +713,7 @@ export class AppController {
       const response = this.appService.createTable(tableDto);
       response.subscribe((result) => res.send(result));
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }

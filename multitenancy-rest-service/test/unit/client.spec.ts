@@ -3,6 +3,8 @@ import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
+const clientName = 'test-client';
+
 jest.mock('@keycloak/keycloak-admin-client', () => {
     return {
         default: jest.fn().mockImplementation(() => {
@@ -12,7 +14,7 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                     find: jest.fn().mockResolvedValue([
                         {
                             id: 'id',
-                            clientId: 'test-client',
+                            clientId: clientName,
                         }
                     ]),
                     generateNewClientSecret: jest.fn().mockResolvedValue({ value: 'clientSecret' })
@@ -38,19 +40,19 @@ describe('Testing Keycloak Client', () => {
         const body = {
             tenantName: 'string',
             clientDetails: {
-                clientId: "test-client",
+                clientId: clientName,
                 rootUrl: "www.testUrl.com",
             }
         };
         const token = 'Bearer token';
         const response = await keycloakClient.createClient(body, token);
-        expect(response).toEqual({ clientId: "test-client", clientSecret: "clientSecret" });
+        expect(response).toEqual({ clientId: clientName, clientSecret: "clientSecret" });
     });
 
     it('Testing "findClient" method', async () => {
-        const mockclientName = 'test-client';
+        const mockclientName = clientName;
         const kcAdminClient = new KcAdminClient();
         const response = await keycloakClient.findClient(kcAdminClient, mockclientName);
-        expect(response.clientId).toEqual('test-client');
+        expect(response.clientId).toEqual(clientName);
     });
 });

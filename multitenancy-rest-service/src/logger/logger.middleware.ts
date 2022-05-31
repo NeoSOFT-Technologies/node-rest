@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import SystemLogger from './system.logger';
 
 export function logger(req: Request, res: Response, next: NextFunction) {
-    const logger = new SystemLogger('HTTP');
+    const Logger = new SystemLogger('HTTP');
 
     const startAt = Date.now();
     const { ip, method, path: url } = req;
@@ -14,10 +14,10 @@ export function logger(req: Request, res: Response, next: NextFunction) {
       const message = `${method} ${url} ${statusCode} ${Date.now() - startAt}ms ${contentLength} - ${userAgent} ${ip}`;
 
       if (statusCode >= 400) {
-        return logger.error(message);
+        return Logger.error(message);
       }
-      return logger.log(message);
+      return Logger.log(message);
     });
 
     next();
-};
+}

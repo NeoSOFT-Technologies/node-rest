@@ -35,6 +35,7 @@ describe('Testing Auth Service', () => {
     };
 
 
+    const authToken = 'Bearer token';
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -70,7 +71,7 @@ describe('Testing Auth Service', () => {
             getHandler: jest.fn(),
             switchToHttp: jest.fn(() => ({
                 getRequest: jest.fn().mockReturnValue({
-                    header: jest.fn().mockReturnValue('Bearer token')
+                    header: jest.fn().mockReturnValue(authToken)
                 }),
             })),
         } as any;
@@ -119,7 +120,7 @@ describe('Testing Auth Service', () => {
             getHandler: jest.fn(),
             switchToHttp: jest.fn(() => ({
                 getRequest: jest.fn().mockReturnValue({
-                    header: jest.fn().mockReturnValue('Bearer token')
+                    header: jest.fn().mockReturnValue(authToken)
                 }),
             })),
         } as any;
@@ -135,7 +136,7 @@ describe('Testing Auth Service', () => {
             getHandler: jest.fn(),
             switchToHttp: jest.fn(() => ({
                 getRequest: jest.fn().mockReturnValue({
-                    header: jest.fn().mockReturnValue('Bearer token')
+                    header: jest.fn().mockReturnValue(authToken)
                 }),
             })),
         } as any;
@@ -149,7 +150,7 @@ describe('Testing Auth Service', () => {
             getHandler: jest.fn(),
             switchToHttp: jest.fn(() => ({
                 getRequest: jest.fn().mockReturnValue({
-                    header: jest.fn().mockReturnValue('Bearer token')
+                    header: jest.fn().mockReturnValue(authToken)
                 }),
             })),
         } as any;

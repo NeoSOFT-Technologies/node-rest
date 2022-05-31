@@ -4,14 +4,14 @@ import Connection from 'mysql2/typings/mysql/lib/Connection';
 
 export const ConnectionUtils = {
   getConnection: function (config: ConfigService) {
-    const db_connection = mysql.createConnection({
+    const DbConnection = mysql.createConnection({
       host: config.get('tenantdb.host'),
       port: config.get('tenantdb.port'),
       user: config.get('db.username'),
       password: config.get('db.password'),
       multipleStatements: true,
     });
-    db_connection.connect((err) => {
+    DbConnection.connect((err) => {
       if (err) {
         console.log(`Error while connecting to db server: ${err}`);
         throw err;
@@ -19,11 +19,11 @@ export const ConnectionUtils = {
       console.log('connected');
     });
 
-    return db_connection;
+    return DbConnection;
   },
 
-  endConnection: function (db_connection: Connection) {
-    db_connection.end((err) => {
+  endConnection: function (DbConnection: Connection) {
+    DbConnection.end((err) => {
       if (err) {
         console.log(`Error while ending connection from db server: ${err}`);
         throw err;

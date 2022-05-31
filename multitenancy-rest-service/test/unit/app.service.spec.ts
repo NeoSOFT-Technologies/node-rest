@@ -71,6 +71,9 @@ describe('Testing AppService', () => {
         createClient: jest.fn(),
     };
 
+    const authToken = 'Bearer token';
+
+
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -211,10 +214,9 @@ describe('Testing AppService', () => {
         mockClient1.send.mockImplementation(() => {
             return of(mockMessage);
         });
-        const token = 'Bearer Token'
         const mocklistAllTenant = jest.spyOn(mockClient1, 'send');
         const mockDeleteTenantFromconfig = jest.spyOn(mockClient2, 'emit');
-        const response = await appService.deleteTenant(tenantName, token);
+        const response = await appService.deleteTenant(tenantName, authToken);
 
         expect(mocklistAllTenant).toHaveBeenCalled();
         expect(mockDeleteTenantFromconfig).toHaveBeenCalled();
@@ -250,15 +252,14 @@ describe('Testing AppService', () => {
             password: 'string'
         };
         const dbName = 'string';
-        const token = 'Bearer token';
-
+        
         mockClient1.send.mockImplementation(() => {
             return of('done');
         });
 
         const checkDbName = jest.spyOn(mockClient1, 'send');
         const mockcreateRealm = jest.spyOn(keycloakRealm, 'createRealm');
-        await appService.createRealm(tenantDetails, dbName, token);
+        await appService.createRealm(tenantDetails, dbName, authToken);
 
         expect(checkDbName).toHaveBeenCalled();
         expect(mockcreateRealm).toHaveBeenCalled();
@@ -267,9 +268,8 @@ describe('Testing AppService', () => {
 
     it('Testing "getAdminDetails"', async () => {
         const userName = 'userName';
-        const token = 'Bearer token';
         const getAdminDetails = jest.spyOn(keycloakUser, 'getAdminDetails');
-        appService.getAdminDetails(userName, token);
+        appService.getAdminDetails(userName, authToken);
 
         expect(getAdminDetails).toHaveBeenCalled();
         getAdminDetails.mockRestore();
@@ -286,9 +286,8 @@ describe('Testing AppService', () => {
                 attributes: ['string']
             }
         };
-        const token = 'Bearer token';
         const mockcreateUser = jest.spyOn(keycloakUser, 'createUser');
-        appService.createUser(user, token);
+        appService.createUser(user, authToken);
 
         expect(mockcreateUser).toHaveBeenCalled();
         mockcreateUser.mockRestore();
@@ -300,7 +299,7 @@ describe('Testing AppService', () => {
                 tenantName: 'string',
                 page: 1,
             },
-            token: 'Bearer token'
+            token: authToken
         };
         const mockgetUsers = jest.spyOn(keycloakUser, 'getUsers');
         appService.listAllUser(data);
@@ -315,9 +314,8 @@ describe('Testing AppService', () => {
             userName: 'userName',
             clientName: 'clientName',
         };
-        const token = 'Bearer token';
         const mockgetUserInfo = jest.spyOn(keycloakUser, 'getUserInfo');
-        appService.userInfo(query, token);
+        appService.userInfo(query, authToken);
 
         expect(mockgetUserInfo).toHaveBeenCalled();
         mockgetUserInfo.mockRestore();
@@ -331,9 +329,8 @@ describe('Testing AppService', () => {
                 firstName: 'firstName'
             }
         };
-        const token = 'Bearer token';
         const mockupdateUser = jest.spyOn(keycloakUser, 'updateUser');
-        appService.updateUser(body, token);
+        appService.updateUser(body, authToken);
 
         expect(mockupdateUser).toHaveBeenCalled();
         mockupdateUser.mockRestore();
@@ -344,9 +341,8 @@ describe('Testing AppService', () => {
             tenantName: 'tenantName',
             userName: 'userName',
         };
-        const token = 'Bearer token';
         const mockdeleteUser = jest.spyOn(keycloakUser, 'deleteUser');
-        appService.deleteUser(body, token);
+        appService.deleteUser(body, authToken);
 
         expect(mockdeleteUser).toHaveBeenCalled();
         mockdeleteUser.mockRestore();
@@ -360,9 +356,8 @@ describe('Testing AppService', () => {
                 rootUrl: "www.testUrl.com",
             },
         };
-        const token = 'Bearer token';
         const mockcreateClient = jest.spyOn(keycloakClient, 'createClient');
-        appService.createClient(body, token);
+        appService.createClient(body, authToken);
 
         expect(mockcreateClient).toHaveBeenCalled();
         mockcreateClient.mockRestore();
@@ -375,9 +370,8 @@ describe('Testing AppService', () => {
                 name: 'string'
             }
         };
-        const token = 'Bearer token';
         const createRealmRoles = jest.spyOn(keycloakRealm, 'createRealmRoles');
-        appService.createRole(body, token);
+        appService.createRole(body, authToken);
 
         expect(createRealmRoles).toHaveBeenCalled();
         createRealmRoles.mockRestore();
@@ -385,9 +379,8 @@ describe('Testing AppService', () => {
 
     it('Testing "getRoles"', async () => {
         const tenantName = 'string';
-        const token = 'Bearer token';
         const getRealmRoles = jest.spyOn(keycloakRealm, 'getRealmRoles');
-        appService.getRoles(tenantName, token);
+        appService.getRoles(tenantName, authToken);
 
         expect(getRealmRoles).toHaveBeenCalled();
         getRealmRoles.mockRestore();
@@ -398,9 +391,8 @@ describe('Testing AppService', () => {
             tenantName: 'tenantName',
             roleName: 'roleName'
         };
-        const token = 'Bearer token';
         const getRealmRoleInfo = jest.spyOn(keycloakRealm, 'getRealmRoleInfo');
-        appService.roleInfo(query, token);
+        appService.roleInfo(query, authToken);
 
         expect(getRealmRoleInfo).toHaveBeenCalled();
         getRealmRoleInfo.mockRestore();
@@ -414,9 +406,8 @@ describe('Testing AppService', () => {
                 name: 'string'
             }
         };
-        const token = 'Bearer token';
         const updateRealmRoles = jest.spyOn(keycloakRealm, 'updateRealmRoles');
-        appService.updateRole(body, token);
+        appService.updateRole(body, authToken);
 
         expect(updateRealmRoles).toHaveBeenCalled();
         updateRealmRoles.mockRestore();
@@ -427,9 +418,8 @@ describe('Testing AppService', () => {
             tenantName: 'tenantName',
             roleName: 'roleName',
         };
-        const token = 'Bearer token';
         const deleteRealmRoles = jest.spyOn(keycloakRealm, 'deleteRealmRoles');
-        appService.deleteRole(body, token);
+        appService.deleteRole(body, authToken);
 
         expect(deleteRealmRoles).toHaveBeenCalled();
         deleteRealmRoles.mockRestore();
@@ -442,9 +432,8 @@ describe('Testing AppService', () => {
             policyType: 'string',
             policyDetails: { name: 'string' },
         };
-        const token = 'Bearer token';
         const mockPolicy = jest.spyOn(keycloakAuthPolicy, 'createPolicy');
-        appService.createPolicy(body, token);
+        appService.createPolicy(body, authToken);
 
         expect(mockPolicy).toHaveBeenCalled();
         mockPolicy.mockRestore();
@@ -456,9 +445,8 @@ describe('Testing AppService', () => {
             clientName: 'string',
             resourceDetails: { name: 'string' },
         };
-        const token = 'Bearer token';
         const mockResource = jest.spyOn(keycloakAuthResource, 'createResource');
-        appService.createResource(body, token);
+        appService.createResource(body, authToken);
 
         expect(mockResource).toHaveBeenCalled();
         mockResource.mockRestore();
@@ -472,9 +460,8 @@ describe('Testing AppService', () => {
                 name: 'string'
             }
         };
-        const token = 'Bearer token';
         const mockScope = jest.spyOn(keycloakAuthScope, 'createScope');
-        appService.createScope(body, token);
+        appService.createScope(body, authToken);
 
         expect(mockScope).toHaveBeenCalled();
         mockScope.mockRestore();
@@ -489,9 +476,8 @@ describe('Testing AppService', () => {
                 name: 'string'
             }
         };
-        const token = 'Bearer token';
         const mockPermission = jest.spyOn(keycloakAuthPermission, 'createPermission');
-        appService.createPermission(body, token);
+        appService.createPermission(body, authToken);
 
         expect(mockPermission).toHaveBeenCalled();
         mockPermission.mockRestore();
@@ -502,9 +488,8 @@ describe('Testing AppService', () => {
             tenantName: 'string',
             clientName: 'string',
         };
-        const token = 'Bearer token';
         const getPermissions = jest.spyOn(keycloakAuthPermission, 'getPermissions');
-        appService.getPermissions(query, token);
+        appService.getPermissions(query, authToken);
 
         expect(getPermissions).toHaveBeenCalled();
         getPermissions.mockRestore();
@@ -520,9 +505,8 @@ describe('Testing AppService', () => {
                 name: 'string'
             }
         };
-        const token = 'Bearer token';
         const updatePermission = jest.spyOn(keycloakAuthPermission, 'updatePermission');
-        appService.updatePermission(body, token);
+        appService.updatePermission(body, authToken);
 
         expect(updatePermission).toHaveBeenCalled();
         updatePermission.mockRestore();
@@ -535,9 +519,8 @@ describe('Testing AppService', () => {
             permissionName: 'string',
             permissionType: 'string',
         };
-        const token = 'Bearer token';
         const deletePermission = jest.spyOn(keycloakAuthPermission, 'deletePermission');
-        appService.deletePermission(body, token);
+        appService.deletePermission(body, authToken);
 
         expect(deletePermission).toHaveBeenCalled();
         deletePermission.mockRestore();

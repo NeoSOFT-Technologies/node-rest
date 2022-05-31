@@ -8,8 +8,8 @@ import { PublicKeyCache } from '../cache.publicKey';
 export class KeycloakAuthGuard implements CanActivate {
   constructor(
     private readonly authenticationService: AuthService,
-    private publicKeyCache: PublicKeyCache,
-    private reflector: Reflector,
+    private readonly publicKeyCache: PublicKeyCache,
+    private readonly reflector: Reflector,
   ) { }
 
   async canActivate(
@@ -39,7 +39,7 @@ export class KeycloakAuthGuard implements CanActivate {
       const publicKey = await this.publicKeyCache.getPublicKey(token);
       await this.authenticationService.validateTokenwithKey(token, publicKey);
 
-      let usrRole: boolean = true, usrPermission: boolean = true;
+      let usrRole = true, usrPermission = true;
       if (roles) {
         const userRoles: string[] = await this.authenticationService.getRoles(token);
         if (!userRoles) {

@@ -35,7 +35,7 @@ export class KeycloakClient {
 
     public async findClient(kcclient: KcAdminClient, clientName: string): Promise<ClientRepresentation> {
         const clients = await kcclient.clients.find();
-        const client = clients.filter((client) => client.clientId === clientName);
+        const client = clients.filter((Client) => Client.clientId === clientName);
         if (!client[0]) {
             throw new NotFoundException('Client not found');
         }
@@ -44,7 +44,7 @@ export class KeycloakClient {
 
     private async generateSecret(kcclient: KcAdminClient, clientName: string): Promise<string> {
         const clients = await kcclient.clients.find();
-        const client = clients.filter((client) => client.clientId === clientName);
+        const client = clients.filter((Client) => Client.clientId === clientName);
         const newCredential = await kcclient.clients.generateNewClientSecret(
             {
                 id: client[0].id,

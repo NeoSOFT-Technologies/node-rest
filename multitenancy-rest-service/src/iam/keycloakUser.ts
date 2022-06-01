@@ -7,6 +7,10 @@ import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRep
 import { GetUsersInfoDto, UserDetailsDto, UsersQueryDto } from "../dto";
 import RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/roleRepresentation";
 
+const ErrorMessage = {
+    NOT_FOUND: 'User not found',
+  }
+
 @Injectable()
 export class KeycloakUser {
     private readonly kcMasterAdminClient: KcAdminClient;
@@ -107,7 +111,7 @@ export class KeycloakUser {
     }
 
     public async getUserInfo(query: GetUsersInfoDto, token: string) {
-        const { tenantName, userName, clientName } = query;
+        const { tenantName, userName } = query;
         const kcClient: KcAdminClient = new KcAdminClient({
             baseUrl: this.keycloakServer,
             realmName: tenantName,
@@ -121,7 +125,7 @@ export class KeycloakUser {
             exact: true
         });
         if (!userInfo[0]) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
         const createdTimestamp = this.formatTimeStamp(userInfo[0]);
         const roles = await this.getUserRoles(kcClient, { id: userInfo[0].id });
@@ -146,7 +150,7 @@ export class KeycloakUser {
             exact: true
         });
         if (!user[0]) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
 
         await kcClient.users.update(
@@ -201,7 +205,7 @@ export class KeycloakUser {
         });
 
         if (!user[0]) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
 
         await kcTenantAdminClient.users.del({
@@ -307,8 +311,8 @@ export class KeycloakUser {
         const permissions: string[] = [];
         for (let elements of evaluation) {
             if (elements.status === 'PERMIT') {
-                elements = elements.policies;
-                const c = elements.map((element: any) => element.policy.name)
+                let elemets = elements.policies;
+                const c = elemets.map((element: any) => element.policy.name)
                 permissions.push(...c);
             }
         }

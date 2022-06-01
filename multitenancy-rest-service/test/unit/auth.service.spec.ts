@@ -21,6 +21,7 @@ jest.mock('jsonwebtoken', () => ({
 
 describe('Testing Auth Service', () => {
     let authService: AuthService;
+    const accessToken = 'access-token';
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -47,12 +48,12 @@ describe('Testing Auth Service', () => {
             clientSecret: 'clientSecret'
         }
 
-        const mockAcessToken = jest.spyOn(axios, 'post').mockResolvedValue('access-token');
+        const mockAccessToken = jest.spyOn(axios, 'post').mockResolvedValue(accessToken);
         const response = await authService.getAccessToken(body);
 
-        expect(mockAcessToken).toHaveBeenCalled();
-        expect(response).toEqual('access-token');
-        mockAcessToken.mockRestore();
+        expect(mockAccessToken).toHaveBeenCalled();
+        expect(response).toEqual(accessToken);
+        mockAccessToken.mockRestore();
     });
 
     it('Testing "logout"', async () => {
@@ -79,11 +80,11 @@ describe('Testing Auth Service', () => {
             clientSecret: 'clientSecret'
         }
 
-        const mockrefreshAccessToken = jest.spyOn(axios, 'post').mockResolvedValue('access-token');
+        const mockrefreshAccessToken = jest.spyOn(axios, 'post').mockResolvedValue(accessToken);
         const response = await authService.refreshAccessToken(body);
 
         expect(mockrefreshAccessToken).toHaveBeenCalled();
-        expect(response).toEqual('access-token');
+        expect(response).toEqual(accessToken);
         mockrefreshAccessToken.mockRestore();
     });
 

@@ -35,7 +35,7 @@ export class PublicKeyCache {
         const client = jwksClient({
             jwksUri: `${iss}/protocol/openid-connect/certs`
         });
-        const key = await client.getSigningKey(this.kid);       
+        const key = await client.getSigningKey(this.kid);
         return key.getPublicKey();
     }
 

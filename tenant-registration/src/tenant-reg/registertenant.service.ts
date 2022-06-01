@@ -19,12 +19,9 @@ export class RegistertenantService {
   }
   async register(tenant: RegisterTenantDto) {
     if (!tenant.tenantName) {
-      tenant.tenantName =
-        tenant.email.split('@')[0] +
-        '-' +
-        Date.now().toString(36).slice(-4) +
-        '-' +
-        Math.random().toString(16).slice(-4);
+      tenant.tenantName = `${tenant.email.split('@')[0]} - ${Date.now()
+        .toString(36)
+        .slice(-4)} - ${Math.random().toString(16).slice(-4)}`;
     }
     const password = tenant.password;
     tenant.password = encodePassword(tenant.password);

@@ -155,7 +155,7 @@ describe('Testing AppController', () => {
         const mockBody: RegisterTenantDto = {
             tenantName: 'tenantName',
             userName: 'userName',
-            email: 'tenant@gmail.com',
+            email: 'tenant@email.com',
             password: 'tenant123',
             description: 'This is tenant Database',
             databaseName: 'tenant_db',
@@ -578,7 +578,7 @@ describe('Testing AppController', () => {
             password: 'tenant123',
             dbName: 'tenant_db'
         }
-        
+
         mockRequest.headers = {
             authorization: authToken
         };

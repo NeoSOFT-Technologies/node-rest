@@ -39,7 +39,7 @@ export class AuthService {
             "content-type": this.contentType,
         };
 
-        return await httpClient.post({
+        return httpClient.post({
             url: this.tokenURL,
             payload: params,
             headers: headers
@@ -88,7 +88,7 @@ export class AuthService {
             "content-type":  this.contentType,
         };
 
-        return await httpClient.post({
+        return httpClient.post({
             url: this.tokenURL,
             payload: params,
             headers: headers

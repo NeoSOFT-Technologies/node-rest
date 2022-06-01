@@ -84,7 +84,7 @@ describe('Testing Keycloak User Service', () => {
         const mockUserDetails = {
             userName: 'string',
             email: 'stirng',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             roles: ['role'],
             attributes: ['string']
         };

@@ -42,7 +42,7 @@ describe('Testing Auth Service', () => {
     it('Testing "getAccessToken"', async () => {
         const body = {
             username: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             tenantName: 'string',
             clientId: 'clientId',
             clientSecret: 'clientSecret'

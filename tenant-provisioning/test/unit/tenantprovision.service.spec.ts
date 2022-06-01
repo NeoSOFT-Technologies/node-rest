@@ -45,7 +45,7 @@ describe('Testing Provisioning MicroService Service', () => {
   it('Testing tenantprovisionService ping', async () => {
     const TenantName = {
       tenantName: 'string',
-      password: 'string',
+      password: process.env.TEST_PASSWORD,
       databaseName: 'string',
     };
 
@@ -58,7 +58,7 @@ describe('Testing Provisioning MicroService Service', () => {
   it('Testing tenantprovisionService createDatabase', async () => {
     const TenantName = {
       tenantName: 'string',
-      password: 'string',
+      password: process.env.TEST_PASSWORD,
       databaseName: 'db-string',
     };
     expect(

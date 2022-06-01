@@ -13,7 +13,7 @@ describe('Testing RegisTration MicroService Service', () => {
   const tenant = {
     tenantName: 'string',
     email: 'string',
-    password: 'string',
+    password: process.env.TEST_PASSWORD,
     description: 'string',
     databaseName: 'string',
     databaseDescription: 'string',

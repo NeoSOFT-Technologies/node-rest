@@ -252,7 +252,7 @@ describe('Testing AppService', () => {
             password: 'string'
         };
         const dbName = 'string';
-        
+
         mockClient1.send.mockImplementation(() => {
             return of('done');
         });

@@ -2,7 +2,7 @@ import { Keycloak, KeycloakUser } from '@app/iam';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-const mockUserDetails = {
+const userDetails = {
     username: 'sample-user',
     email: 'sample-email',
     role: 'sample-role',
@@ -18,14 +18,14 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                         id: 'id'
                     }),
                     find: jest.fn().mockResolvedValue([{
-                        username: mockUserDetails.username,
-                        email: mockUserDetails.email,
+                        username: userDetails.username,
+                        email: userDetails.email,
                         createdTimestamp: 1647865779127
                     }]),
                     count: jest.fn().mockResolvedValue(1),
                     addRealmRoleMappings: jest.fn(),
                     delRealmRoleMappings: jest.fn(),
-                    listRealmRoleMappings: jest.fn().mockResolvedValue([{ name: mockUserDetails }]),
+                    listRealmRoleMappings: jest.fn().mockResolvedValue([{ name: userDetails.role }]),
                     update: jest.fn(),
                     del: jest.fn()
                 },
@@ -105,9 +105,9 @@ describe('Testing Keycloak User Service', () => {
         expect(response).toEqual({
             data: [
                 {
-                    userName: mockUserDetails.username,
-                    email: mockUserDetails.email,
-                    createdTimestamp: mockUserDetails.createdTimestamp
+                    userName: userDetails.username,
+                    email: userDetails.email,
+                    createdTimestamp: userDetails.createdTimestamp
                 }
             ],
             count: 1
@@ -122,11 +122,11 @@ describe('Testing Keycloak User Service', () => {
 
         const response = await keycloakUserService.getUserInfo({ tenantName, userName, clientName }, token);
         expect(response).toEqual({
-            username: mockUserDetails.username,
-            email: mockUserDetails.email,
-            createdTimestamp: mockUserDetails.createdTimestamp,
+            username: userDetails.username,
+            email: userDetails.email,
+            createdTimestamp: userDetails.createdTimestamp,
             tenantName: 'string',
-            roles: [mockUserDetails]
+            roles: [userDetails.role]
         });
     });
 
@@ -157,10 +157,10 @@ describe('Testing Keycloak User Service', () => {
 
         const response = await keycloakUserService.getAdminDetails(userName, token);
         expect(response).toEqual({
-            username: mockUserDetails.username,
-            email: mockUserDetails.email,
-            createdTimestamp: mockUserDetails.createdTimestamp,
-            roles: [mockUserDetails],
+            username: userDetails.username,
+            email: userDetails.email,
+            createdTimestamp: userDetails.createdTimestamp,
+            roles: [userDetails.role],
         });
     });
 });

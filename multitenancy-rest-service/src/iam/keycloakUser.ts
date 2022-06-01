@@ -309,9 +309,9 @@ export class KeycloakUser {
 
         evaluation = evaluation.results;
         const permissions: string[] = [];
-        for (let elements of evaluation) {
+        for (const elements of evaluation) {
             if (elements.status === 'PERMIT') {
-                let elemets = elements.policies;
+                const elemets = elements.policies;
                 const c = elemets.map((element: any) => element.policy.name)
                 permissions.push(...c);
             }

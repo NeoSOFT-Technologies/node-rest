@@ -34,8 +34,8 @@ export class AppService {
     return this.client1.send({ cmd: 'register-tenant' }, tenantDetails);
   }
   createRedirectUrl(tenantName: string) {
-    const keycloakRedirectUrl = this.config.get('keycloak.redirectUrl');
-    return `${keycloakRedirectUrl}/admin/${tenantName}/console/`;
+    const keycloakRedirectUrl = this.config.get('keycloak.server');
+    return `${keycloakRedirectUrl}/realms/${tenantName}/login-actions/reset-credentials?client_id=security-admin-console`;
   }
   getTenantConfig(tenantName: string) {
     return this.client2.send({ cmd: 'get_config' }, tenantName);

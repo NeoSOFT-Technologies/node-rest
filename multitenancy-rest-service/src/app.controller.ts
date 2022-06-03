@@ -108,7 +108,7 @@ export class AppController {
     try {
       const tenantName = req.query.tenant as string;
       const redirectUrl = this.appService.createRedirectUrl(tenantName);
-      res.redirect(redirectUrl);
+      res.send({redirectUrl});
     } catch (e) {
       console.error(e);
       throw e;

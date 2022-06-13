@@ -9,7 +9,7 @@ describe('Testing RegisTration MicroService Controller', () => {
   const TenantDetails = {
     tenantName: 'string',
     email: 'string',
-    password: 'string',
+    password: process.env.TEST_PASSWORD,
     description: 'string',
     databaseName: 'string',
     databaseDescription: 'string',

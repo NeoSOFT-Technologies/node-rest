@@ -18,6 +18,11 @@ import {
 } from './dto';
 import { Role, Permission } from './utils/enums';
 
+const ErrorMessage = {
+  NOT_ALLOWED: 'Not Allowed',
+  ENTER_TENANTNAME: 'Please enter tenantName'
+}
+
 @Controller('api')
 @UseFilters(new HttpErrorFilter())
 export class AppController {
@@ -103,7 +108,7 @@ export class AppController {
     try {
       const tenantName = req.query.tenant as string;
       const redirectUrl = this.appService.createRedirectUrl(tenantName);
-      res.redirect(redirectUrl);
+      res.send({redirectUrl});
     } catch (e) {
       console.error(e);
       throw e;
@@ -160,7 +165,8 @@ export class AppController {
 
       const response = this.appService.register({ ...body, ...client });
       response.subscribe((result) => {
-        res.send(result) });
+        res.send(result)
+      });
     } catch (e) {
       console.error(e);
       throw e;
@@ -181,14 +187,14 @@ export class AppController {
       let tenantName: string = req.query.tenantName as string;
 
       if (tenantNameFromToken === 'master' && !tenantName) {
-        throw new HttpException('Please enter TenantName', HttpStatus.BAD_REQUEST);
+        throw new HttpException(ErrorMessage.ENTER_TENANTNAME, HttpStatus.BAD_REQUEST);
       }
       else if (tenantNameFromToken !== 'master') {
         if (!tenantName) {
           tenantName = tenantNameFromToken;
         }
         else if (tenantName !== tenantNameFromToken) {
-          throw new HttpException('TenantName is not matched', HttpStatus.FORBIDDEN);
+          throw new HttpException(ErrorMessage.NOT_ALLOWED, HttpStatus.FORBIDDEN);
         }
       }
       const response = this.appService.getTenantConfig(tenantName);
@@ -246,7 +252,7 @@ export class AppController {
       const newDescription: string = req.body.action.description;
 
       if (tenantNameFromToken === 'master' && !tenantName) {
-        throw new HttpException('Please enter TenantName', HttpStatus.BAD_REQUEST);
+        throw new HttpException(ErrorMessage.ENTER_TENANTNAME, HttpStatus.BAD_REQUEST);
       }
       else if (tenantNameFromToken !== 'master') {
         if (!tenantName) {
@@ -359,7 +365,7 @@ export class AppController {
       }
       else if (isUser && req.query.userName !== userName) {
         throw new HttpException(
-          'Username is not matched',
+          ErrorMessage.NOT_ALLOWED,
           HttpStatus.METHOD_NOT_ALLOWED,
         );
       }
@@ -394,7 +400,7 @@ export class AppController {
         req.body.userName = userName;
       }
       else if (isUser && req.body.userName !== userName) {
-        throw new HttpException('Wrong username entered', HttpStatus.FORBIDDEN);
+        throw new HttpException(ErrorMessage.NOT_ALLOWED, HttpStatus.FORBIDDEN);
       }
       if (isUser && req.body.action.realmRoles) {
         throw new HttpException('Roles Updation not allowed', HttpStatus.FORBIDDEN)
@@ -419,7 +425,7 @@ export class AppController {
       req.params.tenantName = await this.authService.getTenantName(token);
       const userName = await this.authService.getUserName(token);
       if (userName === req.params.userName) {
-        throw new HttpException('Username is incorrect', HttpStatus.FORBIDDEN);
+        throw new HttpException(ErrorMessage.NOT_ALLOWED, HttpStatus.FORBIDDEN);
       }
       res.send(await this.appService.deleteUser(req.params as any, token));
     } catch (e) {
@@ -438,7 +444,7 @@ export class AppController {
   async createRole(@Req() req: Request, @Res() res: Response) {
     try {
       if (!req.body.tenantName) {
-        throw new HttpException('Enter the tenantName', HttpStatus.BAD_REQUEST);
+        throw new HttpException(ErrorMessage.ENTER_TENANTNAME, HttpStatus.BAD_REQUEST);
       }
       const token = req.headers['authorization'];
       res.send(await this.appService.createRole(req.body, token));
@@ -480,7 +486,7 @@ export class AppController {
     try {
       const token = req.headers['authorization'];
       if (!req.query.tenantName) {
-        throw new HttpException('Please enter tenantName', HttpStatus.BAD_REQUEST);
+        throw new HttpException(ErrorMessage.ENTER_TENANTNAME, HttpStatus.BAD_REQUEST);
       }
       if (!req.query.roleName) {
         throw new HttpException('Please enter roleName', HttpStatus.BAD_REQUEST);
@@ -502,7 +508,7 @@ export class AppController {
   async updateRole(@Req() req: Request, @Res() res: Response) {
     try {
       if (!req.body.tenantName) {
-        throw new HttpException('Please enter tenantName', HttpStatus.BAD_REQUEST);
+        throw new HttpException(ErrorMessage.ENTER_TENANTNAME, HttpStatus.BAD_REQUEST);
       }
       if (!req.body.roleName) {
         throw new HttpException('Please enter roleName', HttpStatus.BAD_REQUEST);
@@ -689,8 +695,8 @@ export class AppController {
       const tenantNameFromToken = await this.authService.getTenantName(token);
       const tenantName: string = req.query.tenantName as string;
 
-      if (tenantName !== tenantNameFromToken){
-        throw new HttpException('Wrong tenantName entered', HttpStatus.FORBIDDEN);
+      if (tenantName !== tenantNameFromToken) {
+        throw new HttpException('Updation Not Allowed', HttpStatus.FORBIDDEN);
       }
       const response = await this.appService.connect(dbDetails);
 

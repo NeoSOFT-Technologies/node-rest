@@ -93,7 +93,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "login"', async () => {
         const mockBody = {
             username: 'username',
-            password: 'password',
+            password: process.env.TEST_PASSWORD,
             tenantName: 'tenantName',
             clientId: 'clientId',
             clientSecret: 'clientSecret',
@@ -155,8 +155,8 @@ describe('Testing AppController', () => {
         const mockBody: RegisterTenantDto = {
             tenantName: 'tenantName',
             userName: 'userName',
-            email: 'tenant@gmail.com',
-            password: 'tenant123',
+            email: 'tenant@email.com',
+            password: process.env.TEST_PASSWORD,
             description: 'This is tenant Database',
             databaseName: 'tenant_db',
             databaseDescription: 'This is database description',
@@ -230,18 +230,18 @@ describe('Testing AppController', () => {
             userDetails: {
                 userName: 'userName',
                 email: 'tenant@gmail.com',
-                password: 'user123',
+                password: process.env.TEST_PASSWORD,
                 roles: ['role'],
                 attributes: ['permission']
             }
         };
         mockRequest.body = {
             tenantName: 'tenantName',
-            password: 'tenant123',
+            password: process.env.TEST_PASSWORD,
             userDetails: {
                 userName: 'userName',
                 email: 'tenant@gmail.com',
-                password: 'user123'
+                password: process.env.TEST_PASSWORD
             }
         };
 
@@ -440,7 +440,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "permission"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             permissionType: 'string',
             permissionDetails: {
@@ -516,7 +516,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "resource"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             resourceDetails: { name: 'string' },
         };
@@ -534,7 +534,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "policy"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             policyType: 'string',
             policyDetails: { name: 'string' },
@@ -553,7 +553,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "scope"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             scopeDetails: {
                 name: 'string'
@@ -575,10 +575,10 @@ describe('Testing AppController', () => {
             host: 'host',
             port: '3306',
             tenantName: 'tenantName',
-            password: 'tenant123',
+            password: process.env.TEST_PASSWORD,
             dbName: 'tenant_db'
         }
-        
+
         mockRequest.headers = {
             authorization: authToken
         };

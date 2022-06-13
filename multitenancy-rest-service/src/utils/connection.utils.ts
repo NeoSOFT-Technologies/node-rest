@@ -22,9 +22,7 @@ export const ConnectionUtils = {
         }
       });
     })
-    return new Promise(async (res) => {
-      res(await connection);
-    })
+    return Promise.resolve(await connection);
   },
 
   endConnection: function (DbConnection: Connection) {

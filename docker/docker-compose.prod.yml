@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+  multitenancy-rest-service:
+    command: npm run start:prod
+    env_file:
+      - ./multitenancy-rest-service/config/prod.env
+
+  tenant-registration:
+    command: npm run start:prod
+    env_file:
+      - ./tenant-registration/config/prod.env
+
+  tenant-master-service:
+    command: npm run start:prod
+    env_file:
+      - ./tenant-master-service/config/prod.env
+
+  tenant-provisioning:
+    command: npm run start:prod
+    env_file:
+      - ./tenant-provisioning/config/prod.env
+
+  tenant-config-service:
+    command: npm run start:prod
+    env_file:
+      - ./tenant-config-service/config/prod.env

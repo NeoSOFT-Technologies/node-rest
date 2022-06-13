@@ -33,7 +33,7 @@ describe('Testing Provisioning MicroService Controller', () => {
   it('Testing tenantprovisionController createDatabase', async () => {
     const Tenant = {
       tenantName: 'string',
-      password: 'string',
+      password: process.env.TEST_PASSWORD,
       databaseName: 'string',
     };
     expect(await tenantprovisionController.createDatabase(Tenant)).toEqual({
@@ -76,7 +76,7 @@ describe('Testing Provisioning MicroService Controller', () => {
   it('Testing tenantprovisionController ping', async () => {
     const TenantName = {
       tenantName: 'string',
-      password: 'string',
+      password: process.env.TEST_PASSWORD,
       databaseName: 'string',
     };
 

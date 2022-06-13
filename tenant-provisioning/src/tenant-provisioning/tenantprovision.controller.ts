@@ -19,9 +19,9 @@ export class TenantprovisionController {
   }
 
   @MessagePattern({ cmd: 'create-table' })
-  async createTable(table_details: ProvisionTenantTableDto) {
+  async createTable(tableDetails: ProvisionTenantTableDto) {
     try {
-      return await this.provisionService.createTable(table_details);
+      return await this.provisionService.createTable(tableDetails);
     } catch (e) {
       return e;
     }

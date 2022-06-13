@@ -125,7 +125,7 @@ describe('Testing AppService', () => {
             tenantName: 'string',
             userName: 'string',
             email: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             description: 'string',
             databaseName: 'string',
             databaseDescription: 'string',
@@ -177,7 +177,7 @@ describe('Testing AppService', () => {
             host: 'string',
             port: 1,
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             dbName: 'string',
         }
         const mockgetConnection = jest.spyOn(ConnectionUtils, 'getConnection');
@@ -249,10 +249,10 @@ describe('Testing AppService', () => {
             tenantName: 'string',
             userName: 'string',
             email: 'string',
-            password: 'string'
+            password: process.env.TEST_PASSWORD
         };
         const dbName = 'string';
-        
+
         mockClient1.send.mockImplementation(() => {
             return of('done');
         });
@@ -281,7 +281,7 @@ describe('Testing AppService', () => {
             userDetails: {
                 userName: 'string',
                 email: 'string',
-                password: 'string',
+                password: process.env.TEST_PASSWORD,
                 roles: ['roles'],
                 attributes: ['string']
             }

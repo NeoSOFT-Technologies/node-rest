@@ -12,7 +12,8 @@ export class TenantMasterController {
     try {
       await this.tenantMasterService.masterTenantService(tenantDetails);
     } catch (e) {
-      return e;
+      console.error(e);
+      throw e;
     }
   }
 }

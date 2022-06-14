@@ -8,8 +8,8 @@ import { DeletePermissionDto, PermissionDto, UpdatePermissionDto } from '../dto'
 export class KeycloakAuthPermission {
     private kcAdminClient: KcAdminClient;
     constructor(
-        private keycloakClient: KeycloakClient,
-        private config: ConfigService
+        private readonly keycloakClient: KeycloakClient,
+        private readonly config: ConfigService
     ) {
         this.keycloakServer = this.config.get('keycloak.server');
     }
@@ -45,11 +45,10 @@ export class KeycloakAuthPermission {
         const parts = token.split(' ')
         kcClient.setAccessToken(parts[1]);
 
-        const permissions = await kcClient.clients.findPermissions({
+        return kcClient.clients.findPermissions({
             id: (await this.keycloakClient.findClient(kcClient, clientName)).id,
             name: ''
         });
-        return permissions;
     }
 
     public async updatePermission(body: UpdatePermissionDto, token: string): Promise<string> {

@@ -1,4 +1,4 @@
-import { columnDto } from "./column.dto";
+import { ColumnDto } from "./column.dto";
 import { CredentialsDto } from "./credentials.dto";
 import { LogoutDto } from "./logout.body.dto";
 import { DbDetailsDto } from "./db.details.dto";
@@ -29,7 +29,7 @@ import { DeletePermissionDto } from "./delete.permission.dto";
 
 
 export {
-    columnDto,
+    ColumnDto,
     CredentialsDto,
     LogoutDto,
     DbDetailsDto,

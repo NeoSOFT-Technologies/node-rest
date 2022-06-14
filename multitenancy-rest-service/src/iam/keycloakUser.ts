@@ -7,20 +7,24 @@ import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRep
 import { GetUsersInfoDto, UserDetailsDto, UsersQueryDto } from "../dto";
 import RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/roleRepresentation";
 
+const ErrorMessage = {
+    NOT_FOUND: 'User not found',
+  }
+
 @Injectable()
 export class KeycloakUser {
-    private kcMasterAdminClient: KcAdminClient;
+    private readonly kcMasterAdminClient: KcAdminClient;
 
     constructor(
-        private keycloak: Keycloak,
-        private config: ConfigService) {
+        private readonly keycloak: Keycloak,
+        private readonly config: ConfigService) {
         this.kcMasterAdminClient = this.keycloak.kcMasterAdminClient
         this.keycloakServer = this.config.get('keycloak.server');
     }
     keycloakServer: string;
 
     public async createAdminUser(realmName: string, userName: string, email: string, password: string): Promise<TenantAdminUser> {
-        return await this.kcMasterAdminClient.users.create({
+        return this.kcMasterAdminClient.users.create({
             username: userName,
             email: email,
             enabled: true,
@@ -34,13 +38,13 @@ export class KeycloakUser {
             },
             realm: realmName
         });
-    };
+    }
 
     public async findUser(client: KcAdminClient): Promise<UserRepresentation> {
         const users = await client.users.find();
         const admin = users.filter((user) => user.username === 'tenantadmin');
         return admin[0];
-    };
+    }
 
     public async createUser(user: { tenantName: string }, userDetails: UserDetailsDto, token: string): Promise<string> {
         const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
@@ -67,13 +71,12 @@ export class KeycloakUser {
         for (const role of userDetails.roles) {
             const userRole: RoleRepresentation = await this.createUserRole(kcTenantAdminClient, role)
             await this.userRoleMapping(kcTenantAdminClient, createdUser, userRole)
-        };
-        
+        }
         return 'User created successfully';
-    };
+    }
 
     public async getUsers(data: { query: UsersQueryDto, token: string }): Promise<{ data: any, count: number }> {
-        let { tenantName, userName = undefined, page = 1 } = data.query;
+        const { tenantName, userName = undefined, page = 1 } = data.query;
         const { token } = data;
         const kcClient: KcAdminClient = new KcAdminClient({
             baseUrl: this.keycloakServer,
@@ -105,10 +108,10 @@ export class KeycloakUser {
             data: userNames,
             count: count
         };
-    };
+    }
 
     public async getUserInfo(query: GetUsersInfoDto, token: string) {
-        const { tenantName, userName, clientName } = query;
+        const { tenantName, userName } = query;
         const kcClient: KcAdminClient = new KcAdminClient({
             baseUrl: this.keycloakServer,
             realmName: tenantName,
@@ -122,8 +125,8 @@ export class KeycloakUser {
             exact: true
         });
         if (!userInfo[0]) {
-            throw new NotFoundException('User not found');
-        };
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
         const createdTimestamp = this.formatTimeStamp(userInfo[0]);
         const roles = await this.getUserRoles(kcClient, { id: userInfo[0].id });
         return {
@@ -132,7 +135,7 @@ export class KeycloakUser {
             tenantName,
             roles
         };
-    };
+    }
 
     public async updateUser(tenantName: string, userName: string, userDetails: UserRepresentation, token: string): Promise<string> {
         const kcClient: KcAdminClient = new KcAdminClient({
@@ -147,8 +150,8 @@ export class KeycloakUser {
             exact: true
         });
         if (!user[0]) {
-            throw new NotFoundException('User not found');
-        };
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
 
         await kcClient.users.update(
             {
@@ -174,7 +177,7 @@ export class KeycloakUser {
                     throw new NotFoundException(`${role} role not found`);
                 }
                 await this.userRoleMapping(kcClient, { id: user[0].id }, userRole)
-            };
+            }
 
             const deleteRoles = currentRoles.filter(role => !updatedRoles.includes(role));
             for (const role of deleteRoles) {
@@ -182,11 +185,11 @@ export class KeycloakUser {
                     name: role
                 });
                 await this.deleteRoleMapping(kcClient, { id: user[0].id }, userRole)
-            };
+            }
         }
 
         return 'User updated successfully';
-    };
+    }
 
     public async deleteUser(tenantName: string, userName: string, token: string): Promise<string> {
         const kcTenantAdminClient: KcAdminClient = new KcAdminClient({
@@ -202,15 +205,15 @@ export class KeycloakUser {
         });
 
         if (!user[0]) {
-            throw new NotFoundException('User not found');
-        };
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
 
         await kcTenantAdminClient.users.del({
             id: user[0].id
         });
 
         return 'User deleted Successfully';
-    };
+    }
 
     public async getAdminDetails(userName: string, token: string) {
         const kcAdminClient: KcAdminClient = new KcAdminClient({
@@ -232,7 +235,7 @@ export class KeycloakUser {
             createdTimestamp,
             roles,
         };
-    };
+    }
 
     private async createUserRole(client: KcAdminClient, role: string): Promise<RoleRepresentation> {
         let userRole = await client.roles.findOneByName({
@@ -248,7 +251,7 @@ export class KeycloakUser {
             });
         }
         return userRole;
-    };
+    }
 
     private async userRoleMapping(client: KcAdminClient, createdUser: { id: string }, userRole: RoleRepresentation): Promise<void> {
         await client.users.addRealmRoleMappings({
@@ -260,7 +263,7 @@ export class KeycloakUser {
                 },
             ]
         });
-    };
+    }
 
     private async deleteRoleMapping(client: KcAdminClient, user: { id: string }, userRole: RoleRepresentation): Promise<void> {
         await client.users.delRealmRoleMappings({
@@ -272,7 +275,7 @@ export class KeycloakUser {
                 },
             ]
         });
-    };
+    }
 
     private async getUserRoles(client: KcAdminClient, user: { id: string }): Promise<string[]> {
         const roles = await client.users.listRealmRoleMappings({
@@ -283,7 +286,7 @@ export class KeycloakUser {
             return !(role.includes('default-roles') || role.includes('uma') || role.includes('offline_access'));
         })
         return rolesName;
-    };
+    }
 
     private async getUserPermission(Kcclient: KcAdminClient, user: { id: string }, clientName: string) {
         const client = await Kcclient.clients.find({
@@ -305,25 +308,23 @@ export class KeycloakUser {
         );
 
         evaluation = evaluation.results;
-        let permissions: string[] = [];
-        for (let elements of evaluation) {
+        const permissions: string[] = [];
+        for (const elements of evaluation) {
             if (elements.status === 'PERMIT') {
-                elements = elements.policies;
-                let c = elements.map((element: any) => element.policy.name)
+                const elemets = elements.policies;
+                const c = elemets.map((element: any) => element.policy.name)
                 permissions.push(...c);
             }
         }
         return permissions;
-    };
+    }
 
     private formatTimeStamp(user: UserRepresentation): string {
         const d = new Date(user.createdTimestamp);
-        const createdTimestamp = new Date(d.getTime() - (d.getTimezoneOffset() * 60000))
+        return new Date(d.getTime() - (d.getTimezoneOffset() * 60000))
             .toISOString()
             .slice(0, 19)
             .replace(/-/g, '/')
             .replace('T', ' ');
-
-        return createdTimestamp;
-    };
+    }
 }

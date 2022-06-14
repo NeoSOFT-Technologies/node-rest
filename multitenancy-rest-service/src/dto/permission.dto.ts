@@ -14,7 +14,6 @@ export class PermissionDto{
     @IsNotEmpty()
     @IsString()
     tenantName: string;
-    
     clientName: string;
     permissionType: string;
     permissionDetails: PermissionDetails;

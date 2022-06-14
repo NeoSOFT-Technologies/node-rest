@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { columnDto } from './column.dto';
+import { ColumnDto } from './column.dto';
 
 export class ProvisionTenantTableDto {
   @ApiProperty()
@@ -7,5 +7,5 @@ export class ProvisionTenantTableDto {
   @ApiProperty()
   tableName: string;
   @ApiProperty()
-  columns: columnDto[];
+  columns: ColumnDto[];
 }

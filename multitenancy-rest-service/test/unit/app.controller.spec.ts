@@ -30,6 +30,8 @@ describe('Testing AppController', () => {
 
     const mockMessage = { Message: 'Testing' };
 
+    const authToken = 'Bearer token';
+
 
     const mockAppService = {
         register: jest.fn(() => of(mockMessage)),
@@ -93,7 +95,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "login"', async () => {
         const mockBody = {
             username: 'username',
-            password: 'password',
+            password: process.env.TEST_PASSWORD,
             tenantName: 'tenantName',
             clientId: 'clientId',
             clientSecret: 'clientSecret',
@@ -142,7 +144,7 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "adminDetails"', async () => {
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
 
         const getAdminDetails = jest.spyOn(appService, 'getAdminDetails');
@@ -155,15 +157,15 @@ describe('Testing AppController', () => {
         const mockBody: RegisterTenantDto = {
             tenantName: 'tenantName',
             userName: 'userName',
-            email: 'tenant@gmail.com',
-            password: 'tenant123',
+            email: 'tenant@email.com',
+            password: process.env.TEST_PASSWORD,
             description: 'This is tenant Database',
             databaseName: 'tenant_db',
             databaseDescription: 'This is database description',
             clientDetails: { clientId: 'clientId' }
         }
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         const createRealm = jest.spyOn(appService, 'createRealm');
@@ -185,7 +187,7 @@ describe('Testing AppController', () => {
             tenantName: 'tenantName',
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
         const getTenantConfig = jest.spyOn(appService, 'getTenantConfig');
@@ -247,23 +249,23 @@ describe('Testing AppController', () => {
             userDetails: {
                 userName: 'userName',
                 email: 'tenant@gmail.com',
-                password: 'user123',
+                password: process.env.TEST_PASSWORD,
                 roles: ['role'],
                 attributes: ['permission']
             }
         };
         mockRequest.body = {
             tenantName: 'tenantName',
-            password: 'tenant123',
+            password: process.env.TEST_PASSWORD,
             userDetails: {
                 userName: 'userName',
                 email: 'tenant@gmail.com',
-                password: 'user123'
+                password: process.env.TEST_PASSWORD
             }
         };
 
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createUser = jest.spyOn(appService, 'createUser');
@@ -280,7 +282,7 @@ describe('Testing AppController', () => {
         };
 
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
 
         const mockSend = jest.spyOn(mockResponse, 'send');
@@ -301,7 +303,7 @@ describe('Testing AppController', () => {
         };
 
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
 
         const mockSend = jest.spyOn(mockResponse, 'send');
@@ -322,7 +324,7 @@ describe('Testing AppController', () => {
         };
 
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
 
         const mockSend = jest.spyOn(mockResponse, 'send');
@@ -340,7 +342,7 @@ describe('Testing AppController', () => {
         };
 
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
 
         const mockSend = jest.spyOn(mockResponse, 'send');
@@ -360,7 +362,7 @@ describe('Testing AppController', () => {
             },
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createClient = jest.spyOn(appService, 'createClient');
@@ -378,7 +380,7 @@ describe('Testing AppController', () => {
             }
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createRoles = jest.spyOn(appService, 'createRole');
@@ -393,7 +395,7 @@ describe('Testing AppController', () => {
             tenantName: 'tenantName',
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const getRoles = jest.spyOn(appService, 'getRoles');
@@ -409,7 +411,7 @@ describe('Testing AppController', () => {
             roleName: 'roleName'
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const roleInfo = jest.spyOn(appService, 'roleInfo');
@@ -428,7 +430,7 @@ describe('Testing AppController', () => {
             }
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const updateRoles = jest.spyOn(appService, 'updateRole');
@@ -444,7 +446,7 @@ describe('Testing AppController', () => {
             roleName: 'roleName',
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const deleteRoles = jest.spyOn(appService, 'deleteRole');
@@ -457,7 +459,7 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "permission"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             permissionType: 'string',
             permissionDetails: {
@@ -465,7 +467,7 @@ describe('Testing AppController', () => {
             }
         }
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createPermission = jest.spyOn(appService, 'createPermission');
@@ -481,7 +483,7 @@ describe('Testing AppController', () => {
             clientName: 'string',
         }
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const getPermissions = jest.spyOn(appService, 'getPermissions');
@@ -502,7 +504,7 @@ describe('Testing AppController', () => {
             }
         }
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const updatePermission = jest.spyOn(appService, 'updatePermission');
@@ -520,7 +522,7 @@ describe('Testing AppController', () => {
             permissionType: 'string',
         }
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const deletePermission = jest.spyOn(appService, 'deletePermission');
@@ -533,12 +535,12 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "resource"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             resourceDetails: { name: 'string' },
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createResource = jest.spyOn(appService, 'createResource');
@@ -551,13 +553,13 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "policy"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             policyType: 'string',
             policyDetails: { name: 'string' },
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createPolicy = jest.spyOn(appService, 'createPolicy');
@@ -570,14 +572,14 @@ describe('Testing AppController', () => {
     it('Testing appcontroller "scope"', async () => {
         mockRequest.body = {
             tenantName: 'string',
-            password: 'string',
+            password: process.env.TEST_PASSWORD,
             clientName: 'string',
             scopeDetails: {
                 name: 'string'
             }
         };
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
         const mockSend = jest.spyOn(mockResponse, 'send');
         const createScope = jest.spyOn(appService, 'createScope');
@@ -592,12 +594,12 @@ describe('Testing AppController', () => {
             host: 'host',
             port: '3306',
             tenantName: 'tenantName',
-            password: 'tenant123',
+            password: process.env.TEST_PASSWORD,
             dbName: 'tenant_db'
         }
-        
+
         mockRequest.headers = {
-            authorization: 'Bearer token'
+            authorization: authToken
         };
 
         const connect = jest.spyOn(appService, 'connect');

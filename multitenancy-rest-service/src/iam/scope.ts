@@ -8,8 +8,8 @@ import { KeycloakClient } from './client';
 export class KeycloakAuthScope {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private keycloakClient: KeycloakClient,
-        private config: ConfigService
+        private readonly keycloakClient: KeycloakClient,
+        private readonly config: ConfigService
     ) { }
 
     public async createScope(body: ScopeDto, token: string): Promise<any> {
@@ -30,4 +30,4 @@ export class KeycloakAuthScope {
         );
         return 'Scope created successfully';
     }
-};
+}

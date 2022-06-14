@@ -21,7 +21,7 @@ describe('Testing Tenant Master Service', () => {
     tenantId: 'string',
     tenantName: 'string',
     tenantDbName: 'string',
-    password: 'string',
+    password: process.env.TEST_PASSWORD,
     description: 'string',
     createdDateTime: 'string',
     host: 'string',

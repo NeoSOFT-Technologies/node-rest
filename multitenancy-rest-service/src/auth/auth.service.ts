@@ -9,7 +9,7 @@ import { Role } from "../utils/enums";
 
 @Injectable()
 export class AuthService {
-    constructor(private config: ConfigService) {
+    constructor(private readonly config: ConfigService) {
         this.keycloakServer = this.config.get('keycloak.server');
     }
 
@@ -17,6 +17,7 @@ export class AuthService {
     logoutURL: string;
     validateURL: string;
     keycloakServer: string;
+    contentType = "application/x-www-form-urlencoded";
 
     async getAccessToken(body: CredentialsDto) {
         let { username, password, tenantName, clientId, clientSecret } = body;
@@ -35,15 +36,14 @@ export class AuthService {
             client_secret: clientSecret,
         });
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type": this.contentType,
         };
 
-        const response = await httpClient.post({
+        return httpClient.post({
             url: this.tokenURL,
             payload: params,
             headers: headers
         });
-        return response;
     }
 
     async logout(body: LogoutDto) {
@@ -60,7 +60,7 @@ export class AuthService {
         });
 
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type":  this.contentType,
         }
 
         const response = await httpClient.post({
@@ -85,15 +85,14 @@ export class AuthService {
             client_secret: clientSecret
         });
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type":  this.contentType,
         };
 
-        const response = await httpClient.post({
+        return httpClient.post({
             url: this.tokenURL,
             payload: params,
             headers: headers
         });
-        return response;
     }
 
     async validateToken(token: string, clientId: string, clientSecret: string) {
@@ -106,7 +105,7 @@ export class AuthService {
             client_secret: clientSecret,
         });
         const headers = {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type":  this.contentType,
         }
 
         const response = await httpClient.post({
@@ -128,7 +127,6 @@ export class AuthService {
         });
         const key = await client.getSigningKey();
         const signingKey = key.getPublicKey();
-        
         return { public_key: signingKey };
     }
 
@@ -140,18 +138,18 @@ export class AuthService {
 
     async getUserName(token: string) {
         token = this.parseToken(token);
-        const { preferred_username }: any = jwt.decode(token) as jwt.JwtPayload;;
+        const { preferred_username }: any = jwt.decode(token) as jwt.JwtPayload;
         return preferred_username;
     }
 
     async getExpTime(token: string) {
         token = this.parseToken(token);
-        const { exp }: any = jwt.decode(token) as jwt.JwtPayload;;
+        const { exp }: any = jwt.decode(token) as jwt.JwtPayload;
         return exp;
     }
 
     async getRoles(token: string) {
-        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
+        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;
 
         let roles: string[] = [];
         if (realm_access.roles) {
@@ -171,7 +169,7 @@ export class AuthService {
 
     async checkUserRole(token: string) {
         token = this.parseToken(token);
-        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;;
+        const { realm_access }: any = jwt.decode(token) as jwt.JwtPayload;
 
         let roles: string[] = [];
         if (realm_access.roles) {

@@ -9,7 +9,7 @@ export class TenantMasterService {
   constructor(
     @Inject('TENANT_PROVISION_SERVICE') private readonly client1: ClientProxy,
     @Inject('TENANT_CONFIG_SERVICE') private readonly client2: ClientProxy,
-    private config: ConfigService,
+    private readonly config: ConfigService,
   ) {
     this.logger = new Logger('Tenant Master Service');
   }

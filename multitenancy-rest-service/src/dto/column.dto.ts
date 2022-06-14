@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class columnDto {
+export class ColumnDto {
   @ApiProperty()
   columnName: string;
   @ApiProperty()

@@ -8,7 +8,7 @@ export class ScopeRepresentationDto {
 
     @ApiHideProperty()
     iconUri?: string;
-    
+
     @ApiHideProperty()
     id?: string;
 }

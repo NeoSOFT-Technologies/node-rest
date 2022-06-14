@@ -8,7 +8,7 @@ import { ClientDto } from '../dto';
 export class KeycloakClient {
     private kcTenantAdminClient: KcAdminClient;
     constructor(
-        private config: ConfigService
+        private readonly config: ConfigService
     ) { }
 
     public async createClient(body: ClientDto, token: string): Promise<{
@@ -31,27 +31,27 @@ export class KeycloakClient {
             clientId: clientDetails.clientId,
             clientSecret
         };
-    };
+    }
 
     public async findClient(kcclient: KcAdminClient, clientName: string): Promise<ClientRepresentation> {
         const clients = await kcclient.clients.find();
-        const client = clients.filter((client) => client.clientId === clientName);
+        const client = clients.filter((Client) => Client.clientId === clientName);
         if (!client[0]) {
             throw new NotFoundException('Client not found');
         }
         return client[0];
-    };
+    }
 
     private async generateSecret(kcclient: KcAdminClient, clientName: string): Promise<string> {
         const clients = await kcclient.clients.find();
-        const client = clients.filter((client) => client.clientId === clientName);
+        const client = clients.filter((Client) => Client.clientId === clientName);
         const newCredential = await kcclient.clients.generateNewClientSecret(
             {
                 id: client[0].id,
             },
         );
         return newCredential.value;
-    };
+    }
 
     public defaultClientDetails() {
         return {
@@ -73,5 +73,5 @@ export class KeycloakClient {
                 }
             }]
         }
-    };
-};
+    }
+}

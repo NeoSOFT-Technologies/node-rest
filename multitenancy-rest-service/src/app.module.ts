@@ -12,7 +12,7 @@ import { Keycloak, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, Key
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: (process.env.NODE_ENV) ? [`${process.cwd()}/config/${process.env.NODE_ENV}.env`] : [`${process.cwd()}/config/.env`],
+      envFilePath: [`${process.cwd()}/config/.env`],
       isGlobal: true,
       expandVariables: true,
       load: config,
@@ -45,6 +45,10 @@ import { Keycloak, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, Key
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, PublicKeyCache, KeycloakAuthGuard, Keycloak, KeycloakUser, KeycloakRealm, KeycloakAuthPolicy, KeycloakAuthResource, KeycloakClient, KeycloakAuthScope, KeycloakAuthPermission],
+  providers: [
+    AppService, AuthService, PublicKeyCache, KeycloakAuthGuard,
+    Keycloak, KeycloakUser, KeycloakRealm, KeycloakAuthPolicy,
+    KeycloakAuthResource, KeycloakClient, KeycloakAuthScope, KeycloakAuthPermission
+  ],
 })
 export class AppModule { }

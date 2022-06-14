@@ -4,9 +4,9 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class Keycloak {
-    constructor(private config: ConfigService) { }
+    constructor(private readonly config: ConfigService) { }
 
     public kcMasterAdminClient: KcAdminClient = new KcAdminClient({
         baseUrl: this.config.get('keycloak.server'),
     });
-};
+}

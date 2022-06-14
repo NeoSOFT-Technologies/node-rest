@@ -4,7 +4,7 @@ import { DbDetailsDto } from '@app/dto';
 
 export const ConnectionUtils = {
   getConnection: async function (dbDetails: DbDetailsDto) {
-    const db_connection = mysql.createConnection({
+    const DbConnection = mysql.createConnection({
       host: dbDetails.host,
       port: dbDetails.port,
       user: dbDetails.tenantName,
@@ -13,7 +13,7 @@ export const ConnectionUtils = {
     });
 
     const connection = new Promise((res) => {
-      db_connection.connect((err) => {
+      DbConnection.connect((err) => {
         if (err) {
           res(err);
         }
@@ -22,13 +22,11 @@ export const ConnectionUtils = {
         }
       });
     })
-    return new Promise(async (res) => {
-      res(await connection);
-    })
+    return Promise.resolve(await connection);
   },
 
-  endConnection: function (db_connection: Connection) {
-    db_connection.end((err) => {
+  endConnection: function (DbConnection: Connection) {
+    DbConnection.end((err) => {
       if (err) {
         throw err;
       }

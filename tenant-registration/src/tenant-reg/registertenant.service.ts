@@ -18,14 +18,6 @@ export class RegistertenantService {
     this.logger = new Logger('Register Tenant Service');
   }
   async register(tenant: RegisterTenantDto) {
-    if (!tenant.tenantName) {
-      tenant.tenantName =
-        tenant.email.split('@')[0] +
-        '-' +
-        Date.now().toString(36).slice(-4) +
-        '-' +
-        Math.random().toString(16).slice(-4);
-    }
     const password = tenant.password;
     tenant.password = encodePassword(tenant.password);
     const date = new Date();
@@ -38,15 +30,15 @@ export class RegistertenantService {
       .replace('T', ' ');
 
     this.logger.log('Inserting tenant data in tenant table ...');
-    const registered_tenant = await this.tenantRepository.save(tenant);
+    const registeredTenant = await this.tenantRepository.save(tenant);
     this.logger.log('Inserted successfully !!');
     const tenantDetails: TenantDetailsDto = {
-      tenantId: registered_tenant.id,
-      tenantName: registered_tenant.tenantName,
-      databaseName: registered_tenant.databaseName,
+      tenantId: registeredTenant.id,
+      tenantName: registeredTenant.tenantName,
+      databaseName: registeredTenant.databaseName,
       password: password,
-      description: registered_tenant.description,
-      createdDateTime: registered_tenant.createdDateTime,
+      description: registeredTenant.description,
+      createdDateTime: registeredTenant.createdDateTime,
     };
     this.client.emit({ cmd: 'tenant-master' }, tenantDetails);
     return { Message: 'Tenant Registered Successfully' };

@@ -7,6 +7,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Request, Response } from 'express';
 import * as httpMocks from 'node-mocks-http';
 import { Observable, of } from 'rxjs';
+import { AppModule } from '@app/app.module';
 
 describe('Testing AppController', () => {
     let appController: AppController;
@@ -74,6 +75,7 @@ describe('Testing AppController', () => {
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
+            imports: [AppModule],
             controllers: [AppController],
             providers: [AppService, AuthService, PublicKeyCache],
         })
@@ -193,10 +195,17 @@ describe('Testing AppController', () => {
         mockSubscribe.mockRestore();
     });
 
-    it('Testing appcontroller "listAllTenant"', async () => {
+    it('Testing appcontroller "listAllTenant"', () => {
+        mockRequest.query = {
+            tenantName: 'tenantName',
+            isDeleted: 'true',
+            page: '1'
+        };
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
-        await appController.listAllTenant(mockRequest, mockResponse);
+        const listAllTenant = jest.spyOn(appService, 'listAllTenant');
+        appController.listAllTenant(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
+        expect(listAllTenant).toHaveBeenCalledWith('tenantName', 'true','1');
         mockSubscribe.mockRestore();
     });
 
@@ -216,9 +225,19 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "deleteTenant"', async () => {
+        mockRequest.params ={
+            tenantName: 'tenantName'
+        };
+
+        mockRequest.headers = {
+            authorization: 'Bearer token'
+        };
+
         const mockSubscribe = jest.spyOn(Observable.prototype, 'subscribe');
+        const deleteTenant = jest.spyOn(appService, 'deleteTenant');
         await appController.deleteTenant(mockRequest, mockResponse);
         expect(mockSubscribe).toHaveBeenCalled();
+        expect(deleteTenant).toHaveBeenCalledWith('tenantName', mockRequest.headers['authorization']);
         mockSubscribe.mockRestore();
     });
 

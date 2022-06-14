@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantprovisionController } from '@app/tenant-provisioning/tenantprovision.controller';
 import { TenantprovisionService } from '@app/tenant-provisioning/tenantprovision.service';
+import { TenantprovisionModule } from '@app/tenant-provisioning/tenantprovision.module';
 
 describe('Testing Provisioning MicroService Controller', () => {
   let tenantprovisionController: TenantprovisionController;
@@ -18,6 +19,7 @@ describe('Testing Provisioning MicroService Controller', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [TenantprovisionModule],
       controllers: [TenantprovisionController],
       providers: [TenantprovisionService],
     })

@@ -7,7 +7,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Request, Response } from 'express';
 import * as httpMocks from 'node-mocks-http';
 import { Observable, of } from 'rxjs';
-import { AppModule } from '@app/app.module';
 
 describe('Testing AppController', () => {
     let appController: AppController;
@@ -44,6 +43,7 @@ describe('Testing AppController', () => {
         createTable: jest.fn(() => of(mockMessage)),
         createRealm: jest.fn(),
         getAdminDetails: jest.fn(),
+        createRedirectUrl: jest.fn(),
         createUser: jest.fn(),
         listAllUser: jest.fn(),
         userInfo: jest.fn(),
@@ -77,7 +77,6 @@ describe('Testing AppController', () => {
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
             controllers: [AppController],
             providers: [AppService, AuthService, PublicKeyCache],
         })
@@ -106,6 +105,19 @@ describe('Testing AppController', () => {
         mockgetAccessToken.mockRestore();
     });
 
+    it('Testing appcontroller "when login failed"', async () => {
+        const mockBody = {
+            username: '',
+            password: process.env.TEST_PASSWORD,
+            tenantName: 'tenantName',
+            clientId: 'clientId',
+            clientSecret: 'clientSecret',
+        }
+
+        expect(async () => await appController.login(mockBody, mockResponse)).rejects.toThrow('Please enter userName');
+        
+    });
+
     it('Testing appcontroller "logout"', async () => {
         const mockBody = {
             tenantName: 'tenantName',
@@ -130,6 +142,16 @@ describe('Testing AppController', () => {
         await appController.refreshAccessToken(mockBody, mockResponse);
         expect(mockrefreshAccessToken).toHaveBeenCalled();
         mockrefreshAccessToken.mockRestore();
+    });
+
+    it('Testing appcontroller "forgetPassword"', () => {
+        mockRequest.query ={
+            tenantName: 'tenantName'
+        };
+        const createRedirectUrl = jest.spyOn(appService, 'createRedirectUrl');
+        appController.forgotPassword(mockRequest,mockResponse);
+        expect(createRedirectUrl).toHaveBeenCalled();
+        createRedirectUrl.mockRestore();
     });
 
     it('Testing appcontroller "publicKey"', async () => {
@@ -183,7 +205,7 @@ describe('Testing AppController', () => {
     });
 
     it('Testing appcontroller "getTenantConfig"', async () => {
-        mockRequest.params = {
+        mockRequest.query = {
             tenantName: 'tenantName',
         };
         mockRequest.headers = {
@@ -195,6 +217,17 @@ describe('Testing AppController', () => {
         expect(mockSubscribe).toHaveBeenCalled();
         expect(getTenantConfig).toHaveBeenCalledWith('tenantName');
         mockSubscribe.mockRestore();
+    });
+
+    it('Testing appcontroller "when getTenantConfig gets failed"', async () => {
+        mockRequest.query = {
+            tenantName: 'tenantname',
+        };
+        mockRequest.headers = {
+            authorization: authToken
+        };
+        
+        expect(async () => await appController.getTenantConfig(mockRequest, mockResponse)).rejects.toThrow("Not Allowed");   
     });
 
     it('Testing appcontroller "listAllTenant"', () => {
@@ -226,6 +259,17 @@ describe('Testing AppController', () => {
         mockSubscribe.mockRestore();
     });
 
+    it('Testing appcontroller "when updateDescription gets failed"', async () => {
+        mockRequest.body = {
+            action: {
+                tenantName: '__',
+                description: 'newDescription'
+            }
+        };
+        expect(async () => await appController.updateDescription(mockRequest, mockResponse)).rejects.toThrow('Updation Not Allowed');
+    });
+
+
     it('Testing appcontroller "deleteTenant"', async () => {
         mockRequest.params ={
             tenantName: 'tenantName'
@@ -255,7 +299,7 @@ describe('Testing AppController', () => {
             }
         };
         mockRequest.body = {
-            tenantName: 'tenantName',
+            tenantName: '',
             password: process.env.TEST_PASSWORD,
             userDetails: {
                 userName: 'userName',
@@ -277,7 +321,7 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "listAllUser"', async () => {
         mockRequest.query = {
-            tenantName: 'tenantName',
+            tenantName: '',
             page: '1'
         };
 
@@ -298,8 +342,8 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "getUserInfo"', async () => {
         mockRequest.query = {
-            tenantName: 'tenantName',
-            usertName: 'usertName',
+            tenantName: '',
+            userName: 'userName',
         };
 
         mockRequest.headers = {
@@ -316,7 +360,7 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "updateUser"', async () => {
         mockRequest.body = {
-            tenantName: 'tenantName',
+            tenantName: '',
             userName: 'userName',
             action: {
                 firstName: 'firstName'
@@ -335,6 +379,22 @@ describe('Testing AppController', () => {
         mockSend.mockRestore();
     });
 
+    it('Testing appcontroller "when updateUser gets failed"', async () => {
+        mockRequest.body = {
+            tenantName: 'tenantName',
+            userName: '',
+            action: {
+                firstName: 'firstName'
+            }
+        };
+
+        mockRequest.headers = {
+            authorization: authToken
+        };
+
+        expect(async () => await appController.updateUser(mockRequest, mockResponse)).rejects.toThrow('Please enter userName');
+    });
+
     it('Testing appcontroller "deleteUser"', async () => {
         mockRequest.params = {
             tenantName: 'tenantName',
@@ -351,6 +411,19 @@ describe('Testing AppController', () => {
         expect(mockSend).toHaveBeenCalled();
         expect(deleteUser).toHaveBeenCalledWith(mockRequest.params, mockRequest.headers['authorization']);
         mockSend.mockRestore();
+    });
+
+    it('Testing appcontroller "when deleteUser gets failed"', async () => {
+        mockRequest.params = {
+            tenantName: 'tenantName',
+            userName: 'userName',
+        };
+
+        mockRequest.headers = {
+            authorization: authToken
+        };
+
+        expect(async () => await appController.deleteUser(mockRequest, mockResponse)).rejects.toThrow("Not Allowed");  
     });
 
     it('Testing appcontroller "tenantClient"', async () => {
@@ -390,9 +463,22 @@ describe('Testing AppController', () => {
         mockSend.mockRestore();
     });
 
+    it('Testing appcontroller "when createRole gets failed"', async () => {
+        mockRequest.body = {
+            tenantName: '',
+            roleDetails: {
+                name: 'string'
+            }
+        };
+        mockRequest.headers = {
+            authorization: authToken
+        };
+        expect(async () => await appController.createRole(mockRequest, mockResponse)).rejects.toThrow("Please enter tenantName");
+    });
+
     it('Testing appcontroller "getAvailableRoles"', async () => {
         mockRequest.query = {
-            tenantName: 'tenantName',
+            tenantName: '',
         };
         mockRequest.headers = {
             authorization: authToken
@@ -421,6 +507,30 @@ describe('Testing AppController', () => {
         mockSend.mockRestore();
     });
 
+    it('Testing appcontroller "when getRoleInfo tenantName get failed"', async () => {
+        mockRequest.query = {
+            tenantName: '',
+            roleName: 'roleName'
+        };
+        mockRequest.headers = {
+            authorization: authToken
+        };
+
+        expect(async () => await appController.getRoleInfo(mockRequest, mockResponse)).rejects.toThrow("Please enter tenantName");
+    });
+
+    it('Testing appcontroller "when getRoleInfo roleName get failed"', async () => {
+        mockRequest.query = {
+            tenantName: 'tenantName',
+            roleName: ''
+        };
+        mockRequest.headers = {
+            authorization: authToken
+        };
+
+        expect(async () => await appController.getRoleInfo(mockRequest, mockResponse)).rejects.toThrow("Please enter roleName");
+    });
+
     it('Testing appcontroller "updateRole"', async () => {
         mockRequest.body = {
             tenantName: 'tenantName',
@@ -439,6 +549,37 @@ describe('Testing AppController', () => {
         expect(updateRoles).toHaveBeenCalledWith(mockRequest.body, mockRequest.headers['authorization']);
         mockSend.mockRestore();
     });
+
+    it('Testing appcontroller "when updateRole tenantName gets failed"', async () => {
+        mockRequest.body = {
+            tenantName: '',
+            roleName: 'roleName',
+            action: {
+                name: 'string'
+            }
+        };
+        mockRequest.headers = {
+            authorization: authToken
+        };
+    
+        expect(async () => await appController.updateRole(mockRequest, mockResponse)).rejects.toThrow("Please enter tenantName");
+    });
+
+    it('Testing appcontroller "when updateRole roleName gets failed"', async () => {
+        mockRequest.body = {
+            tenantName: 'tenantName',
+            roleName: '',
+            action: {
+                name: 'string'
+            }
+        };
+        mockRequest.headers = {
+            authorization: authToken
+        };
+    
+        expect(async () => await appController.updateRole(mockRequest, mockResponse)).rejects.toThrow("Please enter roleName");
+    });
+
 
     it('Testing appcontroller "deleteRole"', async () => {
         mockRequest.params = {
@@ -479,7 +620,7 @@ describe('Testing AppController', () => {
 
     it('Testing appcontroller "listPermission"', async () => {
         mockRequest.query = {
-            tenantName: 'string',
+            tenantName: '',
             clientName: 'string',
         }
         mockRequest.headers = {
@@ -606,6 +747,23 @@ describe('Testing AppController', () => {
         await appController.connectDatabase(mockRequest, mockResponse);
         expect(connect).toHaveBeenCalled();
         connect.mockRestore();
+    });
+
+    it('Testing appcontroller "when connectDatabase method gets failed"', async () => {
+        mockRequest.query = {
+            host: 'host',
+            port: '3306',
+            tenantName: '',
+            password: process.env.TEST_PASSWORD,
+            dbName: 'tenant_db'
+        }
+
+        mockRequest.headers = {
+            authorization: authToken
+        };
+
+        expect(async () => await appController.connectDatabase(mockRequest, mockResponse)).rejects.toThrow("Updation Not Allowed");
+       
     });
 
     it('Testing appcontroller "createTable"', async () => {

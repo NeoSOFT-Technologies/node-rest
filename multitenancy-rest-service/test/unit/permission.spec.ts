@@ -21,7 +21,21 @@ jest.mock('@keycloak/keycloak-admin-client', () => {
                             clientId: 'string',
                         }
                     ]),
-                    createPermission: jest.fn()
+                    findPermissions: jest.fn().mockResolvedValue([
+                        {
+                            id: 'id',
+                            name: 'name'
+                        }
+                    ]),
+                    createPermission: jest.fn(),
+                    updatePermission: jest.fn(),
+                    delPermission: jest.fn().mockResolvedValue([
+                        {
+                            id: 'id',
+                            type: 'string',
+                            permissionId: 'test-permission'
+                        }
+                    ]),
                 },
                 setAccessToken: jest.fn()
             };
@@ -53,5 +67,45 @@ describe('Testing Keycloak Authorization Permission', () => {
         const token = 'Bearer token';
         const response = await keycloakAuthPermission.createPermission(body, token);
         expect(response).toEqual('Permission created successfully');
+    });
+
+    it('Testing "getPermissions" method', async () => {
+        const tenantName = 'string';
+        const clientName = 'string';
+        const token = 'Bearer token';
+
+        const response = await keycloakAuthPermission.getPermissions(tenantName, clientName, token);
+        expect (response).toEqual([{
+            id: 'id',
+            name: 'name'
+        }]);
+    });
+
+    it('Testing "updatePermission" method', async () => {
+        const body = {
+            tenantName: 'string',
+            clientName: 'string',
+            permissionName: 'string',
+            permissionType: 'user',
+            permissionDetails: {
+                name: "test-permission",
+                description: "test permission description"
+            }
+        };
+        const token = 'Bearer token';
+        const response = await keycloakAuthPermission.updatePermission(body, token);
+        expect(response).toEqual('Permission updated successfully');
+    });
+
+    it('Testing "deletePermission" method', async () => {
+        const body = {
+            tenantName: 'string',
+            clientName: 'string',
+            permissionName: 'string',
+            permissionType: 'user'
+        };
+        const token = 'Bearer token';
+        const response = await keycloakAuthPermission.deletePermission(body, token);
+        expect(response).toEqual('Permission deleted successfully');
     });
 });

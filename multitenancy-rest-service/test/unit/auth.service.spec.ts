@@ -56,6 +56,23 @@ describe('Testing Auth Service', () => {
         mockAccessToken.mockRestore();
     });
 
+    it('Testing "when getAccessToken method parameters are missing"', async () => {
+        const body = {
+            username: 'string',
+            password: process.env.TEST_PASSWORD,
+            tenantName: '',
+            clientId: '',
+            clientSecret: ''
+        }
+
+        const mockAccessToken = jest.spyOn(axios, 'post').mockResolvedValue(accessToken);
+        const response = await authService.getAccessToken(body);
+
+        expect(mockAccessToken).toHaveBeenCalled();
+        expect(response).toEqual(accessToken);
+        mockAccessToken.mockRestore();
+    });
+
     it('Testing "logout"', async () => {
         const body = {
             tenantName: 'string',
@@ -72,12 +89,45 @@ describe('Testing Auth Service', () => {
         mockLogOut.mockRestore();
     });
 
+    it('Testing "when logout method parameters are missing"', async () => {
+        const body = {
+            tenantName: 'master',
+            refreshToken: 'string',
+            clientId: '',
+            clientSecret: ''
+        }
+
+        const mockLogOut = jest.spyOn(axios, 'post').mockResolvedValue({ status: 204 });
+        const response = await authService.logout(body);
+
+        expect(mockLogOut).toHaveBeenCalled();
+        expect(response).toEqual(204);
+        mockLogOut.mockRestore();
+    });
+
+
     it('Testing "refreshAccessToken"', async () => {
         const body = {
             tenantName: 'string',
             refreshToken: 'string',
             clientId: 'clientId',
             clientSecret: 'clientSecret'
+        }
+
+        const mockrefreshAccessToken = jest.spyOn(axios, 'post').mockResolvedValue(accessToken);
+        const response = await authService.refreshAccessToken(body);
+
+        expect(mockrefreshAccessToken).toHaveBeenCalled();
+        expect(response).toEqual(accessToken);
+        mockrefreshAccessToken.mockRestore();
+    });
+
+    it('Testing "when refreshAccessToken method parameters are missing"', async () => {
+        const body = {
+            tenantName: 'master',
+            refreshToken: 'string',
+            clientId: '',
+            clientSecret: ''
         }
 
         const mockrefreshAccessToken = jest.spyOn(axios, 'post').mockResolvedValue(accessToken);

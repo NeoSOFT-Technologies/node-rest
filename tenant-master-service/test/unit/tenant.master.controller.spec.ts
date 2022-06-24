@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantMasterController } from '@app/tenant-master/tenant.master.controller';
 import { TenantMasterService } from '@app/tenant-master/tenant.master.service';
+import { TenantMasterModule } from '@app/tenant-master/tenant.master.module';
 
 describe('Tenant Master Controller', () => {
   let tenantMasterController: TenantMasterController;
@@ -20,6 +21,7 @@ describe('Tenant Master Controller', () => {
   };
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [TenantMasterModule],
       controllers: [TenantMasterController],
       providers: [TenantMasterService],
     })

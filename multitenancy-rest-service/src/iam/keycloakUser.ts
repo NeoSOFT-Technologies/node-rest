@@ -303,7 +303,6 @@ export class KeycloakUser {
                 context: {
                     attributes: {}
                 },
-                clientId: ""
             }
 
         );
